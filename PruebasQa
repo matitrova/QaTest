@@ -1,0 +1,10 @@
+tiene_dni True
+tiene_domicilio false 
+
+def puede_crear_abonado 
+    if tiene_dni and tiene_domicilio
+        return true
+    else
+        return false
+    end
+end
