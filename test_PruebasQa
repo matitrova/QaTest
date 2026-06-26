@@ -1,0 +1,19 @@
+import pytest
+
+def puede_crear_abonado(tiene_dni, tiene_domicilio):
+    if tiene_dni and tiene_domicilio:
+        return True
+    else:
+        return False
+    
+
+@pytest.mark.parametrize("dni, domicilio, esperado", [
+    (True, True, True),
+    (True, False, False),
+    (False, True, False),
+    (False, False, False),
+])
+def test_puede_crear_abonado(dni, domicilio, esperado):
+    assert puede_crear_abonado(dni, domicilio) == esperado
+
+
