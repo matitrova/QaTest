@@ -7,3 +7,4 @@ def test_agregar_carrito(page):
     login.login("standard_user", "secret_sauce")
     inventory = InventoryPage(page)
     inventory.agregar_al_carrito("sauce-labs-backpack")
+    assert inventory.obtener_cantidad_carrito() == "1"
