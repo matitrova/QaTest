@@ -14,7 +14,12 @@ def test_alta_abonado(page):
     locator_paso1 = page.get_by_text("Paso 1: Domicilio de Instalación")
     locator_paso1.wait_for()
     assert locator_paso1.is_visible()
+
     abo_nuevo = AboNuevo(page)
     abo_nuevo.completar_nro_calle("123")
     numero_calle_input = abo_nuevo.obtener_nro_calle()
     assert numero_calle_input == "123"
+
+    selec_calle = abo_nuevo.seleccionar_cualquier_calle()
+    calle_seleccionada = abo_nuevo.obtener_calle_seleccionada()
+    assert calle_seleccionada != "Seleccione"

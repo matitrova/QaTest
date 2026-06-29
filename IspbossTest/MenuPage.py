@@ -4,6 +4,7 @@ class MenuPage:
         self.BtnAboMenu = self.page.get_by_text("Abonados").first
         self.btnAboGrilla = self.page.locator('a[href="/Abonados/Default.aspx"]')
         self.BtnAboNuevo = self.page.locator("#ctl00_ctl00_b_b_btnNuevo")
+
         
 
     def navigate(self):
