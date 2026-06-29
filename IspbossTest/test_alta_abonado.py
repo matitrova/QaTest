@@ -23,3 +23,12 @@ def test_alta_abonado(page):
     selec_calle = abo_nuevo.seleccionar_cualquier_calle()
     calle_seleccionada = abo_nuevo.obtener_calle_seleccionada()
     assert calle_seleccionada != "Seleccione"
+
+    abo_nuevo.zona_seleccionada.wait_for()
+    zona_seleccionada = abo_nuevo.obtener_zona_seleccionada()
+    assert zona_seleccionada != "Seleccione"
+
+    next_paso2 = abo_nuevo.click_next_paso2()
+    locator_paso2 = page.get_by_text("Paso 2: Datos Personales")
+    locator_paso2.wait_for()
+    assert page.get_by_text("Paso 2: Datos Personales").is_visible()
