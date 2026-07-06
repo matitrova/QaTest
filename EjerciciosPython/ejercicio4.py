@@ -1,5 +1,5 @@
 abonado1 = {"nombre": "Juan", "dni": "12345678", "estado": "Activo"}
-abonado2 = {"nombre": "Maria", "dni": "123", "estado": "Activo"}
+abonado2 = {"nombre": "Maria", "dni": "123", "estado": "baja"}
 
 def validar_abonado_dni(abonado):
     if len(abonado["dni"]) == 8 and abonado["dni"].isdigit():
