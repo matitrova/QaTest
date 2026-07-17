@@ -1,0 +1,26 @@
+[
+    {
+        "documento": "12345678",
+        "nombre": "Tomas",
+        "apellido": "Gomez",
+        "telefono": "12345678",
+        "email": "juan@test.com",
+        "numero_calle": "423"
+    },
+    {
+        "documento": "23456789",
+        "nombre": "Maria",
+        "apellido": "Lopez",
+        "telefono": "23456789",
+        "email": "maria@test.com",
+        "numero_calle": "512"       
+    },
+    {
+        "documento": "34567890",
+        "nombre": "Pedro",
+        "apellido": "Ramirez",
+        "telefono": "34567890",
+        "email": "pedro@test.com",
+        "numero_calle": "735"  
+    }
+]

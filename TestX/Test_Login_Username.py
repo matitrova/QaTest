@@ -1,5 +1,5 @@
 import pytest
-from LoginPage import LoginPage 
+from TestX.LoginPage import LoginPage 
 
 def test_login_username(page):
     login = LoginPage(page)

@@ -178,3 +178,4 @@ def test_eliminar_usuario(headers):
 
     respuesta = requests.get(f"{BASE_URL}/api/users/{user_id}", headers=headers)
     assert respuesta.status_code == 404
+ 

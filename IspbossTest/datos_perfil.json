@@ -1,0 +1,5 @@
+{
+    "codigo": "TESTQA",
+    "nombre": "Perfil de Prueba QA",
+    "permisos": ["abonado", "comp_facturas", "ordenes_servicio"]
+}

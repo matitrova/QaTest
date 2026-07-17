@@ -16,10 +16,13 @@ class AboNuevo:
         self.locator_Next_paso3 = page.locator("#ctl00_ctl00_b_b_ucAlta_btnGuardar2")
         self.selec_forma_pago_alta_abo = page.locator("#select2-ctl00_ctl00_b_b_ucAlta_ddlFormaPago-container")
         self.locator_Next_paso4 = page.locator("#ctl00_ctl00_b_b_ucAlta_btnGuardar3")
+        self.locator_crear_abonado = page.locator("#ctl00_ctl00_b_b_ucAlta_btnGuardar4")
+        self.locator_boton_volver = page.locator("#ctl00_ctl00_b_b_btnCancelar")
+        self.nombre_perfil_abonado = page.locator("#ctl00_ctl00_b_b_ucFicha_lblNombre")
 
     # ---------- PASO 1: Domicilio de Instalación ----------
 
-    def seleccionar_cualquier_calle(self):
+    def seleccionar_primer_calle(self):
         self.page.locator("#select2-ctl00_ctl00_b_b_ucAlta_ddlInstalacionCalle-container").click()
         self.page.locator(".select2-results__option").first.click()
 
@@ -58,7 +61,7 @@ class AboNuevo:
 
     def obtener_apellido(self):
         return self.abo_alta_apellido.input_value()
-    
+
     def seleccionar_cualquier_categoria(self):
         self.page.locator("#select2-ctl00_ctl00_b_b_ucAlta_ddlCategoria-container").click()
         self.page.locator(".select2-results__option").first.click()
@@ -69,6 +72,10 @@ class AboNuevo:
     def seleccionar_metodo_envio_comprobante(self):
         self.page.locator("#select2-ctl00_ctl00_b_b_ucAlta_ddlComprobanteMetodoEnvio-container").click()
         self.page.locator(".select2-results__option", has_text="Email").click()
+
+    def obtener_metodo_envio_comprobante(self):
+        # CORREGIDO: le faltaba el return
+        return self.page.locator("#select2-ctl00_ctl00_b_b_ucAlta_ddlComprobanteMetodoEnvio-container").inner_text()
 
     def completar_cod_area(self, cod_area):
         self.cod_area.fill(cod_area)
@@ -98,7 +105,20 @@ class AboNuevo:
         self.page.locator(".select2-results__option", has_text="Contado").click()
 
     def obtener_forma_pago(self):
-        return self.page.locator("#select2-ctl00_ctl00_b_b_ucAlta_ddlFormaPago-container").inner_text()
+        # CORREGIDO: apuntaba a self.seleccionar_forma_pago (un método) en vez
+        # del locator guardado en __init__
+        return self.selec_forma_pago_alta_abo.inner_text()
 
     def click_next_paso4(self):
         self.locator_Next_paso4.click()
+
+    def click_guardar_abonado(self):
+        self.locator_crear_abonado.click()
+
+    def click_boton_volver(self):
+        self.locator_boton_volver.click()
+
+    def obtener_nombre_perfil_abonado(self):
+        # CORREGIDO: se eliminó el método duplicado "ver_nombre_perfil_abonado"
+        # que estaba sin usar y sin return
+        return self.nombre_perfil_abonado.inner_text()

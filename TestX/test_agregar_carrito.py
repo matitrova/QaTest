@@ -1,5 +1,5 @@
-from LoginPage import LoginPage
-from Inventory_Page import InventoryPage
+from TestX.LoginPage import LoginPage
+from TestX.Inventory_Page import InventoryPage
 
 def test_agregar_carrito(page):
     login = LoginPage(page)
