@@ -13,3 +13,10 @@ Terminé con 5 tests: alert simple, confirm aceptado y cancelado, prompt con tex
 Código acá: github.com/matitrova/QaTest
 
 #Playwright #QAAutomation
+
+---
+
+**Para publicar:** copiá el texto de arriba, después abrí este link — te abre el compositor de LinkedIn con el repo ya adjunto como tarjeta (necesitás estar logueado en LinkedIn en el navegador que uses):
+https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fgithub.com%2Fmatitrova%2FQaTest
+
+Pegá el texto copiado en el cuadro de comentario ANTES de la tarjeta del link, después publicá. LinkedIn no permite precargar el texto por URL (lo sacó hace años para frenar spam), así que el pegado sigue siendo manual — este link solo evita tener que buscar "crear post" y pegar el link del repo a mano.
