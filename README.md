@@ -78,6 +78,23 @@ Tests de login (casos exitosos, errores, validaciones) y agregar productos al ca
 python3 -m pytest test_Login.py test_agregar_carrito.py -v
 ```
 
+---
+
+### Desafíos de Playwright — carga dinámica y upload de archivos
+Suite sobre the-internet.herokuapp.com enfocada en dos problemas clásicos de automatización de UI.
+
+**Cubre:**
+- Carga dinámica con elemento oculto (`display:none`) vs. elemento que directamente no existe en el DOM hasta terminar la carga — dos formas distintas de la misma espera, cada una necesita su propio manejo
+- Espera explícita con `expect().to_be_visible(timeout=...)` en vez de un `sleep()` a ciegas
+- Upload de archivos con `set_input_files()` y verificación del nombre subido
+
+**Desafío técnico resuelto:**
+- El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
+
+```bash
+python3 -m pytest DesafiosPlaywright/ -v
+```
+
 ## Instalación
 
 ```bash
