@@ -80,16 +80,18 @@ python3 -m pytest test_Login.py test_agregar_carrito.py -v
 
 ---
 
-### Desafíos de Playwright — carga dinámica y upload de archivos
-Suite sobre the-internet.herokuapp.com enfocada en dos problemas clásicos de automatización de UI.
+### Desafíos de Playwright — carga dinámica, upload y diálogos JS
+Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
 **Cubre:**
 - Carga dinámica con elemento oculto (`display:none`) vs. elemento que directamente no existe en el DOM hasta terminar la carga — dos formas distintas de la misma espera, cada una necesita su propio manejo
 - Espera explícita con `expect().to_be_visible(timeout=...)` en vez de un `sleep()` a ciegas
 - Upload de archivos con `set_input_files()` y verificación del nombre subido
+- Diálogos nativos del navegador (`alert`, `confirm`, `prompt`) aceptados, cancelados y con texto ingresado
 
-**Desafío técnico resuelto:**
+**Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
+- Playwright descarta los diálogos JS automáticamente si no hay un listener registrado antes de que aparezcan (a diferencia de Selenium, que permite engancharlos después con `switch_to.alert`) — el handler se registra con `page.once("dialog", ...)` justo antes del click que dispara el diálogo, y con `once` en vez de `on` para no dejarlo pegado y afectar otros tests.
 
 ```bash
 python3 -m pytest DesafiosPlaywright/ -v
