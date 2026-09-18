@@ -80,7 +80,7 @@ python3 -m pytest test_Login.py test_agregar_carrito.py -v
 
 ---
 
-### Desafíos de Playwright — carga dinámica, upload, diálogos JS y checkboxes
+### Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes y dropdown
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
 **Cubre:**
@@ -89,11 +89,13 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
 - Upload de archivos con `set_input_files()` y verificación del nombre subido
 - Diálogos nativos del navegador (`alert`, `confirm`, `prompt`) aceptados, cancelados y con texto ingresado
 - Checkboxes sin `id` propio, ubicados por posición dentro de su contenedor con `.nth()`, y toggle con `.check()` / `.uncheck()`
+- Dropdown (`<select>`) con `.select_option(value=...)`, incluyendo que la opción inicial es un placeholder disabled, no una opción real
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
 - Playwright descarta los diálogos JS automáticamente si no hay un listener registrado antes de que aparezcan (a diferencia de Selenium, que permite engancharlos después con `switch_to.alert`) — el handler se registra con `page.once("dialog", ...)` justo antes del click que dispara el diálogo, y con `once` en vez de `on` para no dejarlo pegado y afectar otros tests.
 - Los checkboxes de esta página no tienen `id` individual, solo el `<form>` que los contiene — hubo que ubicarlos por posición (`.nth(0)`, `.nth(1)`) en vez de por atributo, y verificar que tildar uno no afecte al otro (son independientes).
+- El `<option>` inicial del dropdown tiene `disabled` en el HTML: es un placeholder, no una tercera opción real. El test lo verifica explícitamente (valor `""`) en vez de asumirlo.
 
 ```bash
 python3 -m pytest DesafiosPlaywright/ -v
