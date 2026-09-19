@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **66 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **69 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 14 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 17 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 9 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 15 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 10 | API |
@@ -61,7 +61,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes y dropdown
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown y ventanas
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -72,12 +72,15 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
 - Diálogos nativos del navegador (`alert`, `confirm`, `prompt`) aceptados, cancelados y con texto ingresado
 - Checkboxes sin `id` propio, ubicados por posición dentro de su contenedor con `.nth()`, y toggle con `.check()` / `.uncheck()`
 - Dropdown (`<select>`) con `.select_option(value=...)`, incluyendo que la opción inicial es un placeholder disabled, no una opción real
+- Apertura de pestañas nuevas (`target="_blank"`) y verificación de que la pestaña original no se ve afectada
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
 - Playwright descarta los diálogos JS automáticamente si no hay un listener registrado antes de que aparezcan (a diferencia de Selenium, que permite engancharlos después con `switch_to.alert`) — el handler se registra con `page.once("dialog", ...)` justo antes del click que dispara el diálogo, y con `once` en vez de `on` para no dejarlo pegado y afectar otros tests.
 - Los checkboxes de esta página no tienen `id` individual, solo el `<form>` que los contiene — hubo que ubicarlos por posición (`.nth(0)`, `.nth(1)`) en vez de por atributo, y verificar que tildar uno no afecte al otro (son independientes).
 - El `<option>` inicial del dropdown tiene `disabled` en el HTML: es un placeholder, no una tercera opción real. El test lo verifica explícitamente (valor `""`) en vez de asumirlo.
+- `target="_blank"` no navega la página actual: hay que engancharse a `context.expect_page()` **antes** del click para capturar la pestaña nueva, si el listener se registra después ya es tarde y se pierde la referencia. El `<a>` de esa página además tiene HTML mal formado (una coma suelta entre atributos), así que el link se ubica por rol y texto visible en vez de por `href`.
+- El layout de este sitio carga un script de analítica de un dominio externo (Optimizely) ajeno a lo que se prueba; si esa red está lenta o inaccesible, el evento `load` puede colgarse esperándolo. Se aborta ese pedido puntual con `page.route()` para que el test de ventanas dependa solo del sitio bajo prueba.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
