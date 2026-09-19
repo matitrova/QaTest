@@ -71,7 +71,13 @@ jobs:
       - name: Instalar Newman
         run: npm install -g newman
 
-      - name: Correr la colección de Restful Booker
+      - name: Correr la colección con el environment
         run: >
           newman run postman/restful-booker.postman_collection.json
           -e postman/restful-booker.postman_environment.json
+
+      # Así la usa alguien que la importa en Postman y aprieta Run sin elegir
+      # environment. Tiene que andar igual: los valores por defecto están en la
+      # propia colección.
+      - name: Correr la colección sin environment
+        run: newman run postman/restful-booker.postman_collection.json

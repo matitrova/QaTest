@@ -141,7 +141,8 @@ dos herramientas: **11 pedidos y 22 pruebas** que corren en integración continu
   colección, que usan después los pedidos que lo necesitan.
 - El id de la reserva creada también se guarda en una variable, y encadena el resto del
   recorrido: consultar, modificar, borrar y verificar que se borró.
-- Environment con `base_url` y credenciales, separado de la colección.
+- Valores por defecto en la colección, así que corre sin configurar nada; el environment
+  es opcional y los pisa si se elige. La integración continua prueba las dos formas.
 - Pruebas con `pm.test` y `pm.expect` sobre status code y contenido del JSON.
 
 **Lo que esta API enseña, validado contra la API real:**
@@ -162,8 +163,10 @@ newman run postman/restful-booker.postman_collection.json \
   -e postman/restful-booker.postman_environment.json
 ```
 
-O desde la app de Postman: *Import* → los dos archivos de `postman/` → elegir el
-environment "Restful Booker" → *Run collection*.
+O desde la app de Postman: *Import* → `restful-booker.postman_collection.json` →
+*Run collection*. **Funciona recién importada, sin elegir environment:** la URL y las
+credenciales de demo tienen un valor por defecto en la propia colección. El
+environment de `postman/` es opcional y, si se elige, sus valores tienen prioridad.
 
 ---
 
