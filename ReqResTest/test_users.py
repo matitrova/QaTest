@@ -130,19 +130,21 @@ def test_put_exitoso(headers):
     assert isinstance(datos["data"], dict)
     assert datos["data"]["id"] == user_id
 
+    # ReqRes es una API simulada: responde como si guardara el cambio, pero no lo
+    # persiste. Si despues se vuelve a pedir el usuario, llega el original, sin
+    # "name". Por eso el resultado se valida en la respuesta del PUT mismo, que es
+    # lo unico que esta API promete.
     usuario_modificado = {
         "name": "morpheus",
         "job": "zion resident"
-    }  
+    }
     respuesta = requests.put(f"{BASE_URL}/api/users/{user_id}", json=usuario_modificado, headers=headers)
-    assert respuesta.status_code == 200 
-
-    respuesta = requests.get(f"{BASE_URL}/api/users/{user_id}", headers=headers)
     assert respuesta.status_code == 200
-    datos_nuevos = respuesta.json()["data"]
+
+    datos_nuevos = respuesta.json()
     assert datos_nuevos["name"] == "morpheus"
-    print(f"Usuario modificado: {respuesta.json()['data']}")
-    print(f"Usuario original: {datos['data']}")
+    assert datos_nuevos["job"] == "zion resident"
+    assert "updatedAt" in datos_nuevos
 
 def test_patch_trabajo(headers):
     user_id = 2
@@ -153,16 +155,17 @@ def test_patch_trabajo(headers):
     assert isinstance(datos["data"], dict)
     assert datos["data"]["id"] == user_id
 
+    # Mismo caso que el PUT: ReqRes no persiste, asi que se valida la respuesta
+    # del PATCH y no un GET posterior.
     patch_data = {
         "job": "zion resident"
     }
     respuesta = requests.patch(f"{BASE_URL}/api/users/{user_id}", json=patch_data, headers=headers)
     assert respuesta.status_code == 200
 
-    respuesta = requests.get(f"{BASE_URL}/api/users/{user_id}", headers=headers)
-    assert respuesta.status_code == 200
-    datos_nuevos = respuesta.json()["data"]
+    datos_nuevos = respuesta.json()
     assert datos_nuevos["job"] == "zion resident"
+    assert "updatedAt" in datos_nuevos
 
 def test_eliminar_usuario(headers):
     user_id = 2
@@ -173,9 +176,9 @@ def test_eliminar_usuario(headers):
     assert isinstance(datos["data"], dict)
     assert datos["data"]["id"] == user_id
 
+    # ReqRes responde 204 al DELETE pero no borra nada: un GET posterior sigue
+    # devolviendo 200. Esperar un 404 ahi seria validar algo que esta API nunca
+    # promete. Lo que si garantiza es el 204 sin cuerpo.
     respuesta = requests.delete(f"{BASE_URL}/api/users/{user_id}", headers=headers)
     assert respuesta.status_code == 204
-
-    respuesta = requests.get(f"{BASE_URL}/api/users/{user_id}", headers=headers)
-    assert respuesta.status_code == 404
- 
+    assert respuesta.text == ""
