@@ -55,3 +55,23 @@ jobs:
       - name: Correr tests
         working-directory: ${{ matrix.dir }}
         run: python -m pytest ${{ matrix.target }} -v
+
+  # La colección de Postman corre con Newman, que es Postman desde la terminal.
+  # Es un trabajo aparte porque usa Node en vez de Python.
+  postman:
+    name: "API · Postman (Newman)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar Newman
+        run: npm install -g newman
+
+      - name: Correr la colección de Restful Booker
+        run: >
+          newman run postman/restful-booker.postman_collection.json
+          -e postman/restful-booker.postman_environment.json
