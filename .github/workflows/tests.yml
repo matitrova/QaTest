@@ -1,0 +1,57 @@
+name: Tests
+
+# Cada suite corre como un trabajo aparte, desde su propia carpeta.
+#
+# Por qué no un solo `pytest` desde la raíz: varias carpetas tienen módulos con el
+# mismo nombre (config.py en tres de ellas, LoginPage.py en dos). Corriendo todo
+# junto, Python importa el primero que encuentra y las demás suites terminan
+# usando la configuración equivocada: los tests de ReqRes, por ejemplo, le
+# pegaban a otro sitio y daban 404. Correr cada suite desde su carpeta lo evita
+# sin tocar el código de los tests.
+#
+# TestX es la excepción: importa como paquete (`from TestX.LoginPage import ...`),
+# así que se corre desde la raíz.
+#
+# IspbossTest NO corre acá: automatiza el entorno beta de ISPBoss y necesita
+# credenciales de ese sistema, que no pertenecen a este repositorio.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: ${{ matrix.suite }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { suite: "API · ReqRes",            dir: ReqResTest,                 target: ".",   navegador: false }
+          - { suite: "API · Restful Booker",    dir: RestfulBookerTest,          target: ".",   navegador: false }
+          - { suite: "API · JSONPlaceholder",   dir: ApiTest,                    target: ".",   navegador: false }
+          - { suite: "UI · The Internet",       dir: DesafiosPlaywright,         target: ".",   navegador: true  }
+          - { suite: "UI · SauceDemo",          dir: ".",                        target: TestX, navegador: true  }
+          - { suite: "Práctica · Python",       dir: practica/EjerciciosPython,  target: ".",   navegador: false }
+          - { suite: "Práctica · Playwright",   dir: practica/RepasoPlaywright,  target: ".",   navegador: true  }
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Instalar navegador
+        if: matrix.navegador
+        run: python -m playwright install --with-deps chromium
+
+      - name: Correr tests
+        working-directory: ${{ matrix.dir }}
+        run: python -m pytest ${{ matrix.target }} -v

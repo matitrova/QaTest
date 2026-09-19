@@ -1,28 +1,41 @@
 # QaTest — Portfolio de QA Automation
 
-Proyecto de automatización de pruebas desarrollado con Python, Playwright y Pytest.
-Cubre testing de UI (interfaz web) y testing de API REST.
+[![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
+
+Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
+APIs REST. **66 casos de prueba** organizados con el patrón **Page Object Model**, que
+corren en integración continua con **GitHub Actions** en cada push.
+
+Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
+proveedores de internet en el que trabajé cuatro años como responsable de calidad.
+
+## Qué cubre
+
+| Suite | Sobre qué | Tests | Tipo |
+|---|---|---|---|
+| [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 14 | UI |
+| [`TestX`](TestX) | SauceDemo (e-commerce) | 9 | UI |
+| [`ReqResTest`](ReqResTest) | API de ReqRes | 15 | API |
+| [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 10 | API |
+| [`ApiTest`](ApiTest) | API de JSONPlaceholder | 5 | API |
+| [`practica/`](practica) | Ejercicios de Python y repaso de Playwright | 10 | Práctica |
 
 ## Tecnologías
 
 - **Python 3.12+**
 - **Playwright** — automatización de navegador
-- **Pytest** — framework de testing
+- **Pytest** — framework de testing, con fixtures en `conftest.py` y `parametrize`
 - **Requests** — testing de APIs REST
+- **GitHub Actions** — integración continua
 
-## Estructura del proyecto
-QaTest/
-├── IspbossTest/        # Tests E2E sobre ISPBoss (sistema real de gestión de ISPs)
-├── ApiTest/            # Tests de API REST (CRUD completo)
-├── EjerciciosPython/   # Ejercicios progresivos de Python aplicados a QA
-├── LoginPage.py        # Page Object — login SauceDemo
-├── Inventory_Page.py   # Page Object — inventario SauceDemo
-└── test_*.py           # Tests de SauceDemo
+---
 
-## Proyectos
+## ISPBoss — Alta de Abonado (E2E)
 
-### ISPBoss — Alta de Abonado (E2E)
-Automatización del flujo completo de alta de un abonado en un sistema real de gestión de ISPs (ASP.NET WebForms).
+Automatización del flujo completo de alta de un abonado en un sistema real de gestión
+de ISPs (ASP.NET WebForms). Los datos de prueba viven en JSON aparte y las
+credenciales se leen de variables de entorno: no hay ninguna escrita en el código.
 
 **Cubre:**
 - Login con credenciales reales
@@ -38,49 +51,18 @@ Automatización del flujo completo de alta de un abonado en un sistema real de g
 - Race conditions en modo headless → solución con `wait_for()` y `expect()`
 - IDs largos de ASP.NET y selectores con atributo `name`
 
+Esta suite **no corre en la integración continua**: necesita credenciales del entorno
+beta de ISPBoss, que no pertenecen a este repositorio.
+
 ```bash
-python3 -m pytest IspbossTest/test_alta_abonado.py -v
+export ISPBOSS_USER=...  ISPBOSS_PASS=...
+python3 -m pytest IspbossTest -v
 ```
 
 ---
 
-### API Testing — CRUD completo
-Suite de tests sobre la API pública JSONPlaceholder, cubriendo los 4 verbos HTTP.
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes y dropdown
 
-**Cubre:**
-- GET con verificación de status code, tipos de datos y estructura JSON
-- POST con creación de recursos y verificación de status 201
-- PUT para modificación de recursos existentes
-- DELETE para eliminación
-- Casos negativos (404 para recursos inexistentes)
-- `pytest.mark.parametrize` para correr el mismo test con múltiples inputs
-- Verificación de unicidad de IDs con `set()`
-
-```bash
-python3 -m pytest ApiTest/ -v
-```
-
----
-
-### Ejercicios Python progresivos
-7 ejercicios que van de condicionales simples hasta una clase con pytest, usando contexto de ISPBoss.
-
-```bash
-python3 -m pytest EjerciciosPython/test_abonados.py -v
-```
-
----
-
-### SauceDemo — Login y Carrito
-Tests de login (casos exitosos, errores, validaciones) y agregar productos al carrito.
-
-```bash
-python3 -m pytest test_Login.py test_agregar_carrito.py -v
-```
-
----
-
-### Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes y dropdown
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
 **Cubre:**
@@ -98,33 +80,93 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
 - El `<option>` inicial del dropdown tiene `disabled` en el HTML: es un placeholder, no una tercera opción real. El test lo verifica explícitamente (valor `""`) en vez de asumirlo.
 
 ```bash
-python3 -m pytest DesafiosPlaywright/ -v
+cd DesafiosPlaywright && python3 -m pytest -v
 ```
+
+---
+
+## SauceDemo — Login y carrito
+
+Tests de login (casos exitosos, errores y validaciones) y agregado de productos al
+carrito, con Page Objects para el login y el inventario.
+
+```bash
+python3 -m pytest TestX -v
+```
+
+---
+
+## API — ReqRes, Restful Booker y JSONPlaceholder
+
+Tres APIs públicas con comportamientos distintos, que obligan a probar cosas distintas.
+
+**ReqRes** — registro, login, creación, modificación y borrado de usuarios, con casos
+negativos (registro sin email, sin contraseña).
+
+**Restful Booker** — reservas con **autenticación por token**: el token se obtiene en un
+fixture y se envía en la cookie de las operaciones que lo requieren.
+
+**JSONPlaceholder** — CRUD completo.
+
+**Cubre:**
+- GET con verificación de status code, tipos de datos y estructura JSON
+- POST con creación de recursos y verificación de status 201
+- PUT para modificación de recursos existentes
+- DELETE para eliminación
+- Casos negativos (404 para recursos inexistentes)
+- `pytest.mark.parametrize` para correr el mismo test con múltiples inputs
+- Verificación de unicidad de IDs con `set()`
+
+```bash
+cd ReqResTest && python3 -m pytest -v
+cd RestfulBookerTest && python3 -m pytest -v
+cd ApiTest && python3 -m pytest -v
+```
+
+---
+
+## Decisiones y bugs encontrados
+
+**Probar una API simulada no es probar una API real.** Tres tests de ReqRes fallaban:
+hacían un PUT, PATCH o DELETE y después volvían a pedir el usuario esperando verlo
+modificado o borrado. Pero ReqRes es una API simulada: responde como si guardara el
+cambio y no persiste nada, así que el GET siempre devolvía el usuario original. El test
+validaba algo que esa API nunca promete. Ahora se valida la respuesta de la operación
+misma, que es lo único que ReqRes garantiza.
+
+**Cada suite corre desde su propia carpeta.** Varias carpetas tienen módulos con el
+mismo nombre (`config.py` en tres de ellas). Corriendo todo junto desde la raíz, Python
+importa el primero que encuentra y las demás suites usan la configuración equivocada:
+los tests de ReqRes le pegaban a otro sitio y daban 404. La integración continua corre
+cada suite como un trabajo aparte, desde su carpeta, sin tocar el código de los tests.
+
+**Mayúsculas en nombres de archivo.** El módulo de configuración de ISPBoss estaba
+guardado en el repositorio como `IspBoss_config.py`, pero se importaba como
+`ispboss_config`. Python distingue mayúsculas al importar, así que en cualquier máquina
+que clonara el repo el test ni siquiera cargaba. El origen probable es un renombre que
+solo cambió mayúsculas: macOS no las distingue en los nombres de archivo y, por eso, git
+no siempre registra ese tipo de cambio. El archivo se renombró a minúsculas, que además
+es la convención de Python.
 
 ## Instalación
 
 ```bash
-# Clonar el repo
 git clone https://github.com/matitrova/QaTest.git
 cd QaTest
 
-# Crear entorno virtual
 python3 -m venv venv
-source venv/bin/activate  # Mac/Linux
-venv\Scripts\activate     # Windows
+source venv/bin/activate      # Mac/Linux
+venv\Scripts\activate         # Windows
 
-# Instalar dependencias
 pip install -r requirements.txt
 python3 -m playwright install chromium
 ```
 
-## Correr todos los tests
-
-```bash
-python3 -m pytest -v
-```
+Cada suite se corre desde su carpeta, como muestran los comandos de arriba. La
+integración continua hace lo mismo: ver [`.github/workflows/tests.yml`](.github/workflows/tests.yml).
 
 ## Autor
 
-**Matias Trovato** — Manual QA Tester en transición a QA Automation  
+**Matías Trovato** — QA con cuatro años como responsable de calidad de un sistema de
+facturación en producción, hoy automatizando con Python, Playwright y Pytest.
 [GitHub](https://github.com/matitrova)
