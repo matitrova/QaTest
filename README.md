@@ -19,6 +19,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 15 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 10 | API |
 | [`ApiTest`](ApiTest) | API de JSONPlaceholder | 5 | API |
+| [`postman/`](postman) | API de Restful Booker, en Postman + Newman | 22 | API |
 | [`practica/`](practica) | Ejercicios de Python y repaso de Playwright | 10 | Práctica |
 
 ## Tecnologías
@@ -27,6 +28,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 - **Playwright** — automatización de navegador
 - **Pytest** — framework de testing, con fixtures en `conftest.py` y `parametrize`
 - **Requests** — testing de APIs REST
+- **Postman + Newman** — colecciones de API corriendo en integración continua
 - **GitHub Actions** — integración continua
 
 ---
@@ -125,6 +127,43 @@ cd ReqResTest && python3 -m pytest -v
 cd RestfulBookerTest && python3 -m pytest -v
 cd ApiTest && python3 -m pytest -v
 ```
+
+---
+
+## Postman — Restful Booker con Newman
+
+La misma suite de Restful Booker que está en Python, hecha en Postman para comparar las
+dos herramientas: **11 pedidos y 22 pruebas** que corren en integración continua con
+**Newman**, que es Postman desde la terminal.
+
+**Cubre:**
+- Autenticación: el token se obtiene en el primer pedido y queda en una variable de la
+  colección, que usan después los pedidos que lo necesitan.
+- El id de la reserva creada también se guarda en una variable, y encadena el resto del
+  recorrido: consultar, modificar, borrar y verificar que se borró.
+- Environment con `base_url` y credenciales, separado de la colección.
+- Pruebas con `pm.test` y `pm.expect` sobre status code y contenido del JSON.
+
+**Lo que esta API enseña, validado contra la API real:**
+
+- **Un 200 no significa éxito.** Un login con la clave incorrecta responde 200, con el
+  error solo en el cuerpo (`"reason": "Bad credentials"`). Un test que solo mirara el
+  status code daría ese login por bueno. Por eso se valida que no haya token.
+- **Borrar responde 201 "Created"**, no 200 ni 204 como indica la convención. El test
+  valida lo que la API hace de verdad: si algún día cambiara, avisaría.
+- **Restful Booker sí guarda los cambios, ReqRes no.** Acá tiene sentido consultar una
+  reserva después de crearla, o verificar un 404 después de borrarla. En ReqRes ese
+  mismo test está mal planteado, porque es una API simulada que no persiste nada — ver
+  "Decisiones y bugs encontrados".
+
+```bash
+npm install -g newman
+newman run postman/restful-booker.postman_collection.json \
+  -e postman/restful-booker.postman_environment.json
+```
+
+O desde la app de Postman: *Import* → los dos archivos de `postman/` → elegir el
+environment "Restful Booker" → *Run collection*.
 
 ---
 
