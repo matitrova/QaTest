@@ -1,10 +1,22 @@
 {
   "info": {
     "name": "Restful Booker — QaTest",
-    "description": "Recorrido completo sobre Restful Booker: autenticación por token, alta, consulta, modificación y borrado de reservas, más los casos negativos. Es la misma suite que RestfulBookerTest/ en Python, hecha en Postman para comparar las dos herramientas.",
+    "description": "Recorrido completo sobre Restful Booker: autenticación por token, alta, consulta, modificación y borrado de reservas, más los casos negativos. Es la misma suite que RestfulBookerTest/ en Python, hecha en Postman para comparar las dos herramientas. Funciona recién importada, sin elegir ningún environment: base_url y las credenciales de demo tienen un valor por defecto en la colección. Si se elige el environment \"Restful Booker\", sus valores tienen prioridad.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
+    {
+      "key": "base_url",
+      "value": "https://restful-booker.herokuapp.com"
+    },
+    {
+      "key": "usuario",
+      "value": "admin"
+    },
+    {
+      "key": "clave",
+      "value": "password123"
+    },
     {
       "key": "token",
       "value": ""
