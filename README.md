@@ -63,7 +63,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown y ventanas
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas y hovers
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -75,6 +75,7 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
 - Checkboxes sin `id` propio, ubicados por posición dentro de su contenedor con `.nth()`, y toggle con `.check()` / `.uncheck()`
 - Dropdown (`<select>`) con `.select_option(value=...)`, incluyendo que la opción inicial es un placeholder disabled, no una opción real
 - Apertura de pestañas nuevas (`target="_blank"`) y verificación de que la pestaña original no se ve afectada
+- Hover sobre una de tres figuras iguales, verificando que solo se muestra la información de la que tiene el mouse encima, no las otras dos
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -83,6 +84,7 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
 - El `<option>` inicial del dropdown tiene `disabled` en el HTML: es un placeholder, no una tercera opción real. El test lo verifica explícitamente (valor `""`) en vez de asumirlo.
 - `target="_blank"` no navega la página actual: hay que engancharse a `context.expect_page()` **antes** del click para capturar la pestaña nueva, si el listener se registra después ya es tarde y se pierde la referencia. El `<a>` de esa página además tiene HTML mal formado (una coma suelta entre atributos), así que el link se ubica por rol y texto visible en vez de por `href`.
 - El layout de este sitio carga un script de analítica de un dominio externo (Optimizely) ajeno a lo que se prueba; si esa red está lenta o inaccesible, el evento `load` puede colgarse esperándolo. Se aborta ese pedido puntual con `page.route()` para que el test de ventanas dependa solo del sitio bajo prueba.
+- Las tres figuras de `/hovers` son visualmente idénticas en el HTML (misma clase `.figure`), así que hubo que ubicarlas por posición con `.nth()` y confirmar, al pasar el mouse por la del medio, que las otras dos siguen ocultas — no alcanza con probar que "una" caption aparece, hay que probar que aparece la correcta y ninguna otra.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
