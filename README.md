@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **74 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **76 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 22 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 24 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 9 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 15 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 10 | API |
@@ -63,7 +63,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers y slider
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider y drag and drop
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -77,6 +77,7 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
 - Apertura de pestañas nuevas (`target="_blank"`) y verificación de que la pestaña original no se ve afectada
 - Hover sobre una de tres figuras iguales, verificando que solo se muestra la información de la que tiene el mouse encima, no las otras dos
 - Slider horizontal (`<input type="range">`) movido con flechas del teclado, verificando que respeta el `step` de 0.5 y no se pasa de los límites `min`/`max`
+- Drag and drop entre dos columnas que intercambian su contenido, verificando el resultado del intercambio y que arrastrar dos veces vuelve al estado original
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -88,6 +89,7 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
 - Las tres figuras de `/hovers` son visualmente idénticas en el HTML (misma clase `.figure`), así que hubo que ubicarlas por posición con `.nth()` y confirmar, al pasar el mouse por la del medio, que las otras dos siguen ocultas — no alcanza con probar que "una" caption aparece, hay que probar que aparece la correcta y ninguna otra.
 - Clickear el slider no lo mueve de a un paso: salta directo al valor que corresponde a la posición del click (clickear cerca del borde derecho lo manda directo al máximo), a diferencia de las flechas del teclado que sí respetan el `step`. El test lo usa a favor: clickear el extremo izquierdo del track deja el valor en el mínimo conocido (0) para arrancar cada caso.
 - `page.keyboard.press()` depende del foco global de la página, que en modo headless no siempre queda asentado justo después de un `click()` — a veces la tecla no tenía ningún efecto. Se reemplazó por `locator.press()`, que reenfoca el elemento puntual antes de cada tecla, y quedó estable en corridas repetidas.
+- La página de drag and drop no usa una librería como jQuery UI, sino los eventos nativos de HTML5 Drag and Drop (`dragstart`, `dragover`, `drop`) implementados a mano en JavaScript, que además intercambian el `innerHTML` de las columnas en vez de mover los nodos. Un `dispatchEvent` manual de esos eventos suele quedar incompleto (falta simular `dataTransfer` correctamente) y es la razón por la que este caso es históricamente flaky con Selenium; `locator.drag_to()` de Playwright dispara la secuencia completa vía CDP, así que el test verifica el intercambio de contenido en vez de asumir que "no tira error" es suficiente.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
