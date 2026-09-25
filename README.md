@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **76 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **81 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -16,7 +16,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 24 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 9 | UI |
-| [`ReqResTest`](ReqResTest) | API de ReqRes | 15 | API |
+| [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 10 | API |
 | [`ApiTest`](ApiTest) | API de JSONPlaceholder | 5 | API |
 | [`postman/`](postman) | API de Restful Booker, en Postman + Newman | 22 | API |
@@ -128,6 +128,18 @@ fixture y se envía en la cookie de las operaciones que lo requieren.
 - Casos negativos (404 para recursos inexistentes)
 - `pytest.mark.parametrize` para correr el mismo test con múltiples inputs
 - Verificación de unicidad de IDs con `set()`
+- Paginación: metadata (`page`, `per_page`, `total`, `total_pages`), que las páginas no
+  se superpongan, que `per_page` recalcule `total_pages`, y qué devuelve pedir una
+  página fuera de rango
+
+**Desafíos técnicos resueltos:**
+- Pedir una página que no existe (`?page=999`) no da 404: ReqRes responde **200** con
+  `data: []`, y encima refleja el número de página pedido en el cuerpo aunque no exista.
+  Un test que solo mirara el status code daría esa respuesta por una página más. El caso
+  valida el cuerpo completo, no solo que la request "no falló".
+- `total_pages` no es un valor fijo: depende de `per_page`. El test lo verifica
+  calculándolo (`ceil(total / per_page)`) en vez de hardcodear el número que da con el
+  `per_page` por defecto, para que siga siendo válido si el default cambia.
 
 ```bash
 cd ReqResTest && python3 -m pytest -v
