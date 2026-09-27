@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **86 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **90 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 29 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 33 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 9 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 10 | API |
@@ -63,7 +63,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop y add/remove elements
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements y basic auth
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -79,6 +79,7 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
 - Slider horizontal (`<input type="range">`) movido con flechas del teclado, verificando que respeta el `step` de 0.5 y no se pasa de los límites `min`/`max`
 - Drag and drop entre dos columnas que intercambian su contenido, verificando el resultado del intercambio y que arrastrar dos veces vuelve al estado original
 - Agregar y quitar elementos dinámicamente, verificando que el contador de botones sube y baja de a uno y que la lista puede volver a quedar vacía
+- HTTP Basic Auth: acceso con credenciales correctas por navegador, y verificación por API de que sin credenciales o con credenciales incorrectas la respuesta es 401
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -92,6 +93,7 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
 - `page.keyboard.press()` depende del foco global de la página, que en modo headless no siempre queda asentado justo después de un `click()` — a veces la tecla no tenía ningún efecto. Se reemplazó por `locator.press()`, que reenfoca el elemento puntual antes de cada tecla, y quedó estable en corridas repetidas.
 - La página de drag and drop no usa una librería como jQuery UI, sino los eventos nativos de HTML5 Drag and Drop (`dragstart`, `dragover`, `drop`) implementados a mano en JavaScript, que además intercambian el `innerHTML` de las columnas en vez de mover los nodos. Un `dispatchEvent` manual de esos eventos suele quedar incompleto (falta simular `dataTransfer` correctamente) y es la razón por la que este caso es históricamente flaky con Selenium; `locator.drag_to()` de Playwright dispara la secuencia completa vía CDP, así que el test verifica el intercambio de contenido en vez de asumir que "no tira error" es suficiente.
 - Los botones "Delete" que agrega `/add_remove_elements` son todos idénticos: mismo texto, misma clase, sin `id` ni ningún atributo que los distinga entre sí. No hay forma de verificar "cuál" se eliminó puntualmente, así que el test se apoya en un invariante que sí es verificable: la cantidad total de botones sube y baja de a uno por click. Además, el propio JS de la página elimina siempre `button:first-child` (el primero agregado), no el último — un comportamiento FIFO que contradice la intuición de "deshacer lo último", y que quedó documentado en el código en vez de asumido.
+- HTTP Basic Auth es un diálogo nativo del navegador, no un `dialog` de JavaScript como los de `/javascript_alerts`: no hay ningún `page.on("dialog")` que lo capture, y si `page.goto()` navega sin credenciales ya puestas, el test se queda colgado esperando una interacción que Playwright no puede dar. Tampoco alcanza con pasarlas embebidas en la URL (`https://usuario:clave@...`), porque Chromium las ignora en navegación de primer nivel. La solución es extender el fixture `browser_context_args` de `pytest-playwright` para fijar `http_credentials` en el contexto **antes** de crear la página. Para probar el camino negativo (sin credenciales, o con credenciales incorrectas) sin arriesgarse a colgar el navegador, esos dos casos se verifican con `requests` en vez de con `page`, contra el mismo endpoint.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
