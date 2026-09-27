@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **90 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **95 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 33 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 38 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 9 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 10 | API |
@@ -63,7 +63,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements y basic auth
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth y tablas
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -80,6 +80,10 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
 - Drag and drop entre dos columnas que intercambian su contenido, verificando el resultado del intercambio y que arrastrar dos veces vuelve al estado original
 - Agregar y quitar elementos dinámicamente, verificando que el contador de botones sube y baja de a uno y que la lista puede volver a quedar vacía
 - HTTP Basic Auth: acceso con credenciales correctas por navegador, y verificación por API de que sin credenciales o con credenciales incorrectas la respuesta es 401
+- Tablas ordenables: dos tablas con los mismos datos, una sin ningún atributo para
+  agrupar filas o columnas y otra con clases en cada celda, ordenadas por columna de
+  texto (apellido) y por columna numérica con formato de moneda (`$100.00`), en ambos
+  sentidos
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -94,6 +98,9 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
 - La página de drag and drop no usa una librería como jQuery UI, sino los eventos nativos de HTML5 Drag and Drop (`dragstart`, `dragover`, `drop`) implementados a mano en JavaScript, que además intercambian el `innerHTML` de las columnas en vez de mover los nodos. Un `dispatchEvent` manual de esos eventos suele quedar incompleto (falta simular `dataTransfer` correctamente) y es la razón por la que este caso es históricamente flaky con Selenium; `locator.drag_to()` de Playwright dispara la secuencia completa vía CDP, así que el test verifica el intercambio de contenido en vez de asumir que "no tira error" es suficiente.
 - Los botones "Delete" que agrega `/add_remove_elements` son todos idénticos: mismo texto, misma clase, sin `id` ni ningún atributo que los distinga entre sí. No hay forma de verificar "cuál" se eliminó puntualmente, así que el test se apoya en un invariante que sí es verificable: la cantidad total de botones sube y baja de a uno por click. Además, el propio JS de la página elimina siempre `button:first-child` (el primero agregado), no el último — un comportamiento FIFO que contradice la intuición de "deshacer lo último", y que quedó documentado en el código en vez de asumido.
 - HTTP Basic Auth es un diálogo nativo del navegador, no un `dialog` de JavaScript como los de `/javascript_alerts`: no hay ningún `page.on("dialog")` que lo capture, y si `page.goto()` navega sin credenciales ya puestas, el test se queda colgado esperando una interacción que Playwright no puede dar. Tampoco alcanza con pasarlas embebidas en la URL (`https://usuario:clave@...`), porque Chromium las ignora en navegación de primer nivel. La solución es extender el fixture `browser_context_args` de `pytest-playwright` para fijar `http_credentials` en el contexto **antes** de crear la página. Para probar el camino negativo (sin credenciales, o con credenciales incorrectas) sin arriesgarse a colgar el navegador, esos dos casos se verifican con `requests` en vez de con `page`, contra el mismo endpoint.
+- La tabla ordenable usa el plugin jQuery `tablesorter`, que ordena `$100.00` como texto por default: alfabéticamente, `"$100.00"` queda antes que `"$51.00"` porque compara carácter a carácter (`"1" < "5"`). El test no confía en que el plugin haya interpretado el monto como número: parsea cada celda a `float` y compara ese resultado contra `sorted()`, que es la única forma de confirmar que el orden es numérico y no textual.
+- El CSS de la propia página sugiere que el plugin marca la columna ordenada con las clases `tablesorter-headerAsc` / `tablesorter-headerDesc`, pero la versión que corre en producción usa otras: `headerSortDown` para ascendente y `headerSortUp` para descendente. Guiarse por el CSS en vez de inspeccionar el DOM real hubiera hecho fallar el test silenciosamente ni bien se esperara la clase.
+- Ni el evento `load` ni `networkidle` garantizan que `tablesorter` ya haya enganchado sus listeners de click: bajo latencia de red, un click podía llegar justo antes de que el plugin terminara de inicializarse y no tenía ningún efecto, sin lanzar ningún error que lo delatara. La solución es esperar explícitamente a que cada `<th>` tenga la clase `header` que el plugin agrega al terminar de inicializarse, antes de clickear.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
