@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **95 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **105 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 38 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 48 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 9 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 10 | API |
@@ -63,7 +63,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth y tablas
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas e inputs numéricos
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -84,6 +84,9 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   agrupar filas o columnas y otra con clases en cada celda, ordenadas por columna de
   texto (apellido) y por columna numérica con formato de moneda (`$100.00`), en ambos
   sentidos
+- Input numérico (`<input type="number">`) sin ningún atributo `min`/`max`/`step`:
+  qué caracteres acepta y cuáles descarta el propio navegador al tipear, y cómo
+  responde a las flechas del teclado sin ningún piso ni techo que lo frene
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -101,6 +104,7 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
 - La tabla ordenable usa el plugin jQuery `tablesorter`, que ordena `$100.00` como texto por default: alfabéticamente, `"$100.00"` queda antes que `"$51.00"` porque compara carácter a carácter (`"1" < "5"`). El test no confía en que el plugin haya interpretado el monto como número: parsea cada celda a `float` y compara ese resultado contra `sorted()`, que es la única forma de confirmar que el orden es numérico y no textual.
 - El CSS de la propia página sugiere que el plugin marca la columna ordenada con las clases `tablesorter-headerAsc` / `tablesorter-headerDesc`, pero la versión que corre en producción usa otras: `headerSortDown` para ascendente y `headerSortUp` para descendente. Guiarse por el CSS en vez de inspeccionar el DOM real hubiera hecho fallar el test silenciosamente ni bien se esperara la clase.
 - Ni el evento `load` ni `networkidle` garantizan que `tablesorter` ya haya enganchado sus listeners de click: bajo latencia de red, un click podía llegar justo antes de que el plugin terminara de inicializarse y no tenía ningún efecto, sin lanzar ningún error que lo delatara. La solución es esperar explícitamente a que cada `<th>` tenga la clase `header` que el plugin agrega al terminar de inicializarse, antes de clickear.
+- El input de `/inputs` no tiene ningún atributo `min`, `max`, `step` ni `pattern`: toda la validación es del propio navegador, por ser `type="number"`. Escribir letras no deja rastro (el valor queda vacío), un `+` suelto sin exponente de por medio se descarta igual que una letra, y un segundo punto decimal se descarta solo pero deja pasar el resto de los caracteres (`"5.5.5"` termina en `"5.55"`, no en un valor vacío). La notación científica (`"1e3"`) y los ceros a la izquierda (`"007"`) quedan tal cual se tipearon: el navegador no los normaliza a menos que algo — un submit, por ejemplo — los interprete como número. Y sin `min`, las flechas de teclado no tienen piso: bajar desde 0 sigue restando y entra en negativos.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
