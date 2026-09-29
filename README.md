@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **113 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **118 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -17,7 +17,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 59 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 9 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
-| [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 10 | API |
+| [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
 | [`ApiTest`](ApiTest) | API de JSONPlaceholder | 5 | API |
 | [`postman/`](postman) | API de Restful Booker, en Postman + Newman | 22 | API |
 | [`practica/`](practica) | Ejercicios de Python y repaso de Playwright | 10 | Práctica |
@@ -150,6 +150,9 @@ fixture y se envía en la cookie de las operaciones que lo requieren.
 - Paginación: metadata (`page`, `per_page`, `total`, `total_pages`), que las páginas no
   se superpongan, que `per_page` recalcule `total_pages`, y qué devuelve pedir una
   página fuera de rango
+- Filtros de Restful Booker (`GET /booking?firstname=...&lastname=...&checkin=...&checkout=...`):
+  por nombre solo, por nombre y apellido combinados, sin coincidencias, y por rango de
+  fechas de estadía
 
 **Desafíos técnicos resueltos:**
 - Pedir una página que no existe (`?page=999`) no da 404: ReqRes responde **200** con
@@ -159,6 +162,15 @@ fixture y se envía en la cookie de las operaciones que lo requieren.
 - `total_pages` no es un valor fijo: depende de `per_page`. El test lo verifica
   calculándolo (`ceil(total / per_page)`) en vez de hardcodear el número que da con el
   `per_page` por defecto, para que siga siendo válido si el default cambia.
+- El filtro `firstname` de Restful Booker exige coincidencia **exacta y sensible a
+  mayúsculas**: ni una variante en minúsculas ni un substring del nombre real encuentran
+  la reserva, a diferencia de un `LIKE` de SQL. `checkin`/`checkout` como filtro no
+  buscan una fecha exacta, sino que delimitan un rango: una reserva entra si sus fechas
+  caen dentro de ese rango, no si coinciden con los parámetros. Como es una API pública
+  compartida con reservas de otros tests corriendo en paralelo, los casos identifican sus
+  propias reservas con un `firstname` único por corrida (`uuid4`) y verifican pertenencia
+  al resultado en vez de igualdad exacta de listas, para no depender de qué otros datos
+  haya en ese momento en el sandbox — y las borran al terminar.
 
 ```bash
 cd ReqResTest && python3 -m pytest -v
