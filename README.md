@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **124 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **130 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 65 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 71 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 9 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -63,7 +63,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual y mensajes de notificación
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación y códigos de status HTTP
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -97,6 +97,10 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   ("éxito" o "error"), verificando que el mensaje mostrado sea uno de los dos conocidos,
   que ambos usen exactamente la misma clase CSS (no hay forma de distinguirlos por
   estilo) y que el botón de cierre oculte el mensaje
+- Códigos de status HTTP (200, 301, 404, 500): que el status real de la respuesta
+  coincida con el texto que la propia página imprime en su body, que la página
+  principal linkee a los cuatro, y un caso aparte para el 301 que confirma que la
+  navegación no termina en ninguna otra URL
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -118,6 +122,19 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
 - `/key_presses` traduce el `keyCode` de cada tecla con una tabla propia (`keyboardMap`) que no siempre coincide con lo intuitivo: Backspace se muestra como `BACK_SPACE` (con guión bajo) y una flecha se muestra solo como `LEFT`, `RIGHT`, etc., sin la palabra "ARROW". Nada de eso se puede asumir por el nombre de la tecla en Playwright — hubo que confirmar cada texto contra el sitio real antes de escribirlo en una aserción. El caso más interesante fue Enter: el `<input>` vive solo dentro de un `<form>` sin botón de submit, así que el propio navegador dispara ahí el submit implícito del formulario (el comportamiento estándar cuando hay un único campo de texto). Como el form no tiene `action` ni el input tiene `name`, el submit sólo recarga la misma URL sin enviar nada — Enter nunca llega a mostrar "You entered: ENTER" como cualquier otra tecla, sino que recarga la página entera y borra lo que había escrito. El test lo verifica con `page.expect_navigation()` en vez de asumir que Enter es una tecla más.
 - `/context_menu` engancha su diálogo al evento `oncontextmenu` del elemento, no a un `onclick`: el disparador es específicamente el botón derecho del mouse. El test no se conforma con probar que el clic derecho abre el diálogo — también verifica que un clic izquierdo sobre el mismo cuadro no dispara nada, para no confundir "cualquier clic" con "el botón derecho puntualmente". Es el mismo mecanismo de `page.once("dialog", ...)` que `javascript_alerts`, pero disparado con `locator.click(button="right")` en vez de un `onclick` común.
 - `/notification_message` no tiene forma de pedir "el mensaje de éxito" o "el de error" a demanda: cada visita a la página redirige con uno de los dos elegido al azar por el servidor. Un test no puede afirmar cuál va a aparecer, así que primero verifica solamente que sea uno de los dos conocidos, y para los casos que necesitan un mensaje puntual (el del error, y juntar ambas variantes para comparar su clase) visita la página en un loop hasta encontrarlo, en vez de asumir que aparece a la primera. El mensaje de error además tiene un typo publicado en el sitio real ("unsuccesful", sin la segunda "s"), que el test verifica tal cual está y no con la ortografía correcta. El bug más interesante es que los dos mensajes comparten exactamente la misma clase CSS (`flash notice`), sin ningún atributo que distinga éxito de error — un test que confiara en la clase para saber el resultado de la acción siempre daría el mismo veredicto, sin importar cuál de los dos mensajes se haya mostrado en realidad. El cierre del mensaje tampoco es instantáneo (Foundation le aplica un `fadeOut` de 300ms antes de sacarlo del DOM), así que se verifica con `expect().to_be_hidden()` en vez de comprobar la visibilidad apenas se hace clic.
+- `/status_codes/301` responde con el status HTTP 301 de verdad (`response.status`
+  lo confirma), pero no trae ningún header `Location` -- se puede confirmar
+  inspeccionando la respuesta cruda de la navegación. Un 301 real de un servidor
+  siempre viene acompañado de a dónde redirigir; este es un 301 "de mentira" que
+  sirve su propio contenido en vez de redirigir a ningún lado. El test no se
+  conforma con el status code: confirma también que `page.url` después de la
+  navegación sigue siendo la misma URL pedida, porque un navegador real sí
+  seguiría un 301 legítimo y terminaría en otra parte. Esto obliga a distinguir
+  dos fuentes de verdad independientes para el mismo dato: el status code de la
+  respuesta HTTP (`response.status`, lo que ve el navegador) y el texto que el
+  body imprime ("This page returned a 301 status code", lo que el servidor dice
+  de sí mismo) -- las dos tienen que coincidir, pero son cosas distintas y el
+  test las verifica por separado.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
