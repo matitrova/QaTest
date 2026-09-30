@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **120 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **124 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 61 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 65 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 9 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -63,7 +63,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas y menú contextual
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual y mensajes de notificación
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -93,6 +93,10 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
 - Menú contextual: clic derecho sobre un cuadro dispara un `window.alert` nativo,
   verificando el mensaje exacto y que un clic izquierdo sobre el mismo cuadro no
   dispara nada
+- Mensajes de notificación: cada visita a la página elige al azar uno de dos mensajes
+  ("éxito" o "error"), verificando que el mensaje mostrado sea uno de los dos conocidos,
+  que ambos usen exactamente la misma clase CSS (no hay forma de distinguirlos por
+  estilo) y que el botón de cierre oculte el mensaje
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -113,6 +117,7 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
 - El input de `/inputs` no tiene ningún atributo `min`, `max`, `step` ni `pattern`: toda la validación es del propio navegador, por ser `type="number"`. Escribir letras no deja rastro (el valor queda vacío), un `+` suelto sin exponente de por medio se descarta igual que una letra, y un segundo punto decimal se descarta solo pero deja pasar el resto de los caracteres (`"5.5.5"` termina en `"5.55"`, no en un valor vacío). La notación científica (`"1e3"`) y los ceros a la izquierda (`"007"`) quedan tal cual se tipearon: el navegador no los normaliza a menos que algo — un submit, por ejemplo — los interprete como número. Y sin `min`, las flechas de teclado no tienen piso: bajar desde 0 sigue restando y entra en negativos.
 - `/key_presses` traduce el `keyCode` de cada tecla con una tabla propia (`keyboardMap`) que no siempre coincide con lo intuitivo: Backspace se muestra como `BACK_SPACE` (con guión bajo) y una flecha se muestra solo como `LEFT`, `RIGHT`, etc., sin la palabra "ARROW". Nada de eso se puede asumir por el nombre de la tecla en Playwright — hubo que confirmar cada texto contra el sitio real antes de escribirlo en una aserción. El caso más interesante fue Enter: el `<input>` vive solo dentro de un `<form>` sin botón de submit, así que el propio navegador dispara ahí el submit implícito del formulario (el comportamiento estándar cuando hay un único campo de texto). Como el form no tiene `action` ni el input tiene `name`, el submit sólo recarga la misma URL sin enviar nada — Enter nunca llega a mostrar "You entered: ENTER" como cualquier otra tecla, sino que recarga la página entera y borra lo que había escrito. El test lo verifica con `page.expect_navigation()` en vez de asumir que Enter es una tecla más.
 - `/context_menu` engancha su diálogo al evento `oncontextmenu` del elemento, no a un `onclick`: el disparador es específicamente el botón derecho del mouse. El test no se conforma con probar que el clic derecho abre el diálogo — también verifica que un clic izquierdo sobre el mismo cuadro no dispara nada, para no confundir "cualquier clic" con "el botón derecho puntualmente". Es el mismo mecanismo de `page.once("dialog", ...)` que `javascript_alerts`, pero disparado con `locator.click(button="right")` en vez de un `onclick` común.
+- `/notification_message` no tiene forma de pedir "el mensaje de éxito" o "el de error" a demanda: cada visita a la página redirige con uno de los dos elegido al azar por el servidor. Un test no puede afirmar cuál va a aparecer, así que primero verifica solamente que sea uno de los dos conocidos, y para los casos que necesitan un mensaje puntual (el del error, y juntar ambas variantes para comparar su clase) visita la página en un loop hasta encontrarlo, en vez de asumir que aparece a la primera. El mensaje de error además tiene un typo publicado en el sitio real ("unsuccesful", sin la segunda "s"), que el test verifica tal cual está y no con la ortografía correcta. El bug más interesante es que los dos mensajes comparten exactamente la misma clase CSS (`flash notice`), sin ningún atributo que distinga éxito de error — un test que confiara en la clase para saber el resultado de la acción siempre daría el mismo veredicto, sin importar cuál de los dos mensajes se haya mostrado en realidad. El cierre del mensaje tampoco es instantáneo (Foundation le aplica un `fadeOut` de 300ms antes de sacarlo del DOM), así que se verifica con `expect().to_be_hidden()` en vez de comprobar la visibilidad apenas se hace clic.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
