@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **134 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **137 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 75 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 78 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 9 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -63,7 +63,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP y elementos que aparecen y desaparecen
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen y contenido que cambia de posición
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -105,6 +105,12 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   están siempre presentes y en el mismo orden, y un quinto ("Gallery") que el
   servidor decide al azar si incluir o no en cada carga, verificando ambos
   estados y que, cuando aparece, siempre queda último
+- Contenido que cambia de posición: una lista de cinco líneas de texto donde
+  una de ellas ("Important Information You're Looking For") aparece en una
+  posición distinta en cada carga de la página, verificando que las cinco
+  líneas siguen siendo las mismas (sin importar el orden), que la posición de
+  esa línea varía entre recargas y que no existe ningún elemento individual
+  para ubicarla por locator, solo texto plano dentro de un contenedor común
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -149,6 +155,19 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   cuatro items (Home, About, Contact Us, Portfolio) están siempre presentes y
   en el mismo orden -- el test lo confirma por separado del quinto, para no
   mezclar "qué es estable" con "qué es aleatorio" en la misma aserción.
+- `/shifting_content/list` no tiene ningún `<li>` ni elemento individual por
+  línea: las cinco líneas son texto plano separado por `<br><br>` dentro de un
+  único `<div>`. Por eso `get_by_text(exact=True)` -- que sí funciona en casos
+  parecidos de este mismo sitio, como `/disappearing_elements` -- no encuentra
+  nada acá: no existe ningún elemento cuyo texto completo sea exactamente esa
+  línea, porque el único elemento que la contiene es el `<div>` entero con las
+  cinco líneas juntas (`get_by_text()` sin `exact` sí "encuentra" algo, pero
+  devuelve ese mismo `<div>` completo, no la línea puntual). La única forma de
+  ubicar la línea es parsear el texto completo del contenedor con
+  `inner_text()` y partirlo por salto de línea, que es lo que hace
+  `ShiftingContentListPage.lineas()`. El test lo verifica explícitamente
+  comprobando que ese locator exacto da `count() == 0`, en vez de asumir que
+  "no funciona" sin probarlo.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
