@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **130 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **134 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 71 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 75 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 9 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -63,7 +63,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación y códigos de status HTTP
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP y elementos que aparecen y desaparecen
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -101,6 +101,10 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   coincida con el texto que la propia página imprime en su body, que la página
   principal linkee a los cuatro, y un caso aparte para el 301 que confirma que la
   navegación no termina en ninguna otra URL
+- Elementos que aparecen y desaparecen: un menú de navegación donde cuatro items
+  están siempre presentes y en el mismo orden, y un quinto ("Gallery") que el
+  servidor decide al azar si incluir o no en cada carga, verificando ambos
+  estados y que, cuando aparece, siempre queda último
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -135,6 +139,16 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   body imprime ("This page returned a 301 status code", lo que el servidor dice
   de sí mismo) -- las dos tienen que coincidir, pero son cosas distintas y el
   test las verifica por separado.
+- `/disappearing_elements` no oculta "Gallery" con CSS: el servidor decide en
+  cada pedido si lo incluye en el HTML, así que cuando no aparece no hay
+  ningún `<li>` oculto esperando en el DOM -- no existe. Un test que buscara
+  el elemento con `is_hidden()` nunca encontraría nada que afirmar, porque no
+  hay nada que mirar. La única forma de probar las dos ramas es recargar en un
+  loop hasta verlas ambas, igual que con `/notification_message`, pero acá la
+  variable es la *cantidad* de items (4 o 5), no su contenido. Los primeros
+  cuatro items (Home, About, Contact Us, Portfolio) están siempre presentes y
+  en el mismo orden -- el test lo confirma por separado del quinto, para no
+  mezclar "qué es estable" con "qué es aleatorio" en la misma aserción.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
