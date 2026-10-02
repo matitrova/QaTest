@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **141 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **143 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,7 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 82 | UI |
-| [`TestX`](TestX) | SauceDemo (e-commerce) | 9 | UI |
+| [`TestX`](TestX) | SauceDemo (e-commerce) | 11 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
 | [`ApiTest`](ApiTest) | API de JSONPlaceholder | 5 | API |
@@ -192,10 +192,35 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## SauceDemo — Login y carrito
+## SauceDemo — Login, carrito y checkout completo
 
-Tests de login (casos exitosos, errores y validaciones) y agregado de productos al
-carrito, con Page Objects para el login y el inventario.
+Tests de login (casos exitosos, errores y validaciones), agregado de productos al
+carrito y el flujo completo de compra, con Page Objects para el login, el inventario y
+el checkout.
+
+**Cubre:**
+- Checkout de principio a fin: agregar un producto, ir al carrito, completar los tres
+  pasos del checkout y llegar a la pantalla de confirmación
+- Verificación de que el impuesto (8% del subtotal) y el total se calculan de verdad, no
+  son un texto fijo en la página
+- Que el carrito queda vacío después de confirmar la compra
+- Validación del formulario de checkout: continuar sin completar los datos personales
+  muestra un error y no avanza de pantalla
+
+**Desafíos técnicos resueltos:**
+- La versión actual de SauceDemo es una SPA (bundle servido con Vite): al hacer clic en
+  "Checkout" o en "Continue", la URL cambia primero (`history.pushState`) y el
+  componente de la página nueva recién se monta un instante después. Un locator
+  consultado apenas se resuelve `wait_for_url()` a veces todavía encuentra el DOM de la
+  página anterior -- por ejemplo, el formulario de datos personales devolvía `count()
+  == 0` justo después de navegar a `/checkout-step-one.html`, porque el carrito
+  seguía siendo lo único montado. La solución es esperar con `expect().to_be_visible()`
+  sobre un elemento propio de la página nueva antes de interactuar con ella, en vez de
+  confiar en que la URL ya implica que el contenido está listo.
+- El impuesto que muestra el resumen de compra no es un 8% redondeado a ojo: es
+  `round(subtotal * 0.08, 2)`. El test recalcula ese valor a partir del subtotal real
+  que muestra la página en cada corrida, en vez de hardcodear un monto fijo, para que
+  siga siendo válido si cambia el precio del producto usado en la prueba.
 
 ```bash
 python3 -m pytest TestX -v
