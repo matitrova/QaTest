@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **137 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **141 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 78 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 82 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 9 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -63,7 +63,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen y contenido que cambia de posición
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición y recuperar contraseña
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -111,6 +111,11 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   líneas siguen siendo las mismas (sin importar el orden), que la posición de
   esa línea varía entre recargas y que no existe ningún elemento individual
   para ubicarla por locator, solo texto plano dentro de un contenedor común
+- Recuperar contraseña: el formulario de `/forgot_password` responde
+  **500 Internal Server Error** con cualquier input -- un email con formato
+  válido, un campo vacío y un texto sin forma de email dan exactamente el
+  mismo resultado, lo que descarta que el error dependa de una validación de
+  formato
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -168,6 +173,18 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   `ShiftingContentListPage.lineas()`. El test lo verifica explícitamente
   comprobando que ese locator exacto da `count() == 0`, en vez de asumir que
   "no funciona" sin probarlo.
+- `/forgot_password` tiene un bug real en el servidor: enviar el formulario
+  devuelve **500 Internal Server Error** sin importar qué se escriba en el
+  campo de email. El propio HTML no ayuda a sospecharlo de entrada: el input
+  es `type="text"`, no `type="email"`, así que el navegador no aplica ninguna
+  validación de formato antes de mandar el POST -- cualquier string llega
+  igual al servidor. Para confirmar que el 500 es un bug del backend y no el
+  resultado esperable de una validación que falla distinto según el input, el
+  test prueba tres casos (`usuario@example.com`, campo vacío y un texto sin
+  forma de email) y verifica que los tres dan la misma respuesta: si el error
+  dependiera de la validación del email, el campo vacío o el texto sin
+  arroba deberían fallar antes o distinto que un email con formato válido, y
+  no es así.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
