@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **151 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **153 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,7 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 82 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 8 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 10 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 11 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -193,7 +193,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto"
+## UI Testing Playground — ocho formas distintas de estar "oculto", y un botón que ignora clicks de JS
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -205,6 +205,9 @@ no el sitio completo).
   fuera de pantalla, superposición con otro elemento y eliminación directa del DOM --
   verificando con qué técnicas `is_visible()` de Playwright coincide con lo que ve un
   usuario real y con cuáles no.
+- `/click`: un botón que ignora clicks disparados por JavaScript y solo reacciona a un
+  click físico de mouse, verificando ambos caminos -- `locator.click()` de Playwright sí
+  lo activa, `element.click()` ejecutado vía `page.evaluate()` no.
 
 **Desafíos técnicos resueltos:**
 - `is_visible()` de Playwright no es un sinónimo de "el usuario lo ve": solo mira el
@@ -232,6 +235,15 @@ no el sitio completo).
   corrió y la capa queda en su estado inicial (altura 0) por un instante. El test
   espera explícitamente a que la capa tenga altura real antes de afirmar nada sobre
   la superposición, en vez de asumir que el click ya dejó todo listo.
+- `/click` filtra el evento de click en su propio handler con la condición
+  `event.screenX > 0`: un click sintético disparado desde JavaScript
+  (`elemento.click()`) no trae coordenadas de pantalla reales -- queda en
+  `screenX == 0` -- y el handler lo descarta en silencio, sin lanzar ningún
+  error que delate que "no pasó nada". `locator.click()` de Playwright, en
+  cambio, dispara el click a través del protocolo de DevTools como un evento
+  de mouse físico de verdad, con coordenadas reales, y sí pasa el filtro. El
+  test prueba las dos formas sobre el mismo botón para dejar esa diferencia
+  documentada en código, no solo en la descripción de la página.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v
