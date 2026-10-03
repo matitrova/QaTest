@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **143 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **151 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,6 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 82 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 8 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 11 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -188,6 +189,52 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
+```
+
+---
+
+## UI Testing Playground — ocho formas distintas de estar "oculto"
+
+Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
+de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
+no el sitio completo).
+
+**Cubre:**
+- `/visibility`: un botón "Hide" oculta otros siete, cada uno con una técnica CSS/DOM
+  distinta -- `display: none`, `visibility: hidden`, `opacity: 0`, ancho 0, posición
+  fuera de pantalla, superposición con otro elemento y eliminación directa del DOM --
+  verificando con qué técnicas `is_visible()` de Playwright coincide con lo que ve un
+  usuario real y con cuáles no.
+
+**Desafíos técnicos resueltos:**
+- `is_visible()` de Playwright no es un sinónimo de "el usuario lo ve": solo mira el
+  layout (bounding box) y los estilos `visibility`/`display`. Un botón con
+  `opacity: 0` o movido a `position: absolute; left: -9999px` sigue dando
+  `is_visible() == True`, porque conserva tamaño y `visibility: visible` -- son
+  técnicas que esconden algo a simple vista sin que Playwright las detecte. El único
+  caso que de verdad lo engaña es el que no toca ningún estilo del botón: superponerle
+  otro elemento encima. `is_visible()` no mira qué hay delante, así que también da
+  `True`, pero ahí un click real sí choca con esa capa y termina en timeout de
+  "actionability" en vez de llegar al botón -- la única forma de confirmar la
+  superposición no es leer un estado, es intentar clickear y ver que falla.
+- `display: none` sí saca al elemento del flujo de layout (`bounding_box()` devuelve
+  `None`); `visibility: hidden` y ancho 0, en cambio, conservan un bounding box pero
+  Playwright los trata igual como no visibles -- dos resultados iguales
+  (`is_visible() == False`) por razones de DOM distintas.
+- El botón "Hide" depende de un handler de jQuery cargado desde un CDN externo
+  (`code.jquery.com`). Si esa descarga no llega a tiempo, el click no dispara nada y
+  `$` queda indefinido sin ningún error visible en el test -- solo se nota después,
+  esperando en vano un cambio que nunca iba a pasar. La solución espera explícitamente
+  a que `$` esté definido antes de clickear, y recarga la página si no llega a
+  tiempo, en vez de asumir que la carga de scripts externos nunca falla.
+- La capa que tapa al botón superpuesto se posiciona con jQuery `.position()` dentro
+  del mismo handler de click: justo después del click, ese cálculo a veces todavía no
+  corrió y la capa queda en su estado inicial (altura 0) por un instante. El test
+  espera explícitamente a que la capa tenga altura real antes de afirmar nada sobre
+  la superposición, en vez de asumir que el click ya dejó todo listo.
+
+```bash
+cd UiTestingPlaygroundTest && python3 -m pytest -v
 ```
 
 ---

@@ -33,6 +33,7 @@ jobs:
           - { suite: "API · Restful Booker",    dir: RestfulBookerTest,          target: ".",   navegador: false }
           - { suite: "API · JSONPlaceholder",   dir: ApiTest,                    target: ".",   navegador: false }
           - { suite: "UI · The Internet",       dir: DesafiosPlaywright,         target: ".",   navegador: true  }
+          - { suite: "UI · Testing Playground", dir: UiTestingPlaygroundTest,    target: ".",   navegador: true  }
           - { suite: "UI · SauceDemo",          dir: ".",                        target: TestX, navegador: true  }
           - { suite: "Práctica · Python",       dir: practica/EjerciciosPython,  target: ".",   navegador: false }
           - { suite: "Práctica · Playwright",   dir: practica/RepasoPlaywright,  target: ".",   navegador: true  }
