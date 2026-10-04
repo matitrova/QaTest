@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **153 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **157 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 82 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 86 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 10 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 11 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición y recuperar contraseña
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña y anuncio de entrada
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -117,6 +117,12 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   válido, un campo vacío y un texto sin forma de email dan exactamente el
   mismo resultado, lo que descarta que el error dependa de una validación de
   formato
+- Anuncio de entrada (`/entry_ad`): un modal que aparece 500ms después de
+  cargar la página, se cierra al tocar el fondo o el botón "Close" pero no al
+  tocar su propio contenido, y queda cerrado para el resto de la sesión --
+  una nueva visita a la página ni siquiera recibe el script que lo muestra.
+  El sitio promete "to re-enable it, click here", pero ese link nunca
+  reactiva nada
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -186,6 +192,22 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   dependiera de la validación del email, el campo vacío o el texto sin
   arroba deberían fallar antes o distinto que un email con formato válido, y
   no es así.
+- `/entry_ad` promete "to re-enable it, click here" en un link que llama a
+  `$.post('/entry-ad')` -- con GUION. El único endpoint que el servidor usa
+  de verdad para marcar la sesión como "ya cerrado" es `/entry_ad`, con GUION
+  BAJO (el mismo que dispara el botón "Close"). El típo hace que el POST de
+  "reiniciar" pegue a una ruta que no existe (**404**) y la sesión nunca se
+  actualiza: el anuncio queda cerrado para siempre, sin ningún error visible
+  para quien hace click. El propio `<a href="">` del link, sin
+  `preventDefault()`, dispara además una navegación real del navegador que
+  en una corrida real puede cancelar ese POST a mitad de camino -- probar el
+  404 clickeando el link es inherentemente flaky, así que ese chequeo se
+  hace con `page.request.post()` directo al endpoint, y por separado se
+  confirma el síntoma (clickear "reiniciar" y revisitar la página sigue sin
+  mostrar el anuncio). Además, el click del body que cierra el anuncio en
+  cualquier parte de la página (`$('body').on('click', dismissedAd)`) se
+  corta con `e.stopPropagation()` únicamente dentro de la caja del modal, así
+  que clickear el texto del anuncio no lo cierra pero clickear su fondo sí.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
