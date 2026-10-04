@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **157 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **160 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 86 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 89 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 10 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 11 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña y anuncio de entrada
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada e imágenes rotas
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -123,6 +123,10 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   una nueva visita a la página ni siquiera recibe el script que lo muestra.
   El sitio promete "to re-enable it, click here", pero ese link nunca
   reactiva nada
+- Imágenes rotas (`/broken_images`): de tres `<img>` en la página, dos
+  apuntan a rutas que no existen (404) y una carga bien, verificando cada
+  una por separado con el status real de la respuesta y con
+  `naturalWidth`/`naturalHeight` del elemento
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -208,6 +212,16 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   cualquier parte de la página (`$('body').on('click', dismissedAd)`) se
   corta con `e.stopPropagation()` únicamente dentro de la caja del modal, así
   que clickear el texto del anuncio no lo cierra pero clickear su fondo sí.
+- `/broken_images` no deja ningún rastro en el DOM de qué imagen rompió y
+  cuál no: las tres etiquetas `<img>` son indistinguibles por HTML, y la
+  propiedad `complete` del elemento da `True` en las tres apenas el
+  navegador termina de intentar cargarlas, se hayan roto o no -- no sirve
+  para distinguir una imagen rota de una que cargó bien. La única señal
+  confiable es `naturalWidth`/`naturalHeight`: quedan en `0` cuando la
+  respuesta no trajo una imagen válida, y reflejan el tamaño real del
+  archivo en cualquier otro caso. El test cruza esa señal contra el
+  status HTTP real de cada request (dos 404 y un 200) para confirmar que
+  ambas fuentes coinciden, en vez de confiar en una sola.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
