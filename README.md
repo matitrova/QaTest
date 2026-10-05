@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **160 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **163 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,7 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 89 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 10 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 13 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 11 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -229,7 +229,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", y un botón que ignora clicks de JS
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS y una tabla que se reordena sola
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -244,6 +244,12 @@ no el sitio completo).
 - `/click`: un botón que ignora clicks disparados por JavaScript y solo reacciona a un
   click físico de mouse, verificando ambos caminos -- `locator.click()` de Playwright sí
   lo activa, `element.click()` ejecutado vía `page.evaluate()` no.
+- `/dynamictable`: una tabla de procesos (Name, CPU, Disk, Memory, Network) que en cada
+  recarga cambia al azar tanto el orden de sus columnas como el de sus filas,
+  verificando que el valor de CPU de Chrome ubicado por nombre de columna coincida con
+  el que muestra el label de abajo, y que tanto las columnas como la posición de la
+  fila de Chrome efectivamente cambien de orden entre recargas (no solo que el test
+  "no falle" con un orden fijo).
 
 **Desafíos técnicos resueltos:**
 - `is_visible()` de Playwright no es un sinónimo de "el usuario lo ve": solo mira el
@@ -280,6 +286,19 @@ no el sitio completo).
   de mouse físico de verdad, con coordenadas reales, y sí pasa el filtro. El
   test prueba las dos formas sobre el mismo botón para dejar esa diferencia
   documentada en código, no solo en la descripción de la página.
+- `/dynamictable` no usa un `<table>` HTML ni un plugin de JS como la tabla
+  ordenable de `/tables`: son `<div>` con atributos ARIA (`role="row"`,
+  `role="columnheader"`, `role="cell"`), y tanto el orden de las columnas
+  como el de las filas se vuelve a tirar al azar en cada recarga, salvo la
+  columna del nombre de proceso, que siempre queda primera. Un locator por
+  índice fijo (`.nth(1)` para "la columna de CPU") funciona en la primera
+  carga y falla en la siguiente sin ningún aviso, porque sigue devolviendo
+  una celda real, solo que de otra columna. La solución es preguntarle a los
+  propios encabezados en qué posición está "CPU" antes de leer la celda, en
+  vez de asumir una posición. Dos tests aparte confirman que el supuesto que
+  obliga a esa solución es real: hacen varias recargas y verifican que el
+  orden efectivamente cambió al menos una vez, para no quedarse validando
+  contra una sola distribución posible por casualidad.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v
