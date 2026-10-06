@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **170 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **174 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,7 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 96 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 13 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 17 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 11 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -254,7 +254,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS y una tabla que se reordena sola
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola y una barra de progreso al azar
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -275,6 +275,11 @@ no el sitio completo).
   el que muestra el label de abajo, y que tanto las columnas como la posición de la
   fila de Chrome efectivamente cambien de orden entre recargas (no solo que el test
   "no falle" con un orden fijo).
+- `/progressbar`: una barra que sube de 25% a 100% a un ritmo aleatorio y que hay que
+  frenar lo más cerca posible del 75%, verificando el caso límite de frenarla antes de
+  que arranque a moverse, el caso general de frenarla al llegar al 75%, que el label de
+  resultado coincida con el valor real de la barra, y que `Stop` efectivamente corte el
+  avance en vez de solo dejar de leerlo.
 
 **Desafíos técnicos resueltos:**
 - `is_visible()` de Playwright no es un sinónimo de "el usuario lo ve": solo mira el
@@ -324,6 +329,19 @@ no el sitio completo).
   obliga a esa solución es real: hacen varias recargas y verifican que el
   orden efectivamente cambió al menos una vez, para no quedarse validando
   contra una sola distribución posible por casualidad.
+- `/progressbar` calcula el delay entre pasos una sola vez por cada click en
+  Start (al azar entre 0 y 499ms) y lo reusa en los ~50 pasos que faltan
+  hasta el 75% -- en el peor caso, llegar del 25% al 75% puede tardar más de
+  24 segundos. Un timeout corto confundiría ese caso límite, real y válido,
+  con una falla de la página, así que el test espera con un margen generoso
+  en vez de asumir un ritmo fijo. Además, el primer incremento no sigue ese
+  delay random: está programado con un `setTimeout` fijo de 1000ms, separado
+  del resto -- eso permite un test 100% determinístico (Start seguido de
+  Stop sin ninguna espera siempre cae en esa ventana fija) en un desafío que
+  por diseño es aleatorio. Por último, el propio label de resultado de la
+  página trata el 25% como "todavía no arrancó" (`ratio == 25 ? "n/a" :
+  ratio - 75`) en vez de mostrar `-50`: asumir la resta sin leer el código
+  fuente hubiera hecho fallar ese test determinístico contra el sitio real.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v
