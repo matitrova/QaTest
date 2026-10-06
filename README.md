@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **163 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **170 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 89 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 96 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 13 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 11 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada e imágenes rotas
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas e intención de salida
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -127,6 +127,12 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   apuntan a rutas que no existen (404) y una carga bien, verificando cada
   una por separado con el status real de la respuesta y con
   `naturalWidth`/`naturalHeight` del elemento
+- Intención de salida (`/exit_intent`): un modal que aparece cuando el mouse
+  sale del viewport por el borde superior (y no por moverse dentro de la
+  página, ni por salir por abajo o los costados), que un click dentro del
+  modal no lo cierra pero un click en su botón "Close" sí, y que una vez
+  mostrado no vuelve a dispararse dentro de la misma carga de página aunque
+  el mouse vuelva a salir por arriba
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -222,6 +228,25 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   archivo en cualquier otro caso. El test cruza esa señal contra el
   status HTTP real de cada request (dos 404 y un 200) para confirmar que
   ambas fuentes coinciden, en vez de confiar en una sola.
+- `/exit_intent` usa la librería `ouibounce`, inicializada con
+  `aggressive: true` y `sensitivity` en su valor por default (20px): solo
+  cuenta como "salida" un `mouseleave` del `documentElement` con
+  `clientY <= 20`, el borde superior puntualmente -- moverse dentro de la
+  página, incluso hasta el borde inferior, no dispara ese evento. En
+  Playwright no hay forma de que el mouse "salga de verdad" de un
+  navegador headless, pero `page.mouse.move()` sí puede posicionarlo en
+  coordenadas negativas, y eso alcanza para que Chromium dispare el
+  `mouseleave` real con el `clientY` que la librería necesita -- no hizo
+  falta simular el evento a mano con `dispatchEvent`. La hipótesis inicial
+  sobre `aggressive: true` era que permitía que el modal se repitiera cada
+  vez que el mouse volviera a salir por arriba, pero probándolo quedó claro
+  que no: esa opción solo hace que la librería ignore la cookie que evitaría
+  mostrarlo de nuevo en una **visita futura** a la página. Dentro de la
+  misma carga, el propio callback interno que muestra el modal desconecta
+  los listeners de `mouseleave`/`mouseenter`/`keydown` apenas se dispara una
+  vez, sin excepción -- una segunda salida por arriba en la misma carga no
+  reabre nada, y el test que lo asume quedó escrito después de confirmarlo
+  contra el sitio real, no antes.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
