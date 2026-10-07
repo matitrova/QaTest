@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas e intención de salida
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida y menú flotante
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -133,6 +133,12 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   modal no lo cierra pero un click en su botón "Close" sí, y que una vez
   mostrado no vuelve a dispararse dentro de la misma carga de página aunque
   el mouse vuelva a salir por arriba
+- Menú flotante (`/floating_menu`): un menú que arranca en una posición fija
+  dentro del documento y, al hacer scroll, se recalcula para quedar pegado
+  cerca del borde superior del viewport en vez de desplazarse fuera de
+  vista, verificando tanto la posición resultante tras un scroll largo como
+  que vuelve exactamente a su posición original al volver arriba, y que los
+  links del menú siguen siendo clickeables mientras está "flotando"
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -247,6 +253,18 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   vez, sin excepción -- una segunda salida por arriba en la misma carga no
   reabre nada, y el test que lo asume quedó escrito después de confirmarlo
   contra el sitio real, no antes.
+- `/floating_menu` usa la librería `stickyfloat`, que **no** cambia el menú a
+  `position: fixed` (lo que el navegador resolvería solo, sin ningún
+  JavaScript en cada scroll): el elemento se queda `position: absolute`
+  todo el tiempo, y es la propia librería la que, en cada evento de scroll,
+  recalcula a mano el `top` inline para que la caja siga pareciendo clavada
+  cerca del borde superior. Por eso el test no afirma nada sobre el valor de
+  `top` en sí (que crece sin límite junto con el scroll) sino sobre la
+  posición resultante en pantalla (`bounding_box()`): sin esta librería, un
+  elemento `position: absolute` ubicado a 32px del tope del documento
+  terminaría en `y = 32 - 2000 = -1968` (bien afuera del viewport) después
+  de un scroll de 2000px, y que siga apareciendo pegado arriba es la prueba
+  de que algo lo está reposicionando activamente en cada frame.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
