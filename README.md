@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **174 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **178 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,7 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 96 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 17 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 21 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 11 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -254,7 +254,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola y una barra de progreso al azar
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar y un link que se reemplaza a sí mismo al pasarle el mouse
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -280,6 +280,13 @@ no el sitio completo).
   que arranque a moverse, el caso general de frenarla al llegar al 75%, que el label de
   resultado coincida con el valor real de la barra, y que `Stop` efectivamente corte el
   avance en vez de solo dejar de leerlo.
+- `/mouseover`: dos links que, al pasarles el mouse por encima, se reemplazan a sí
+  mismos por un clon con otro título y otra clase, verificando que el título y la clase
+  cambian de verdad tras el hover, que dos clicks consecutivos suben el contador en 2 (el
+  escenario que la propia página pide probar), que una referencia al nodo tomada *antes*
+  del hover queda inválida y no se puede clickear, y que el segundo link -- descrito por
+  la página como "idéntico" tras el reemplazo -- en realidad solo mantiene el título, no
+  la clase.
 
 **Desafíos técnicos resueltos:**
 - `is_visible()` de Playwright no es un sinónimo de "el usuario lo ve": solo mira el
@@ -342,6 +349,30 @@ no el sitio completo).
   página trata el 25% como "todavía no arrancó" (`ratio == 25 ? "n/a" :
   ratio - 75`) en vez de mostrar `-50`: asumir la resta sin leer el código
   fuente hubiera hecho fallar ese test determinístico contra el sitio real.
+- `/mouseover` está diseñada a propósito para reproducir el "stale element
+  problem" de Selenium: el handler de `onmouseenter` no modifica el `<a>`
+  original, lo clona (`cloneNode`), le cambia atributos al clon y reemplaza
+  el nodo viejo por el nuevo con `removeChild`/`appendChild`. Guardar una
+  referencia al elemento con `page.query_selector()` (el equivalente de
+  Playwright a un `WebElement`) y clickearla después del hover falla con
+  "Element is not attached to the DOM", porque esa referencia sigue
+  apuntando al nodo que ya no existe en el documento -- confirmado
+  explícitamente leyendo `el.isConnected` antes de intentar el click, no
+  solo capturando la excepción. Un `Locator` no tiene este problema porque
+  no guarda un nodo: se vuelve a resolver contra el DOM actual en cada
+  acción, así que dos `.click()` seguidos sobre el mismo `Locator` -- el
+  escenario que la página pide probar explícitamente -- siempre encuentran
+  el clon vigente y suben el contador de a uno por click, sin perder
+  ninguno.
+- La página describe el segundo link ("Link Button") como uno que "se
+  reemplaza con uno idéntico" al pasarle el mouse, a diferencia del primero
+  (que cambia de título). Leyendo el código fuente, `linkButtonActive()` le
+  cambia la clase a `text-warning` igual que al primero -- la única
+  diferencia real contra el primer link es que el título no cambia
+  (`title="Link Button"` se mantiene en las dos versiones). "Idéntico"
+  describe el título, no el resto del clon, y el test lo verifica
+  explícitamente en vez de asumir la descripción de la página al pie de la
+  letra.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v
