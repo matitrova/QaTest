@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **178 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **182 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,7 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 96 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 21 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 25 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 11 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -294,7 +294,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar y un link que se reemplaza a sí mismo al pasarle el mouse
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse y un botón cuyo id cambia en cada carga
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -327,6 +327,12 @@ no el sitio completo).
   del hover queda inválida y no se puede clickear, y que el segundo link -- descrito por
   la página como "idéntico" tras el reemplazo -- en realidad solo mantiene el título, no
   la clase.
+- `/dynamicid`: un botón cuyo único atributo `id` es un UUID distinto en cada carga de
+  página, verificando que el id efectivamente cambia entre recargas, que el id de una
+  carga anterior deja de existir en el DOM tras recargar (la prueba concreta de por qué
+  ubicarlo por ese atributo rompería el test a la primera recarga) y que un locator por
+  rol y texto visible -- que no depende del id -- puede clickear el botón sin problema
+  en tres recargas seguidas.
 
 **Desafíos técnicos resueltos:**
 - `is_visible()` de Playwright no es un sinónimo de "el usuario lo ve": solo mira el
@@ -413,6 +419,14 @@ no el sitio completo).
   describe el título, no el resto del clon, y el test lo verifica
   explícitamente en vez de asumir la descripción de la página al pie de la
   letra.
+- El id de `/dynamicid` es un UUID (`4e044870-4ee7-...`), que casi siempre
+  arranca con un dígito. Un selector CSS de id no puede empezar con un
+  dígito sin escaparlo: interpolar el id crudo en un locator tipo
+  `page.locator(f"#{id}")` no "no encuentra nada" cuando ese id ya no
+  existe tras recargar -- tira directamente un `SyntaxError` de selector
+  inválido, porque `#4e04...` ni siquiera es CSS válido. El test confirma
+  esa ausencia con un selector de atributo (`[id="..."]`) en su lugar, que
+  no tiene esa restricción.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v
