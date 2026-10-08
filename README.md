@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida y menú flotante
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante y scroll infinito
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -133,6 +133,10 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   modal no lo cierra pero un click en su botón "Close" sí, y que una vez
   mostrado no vuelve a dispararse dentro de la misma carga de página aunque
   el mouse vuelva a salir por arriba
+- Scroll infinito (`/infinite_scroll`): la página carga al menos un párrafo
+  sin que haga falta scrollear, y cada scroll hasta el fondo del documento
+  agrega exactamente un párrafo más, mientras que un scroll que no llega al
+  fondo no agrega nada
 - Menú flotante (`/floating_menu`): un menú que arranca en una posición fija
   dentro del documento y, al hacer scroll, se recalcula para quedar pegado
   cerca del borde superior del viewport en vez de desplazarse fuera de
@@ -265,6 +269,24 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   terminaría en `y = 32 - 2000 = -1968` (bien afuera del viewport) después
   de un scroll de 2000px, y que siga apareciendo pegado arriba es la prueba
   de que algo lo está reposicionando activamente en cada frame.
+- `/infinite_scroll` usa la librería `jscroll`, que no agrega contenido ante
+  "cualquier" scroll sino solo cuando el scroll deja el final del documento
+  lo bastante cerca del borde inferior del viewport -- por eso el contenido
+  nuevo no aparece envuelto en `<p>` (no hay ningún `<p>` en toda la página,
+  el texto se agrega como texto plano dentro de un `<div class="jscroll-added">`)
+  y el test lo ubica por esa clase en vez de por una etiqueta semántica que
+  no existe. El primer párrafo se carga solo, sin ningún scroll de por
+  medio, y cuánto más contenido aparece así depende de la altura del
+  viewport: con uno chico alcanza y sobra un solo párrafo para llenarlo, con
+  uno más alto (como el default de 1280x720 de este repo) ya entran dos
+  antes de tocar nada. Afirmar un número fijo de párrafos "al cargar" sería
+  asumir un viewport puntual que nada garantiza -- el test solo pide que
+  haya como mínimo uno, y mide todo lo demás por la diferencia entre el
+  conteo de antes y de después de cada scroll, no por un valor absoluto.
+  Para confirmar que el umbral importa de verdad, un scroll corto que no
+  llega al fondo (`window.scrollTo(0, 50)`) se prueba por separado contra
+  uno que sí llega (`document.body.scrollHeight`): solo el segundo agrega
+  contenido.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
