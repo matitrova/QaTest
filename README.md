@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **185 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **191 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -16,7 +16,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 96 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 28 | UI |
-| [`TestX`](TestX) | SauceDemo (e-commerce) | 11 | UI |
+| [`TestX`](TestX) | SauceDemo (e-commerce) | 17 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
 | [`ApiTest`](ApiTest) | API de JSONPlaceholder | 5 | API |
@@ -447,11 +447,12 @@ cd UiTestingPlaygroundTest && python3 -m pytest -v
 
 ---
 
-## SauceDemo — Login, carrito y checkout completo
+## SauceDemo — Login, carrito, checkout completo y usuarios especiales
 
 Tests de login (casos exitosos, errores y validaciones), agregado de productos al
-carrito y el flujo completo de compra, con Page Objects para el login, el inventario y
-el checkout.
+carrito, el flujo completo de compra y los usuarios de prueba que SauceDemo ofrece a
+propósito con bugs y comportamientos distintos, con Page Objects para el login, el
+inventario y el checkout.
 
 **Cubre:**
 - Checkout de principio a fin: agregar un producto, ir al carrito, completar los tres
@@ -461,6 +462,11 @@ el checkout.
 - Que el carrito queda vacío después de confirmar la compra
 - Validación del formulario de checkout: continuar sin completar los datos personales
   muestra un error y no avanza de pantalla
+- `problem_user`: las seis imágenes del catálogo apuntan al mismo archivo (contra
+  `standard_user`, donde las seis son distintas), y el selector de orden "Name (Z to A)"
+  no reordena la lista (contra `standard_user`, donde sí la reordena correctamente)
+- `performance_glitch_user`: el login se repite varias veces con sesiones nuevas para
+  confirmar que el delay artificial de ~5 segundos es intermitente, no constante
 
 **Desafíos técnicos resueltos:**
 - La versión actual de SauceDemo es una SPA (bundle servido con Vite): al hacer clic en
@@ -471,11 +477,29 @@ el checkout.
   == 0` justo después de navegar a `/checkout-step-one.html`, porque el carrito
   seguía siendo lo único montado. La solución es esperar con `expect().to_be_visible()`
   sobre un elemento propio de la página nueva antes de interactuar con ella, en vez de
-  confiar en que la URL ya implica que el contenido está listo.
+  confiar en que la URL ya implica que el contenido está listo. El mismo problema
+  aparece al entrar al inventario con cualquier usuario: `wait_for_url()` por sí solo no
+  alcanza, hace falta esperar a que el primer producto esté visible antes de leer nada.
 - El impuesto que muestra el resumen de compra no es un 8% redondeado a ojo: es
   `round(subtotal * 0.08, 2)`. El test recalcula ese valor a partir del subtotal real
   que muestra la página en cada corrida, en vez de hardcodear un monto fijo, para que
   siga siendo válido si cambia el precio del producto usado en la prueba.
+- Las imágenes "rotas" de `problem_user` no son imágenes caídas: las seis responden
+  **200** y cargan con dimensiones reales (`naturalWidth`/`naturalHeight` distintos de
+  cero), a diferencia del caso de `/broken_images` ya cubierto en DesafiosPlaywright. El
+  bug es otro: el catálogo entero muestra el mismo archivo sin importar qué producto es,
+  así que el test no verifica "que la imagen cargue" sino que las seis sean
+  exactamente la misma, contra `standard_user` donde las seis son distintas entre sí.
+- El delay de `performance_glitch_user` resultó no ser determinístico: midiendo 30
+  logins seguidos contra el sitio real, el delay de ~5 segundos apareció en 21 de 30
+  (70%), no en los 30. Un test que afirmara "este usuario siempre tarda más de 2
+  segundos" sería flaky por diseño en el ~30% de corridas que caen rápidas. La solución
+  es repetir el login varias veces con contextos nuevos (una sesión limpia por intento)
+  y afirmar solo lo reproducible: que aparece al menos un login lento en varios
+  intentos, sin exigir que todos lo sean. El cronómetro además tiene que envolver el
+  `click()` del login entero, no solo el `wait_for_url()` posterior -- el delay ocurre
+  durante la propia respuesta al click, así que medir después de que `login()` ya
+  retornó siempre da un tiempo casi nulo, aunque el login en sí haya tardado 5 segundos.
 
 ```bash
 python3 -m pytest TestX -v
