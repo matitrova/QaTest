@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **182 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **185 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,7 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 96 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 25 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 28 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 11 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -294,7 +294,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse y un botón cuyo id cambia en cada carga
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga y un dato que tarda 15 segundos reales en llegar por AJAX
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -333,6 +333,12 @@ no el sitio completo).
   ubicarlo por ese atributo rompería el test a la primera recarga) y que un locator por
   rol y texto visible -- que no depende del id -- puede clickear el botón sin problema
   en tres recargas seguidas.
+- `/ajax`: un botón que dispara un pedido real al servidor (`$.get("/ajaxdata")`) que
+  tarda 15 segundos en responder antes de que aparezca un `<p>` con el texto cargado,
+  verificando que no hay contenido antes del click, que el spinner aparece de inmediato
+  al clickear (lo muestra el propio handler, no la respuesta) y que, tras esperar
+  explícitamente a que la etiqueta aparezca, el texto es el esperado y el spinner ya
+  no está visible.
 
 **Desafíos técnicos resueltos:**
 - `is_visible()` de Playwright no es un sinónimo de "el usuario lo ve": solo mira el
@@ -427,6 +433,13 @@ no el sitio completo).
   inválido, porque `#4e04...` ni siquiera es CSS válido. El test confirma
   esa ausencia con un selector de atributo (`[id="..."]`) en su lugar, que
   no tiene esa restricción.
+- `/ajax` no simula el delay en el cliente: el botón llama a `/ajaxdata`, un endpoint
+  real del servidor que tarda 15 segundos exactos en responder antes de que el
+  callback de `$.get()` inserte el `<p>` con el resultado -- confirmado midiendo la
+  respuesta directamente con `curl` antes de escribir el test. Un timeout por
+  defecto de Playwright (5 segundos) falla ahí siempre, no por flaky: el test espera
+  la etiqueta con un timeout explícito por encima de esos 15 segundos reales, en vez
+  de asumir que todo delay de AJAX es cosa del cliente.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v
