@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **195 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **199 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,7 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 96 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 32 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 36 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 17 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -294,7 +294,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX y un espacio invisible que rompe un XPath aparentemente correcto
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, y un espacio invisible que rompe un XPath aparentemente correcto
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -339,6 +339,12 @@ no el sitio completo).
   al clickear (lo muestra el propio handler, no la respuesta) y que, tras esperar
   explícitamente a que la etiqueta aparezca, el texto es el esperado y el spinner ya
   no está visible.
+- `/clientDelay`: un botón casi idéntico al de `/ajax` -- mismo spinner, mismos 15
+  segundos de espera -- pero que calcula el resultado íntegramente en el navegador
+  con un `setTimeout`, verificando que el contenido y el spinner arrancan igual que
+  en `/ajax` (vacío y oculto), que tras esperar aparece el texto correcto y el
+  spinner se oculta, y -- la diferencia real entre ambos casos -- que ningún pedido
+  `xhr`/`fetch` se dispara entre el click y que el texto aparece.
 - `/nbsp`: un botón cuyo texto visible es idéntico a simple vista a "My Button", pero
   el espacio real entre las dos palabras es un carácter non-breaking space (`\xa0`), no
   un espacio común, verificando que un XPath con `text()='My Button'` (espacio normal)
@@ -446,6 +452,19 @@ no el sitio completo).
   defecto de Playwright (5 segundos) falla ahí siempre, no por flaky: el test espera
   la etiqueta con un timeout explícito por encima de esos 15 segundos reales, en vez
   de asumir que todo delay de AJAX es cosa del cliente.
+- `/clientDelay` y `/ajax` se ven y se comportan idéntico desde afuera: mismo
+  botón, mismo spinner, los mismos 15 segundos de espera antes de que aparezca el
+  texto. La diferencia está en qué pasa por detrás. `/ajax` dispara un
+  `$.get("/ajaxdata")` real, un pedido de red que un servidor tarda 15 segundos en
+  responder. `/clientDelay`, en cambio, llama a `CreateLabel()`, que no pide nada a
+  ningún servidor: programa el mismo texto con un `setTimeout(fn, 15000)` del propio
+  navegador. Confirmado capturando los eventos `request` de Playwright durante la
+  espera: en `/clientDelay` el único pedido que se dispara es el de una fuente de
+  ícono ya en caché, ninguno de tipo `xhr` ni `fetch` -- a diferencia de lo que
+  pasaría en `/ajax`, donde el pedido a `/ajaxdata` sí aparecería en esa misma
+  lista. Dos páginas que un test visual no podría distinguir, pero que son dos
+  problemas de automatización distintos: esperar una respuesta de servidor no es lo
+  mismo que esperar a que el navegador termine de ejecutar su propio JavaScript.
 - El HTML de `/nbsp` escribe el texto del botón como `My&nbsp;Button`, que un
   navegador renderiza exactamente igual que "My Button" con espacio normal -- no hay
   ninguna diferencia visual que delate el problema. Un XPath `//button[text()='My
