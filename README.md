@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **191 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **195 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,7 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 96 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 28 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 32 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 17 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -294,7 +294,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga y un dato que tarda 15 segundos reales en llegar por AJAX
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX y un espacio invisible que rompe un XPath aparentemente correcto
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -339,6 +339,12 @@ no el sitio completo).
   al clickear (lo muestra el propio handler, no la respuesta) y que, tras esperar
   explícitamente a que la etiqueta aparezca, el texto es el esperado y el spinner ya
   no está visible.
+- `/nbsp`: un botón cuyo texto visible es idéntico a simple vista a "My Button", pero
+  el espacio real entre las dos palabras es un carácter non-breaking space (`\xa0`), no
+  un espacio común, verificando que un XPath con `text()='My Button'` (espacio normal)
+  no encuentra nada, que el mismo XPath con un nbsp sí encuentra el botón, que el texto
+  crudo del elemento efectivamente contiene ese carácter, y que un locator por rol y
+  texto visible encuentra y clickea el botón sin que haga falta saber nada de esto.
 
 **Desafíos técnicos resueltos:**
 - `is_visible()` de Playwright no es un sinónimo de "el usuario lo ve": solo mira el
@@ -440,6 +446,18 @@ no el sitio completo).
   defecto de Playwright (5 segundos) falla ahí siempre, no por flaky: el test espera
   la etiqueta con un timeout explícito por encima de esos 15 segundos reales, en vez
   de asumir que todo delay de AJAX es cosa del cliente.
+- El HTML de `/nbsp` escribe el texto del botón como `My&nbsp;Button`, que un
+  navegador renderiza exactamente igual que "My Button" con espacio normal -- no hay
+  ninguna diferencia visual que delate el problema. Un XPath `//button[text()='My
+  Button']` escrito con el espacio que se ve en pantalla compara contra el string
+  literal `"My Button"` carácter por carácter, y `\xa0 != 0x20`, así que no encuentra
+  nada aunque el botón esté ahí. `locator.text_content()` confirma la causa exacta:
+  el string real devuelto es `'My\xa0Button'`. El motor de texto propio de Playwright
+  (el que usan `get_by_text()` y `get_by_role(name=...)`), a diferencia de XPath,
+  normaliza nbsp a espacio común antes de comparar -- por eso un locator por rol y
+  texto visible encuentra el mismo botón sin que el test necesite saber que ese
+  espacio es distinto, mientras que el XPath literal del enunciado de la página sigue
+  fallando tal como está escrito.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v
