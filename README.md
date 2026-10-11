@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **199 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **204 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,7 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 96 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 36 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 41 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 17 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -294,7 +294,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, y un espacio invisible que rompe un XPath aparentemente correcto
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, un espacio invisible que rompe un XPath aparentemente correcto, y tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -351,6 +351,13 @@ no el sitio completo).
   no encuentra nada, que el mismo XPath con un nbsp sí encuentra el botón, que el texto
   crudo del elemento efectivamente contiene ese carácter, y que un locator por rol y
   texto visible encuentra y clickea el botón sin que haga falta saber nada de esto.
+- `/classattr`: tres botones con el mismo texto visible ("Button"), cada uno con varias
+  clases CSS a la vez (`btn class1 btn-success btn-test`, `btn class2 btn-warning
+  btn-test`, `btn class3 btn-primary btn-test`), verificando que un XPath que compara el
+  atributo `class` completo contra un único valor no encuentra ninguno de los tres, que
+  un selector CSS por clase sí encuentra exactamente el botón correcto, que clickearlo
+  dispara un `alert` nativo con el texto exacto que distingue a ese botón de los otros
+  dos, y que clickear cualquiera de los otros dos no dispara ningún diálogo.
 
 **Desafíos técnicos resueltos:**
 - `is_visible()` de Playwright no es un sinónimo de "el usuario lo ve": solo mira el
@@ -477,6 +484,20 @@ no el sitio completo).
   texto visible encuentra el mismo botón sin que el test necesite saber que ese
   espacio es distinto, mientras que el XPath literal del enunciado de la página sigue
   fallando tal como está escrito.
+- El atributo `class` de `/classattr` no es un valor único: es una lista de tokens
+  separados por espacio (`btn class3 btn-primary btn-test`). Un XPath que compara el
+  atributo completo con `@class='btn-primary'` -- el propio ejemplo que la página
+  muestra como "esto no funciona" -- exige una igualdad exacta de todo el string, así
+  que nunca encuentra el botón aunque `btn-primary` sea una de sus clases reales. Un
+  selector CSS por clase (`button.btn-primary`), en cambio, busca dentro de la lista
+  completa de tokens, no un match exacto del atributo entero. El `get_by_role()` por
+  nombre visible tampoco sirve para distinguir el botón correcto acá: los tres
+  muestran "Button" (el nombre accesible normaliza y recorta los espacios de más que
+  tiene el tercero en el HTML), así que el único diferenciador real es la clase. El
+  handler de la página (`event.target.className.indexOf("btn-primary")`) confirma que
+  el criterio del propio sitio también es por clase, no por texto ni por posición: el
+  test lo verifica clickeando los tres botones por separado y comprobando que solo uno
+  dispara el `alert`.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v
