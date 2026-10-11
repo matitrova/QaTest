@@ -294,7 +294,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, un espacio invisible que rompe un XPath aparentemente correcto, y tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, y tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -345,6 +345,13 @@ no el sitio completo).
   en `/ajax` (vacío y oculto), que tras esperar aparece el texto correcto y el
   spinner se oculta, y -- la diferencia real entre ambos casos -- que ningún pedido
   `xhr`/`fetch` se dispara entre el click y que el texto aparece.
+- `/loaddelay`: una página cuyo servidor tarda ~5 segundos reales en mandar la
+  respuesta antes de que el navegador termine de cargarla -- a diferencia de
+  `/ajax` y `/clientDelay`, donde la página carga al toque y el retraso aparece
+  recién después de un click -- verificando que la propia navegación
+  (`page.goto()`) queda bloqueada al menos esos segundos, que el botón ya está
+  visible apenas termina de cargar sin necesitar ningún wait_for adicional, y
+  que esa demora no dispara ningún pedido `xhr`/`fetch` de por sí.
 - `/nbsp`: un botón cuyo texto visible es idéntico a simple vista a "My Button", pero
   el espacio real entre las dos palabras es un carácter non-breaking space (`\xa0`), no
   un espacio común, verificando que un XPath con `text()='My Button'` (espacio normal)
@@ -472,6 +479,20 @@ no el sitio completo).
   lista. Dos páginas que un test visual no podría distinguir, pero que son dos
   problemas de automatización distintos: esperar una respuesta de servidor no es lo
   mismo que esperar a que el navegador termine de ejecutar su propio JavaScript.
+- `/loaddelay` no simula nada en el navegador: medido directamente con
+  `curl -w "%{time_total}"` antes de escribir el test, el servidor tarda
+  ~5 segundos exactos en mandar el documento HTML completo, así que
+  `page.goto()` queda bloqueado todo ese tiempo y recién devuelve el control
+  cuando la página ya terminó de cargar -- por eso el botón ya está visible
+  apenas vuelve `goto()`, sin ningún `wait_for` extra. Es el mismo síntoma
+  visible que `/clientDelay` (una espera de varios segundos antes de ver
+  contenido) pero por una causa opuesta a las de `/ajax` y `/clientDelay`:
+  ahí la página carga instantánea y el delay llega recién después de un
+  click (vía red real o `setTimeout` del navegador); acá el delay es previo
+  a que la página exista para el navegador. Confirmado también capturando
+  eventos `request` durante la navegación: ninguno es `xhr` ni `fetch`,
+  porque no hace falta ninguna llamada aparte -- todo el retraso va en la
+  respuesta del propio documento.
 - El HTML de `/nbsp` escribe el texto del botón como `My&nbsp;Button`, que un
   navegador renderiza exactamente igual que "My Button" con espacio normal -- no hay
   ninguna diferencia visual que delate el problema. Un XPath `//button[text()='My
