@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **204 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **207 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,7 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 96 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 41 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 44 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 17 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -294,7 +294,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, y tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias, y un input que un div superpuesto vacía solo si se escribe sin escrollarlo antes a la vista
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -505,6 +505,22 @@ no el sitio completo).
   texto visible encuentra el mismo botón sin que el test necesite saber que ese
   espacio es distinto, mientras que el XPath literal del enunciado de la página sigue
   fallando tal como está escrito.
+- `scroll_into_view_if_needed()` de Playwright no resuelve el caso de
+  `/overlapped`: confirmado con `bounding_box()` antes y después de llamarlo,
+  no mueve el scroll del contenedor interno un solo píxel, porque Playwright
+  solo escrolea si el elemento no intersecta el viewport -- y `#name` ya es
+  parte del viewport visible, lo que lo tapa es otro elemento encima, no un
+  recorte de pantalla. `fill()` sobre ese input "funciona" sin error ninguno
+  (el campo pasa el chequeo de actionability de Playwright, que no mira qué
+  hay delante), pero la propia página detecta la superposición por su
+  cuenta: un listener de `input` calcula el punto central del campo con
+  `getBoundingClientRect()` y pregunta con `elementFromPoint()` qué elemento
+  hay ahí, y mientras la respuesta sea el `<div>` gris en vez del input, borra
+  el valor que se acababa de escribir. La solución real es forzar el scroll
+  del contenedor con JavaScript (`el.evaluate("el => el.scrollIntoView()")`),
+  que sí reubica al input fuera del área que tapa el div -- un caso donde el
+  método de Playwright pensado justamente para esto no alcanza, y hay que
+  bajar un nivel más.
 - El atributo `class` de `/classattr` no es un valor único: es una lista de tokens
   separados por espacio (`btn class3 btn-primary btn-test`). Un XPath que compara el
   atributo completo con `@class='btn-primary'` -- el propio ejemplo que la página
@@ -519,6 +535,12 @@ no el sitio completo).
   el criterio del propio sitio también es por clase, no por texto ni por posición: el
   test lo verifica clickeando los tres botones por separado y comprobando que solo uno
   dispara el `alert`.
+- `/overlapped`: un input (`#name`) dentro de un contenedor con scroll interno
+  (`overflow-y: scroll`), parcialmente tapado por un `<div>` gris posicionado de forma
+  absoluta encima suyo, verificando que escribir en el campo sin escrollarlo antes a la
+  vista termina con el campo vacío, que escrollarlo primero hace que el texto quede
+  cargado, y que ese mismo scroll también libera a `#subject` (que arranca más abajo
+  en el contenedor).
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v
