@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **207 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **212 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,7 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 96 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 44 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 49 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 17 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -294,7 +294,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias, y un input que un div superpuesto vacía solo si se escribe sin escrollarlo antes a la vista
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias, un input que un div superpuesto vacía solo si se escribe sin escrollarlo antes a la vista, y un botón verde que queda tapado por uno azul idéntico en posición al clickearlo
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -541,6 +541,21 @@ no el sitio completo).
   vista termina con el campo vacío, que escrollarlo primero hace que el texto quede
   cargado, y que ese mismo scroll también libera a `#subject` (que arranca más abajo
   en el contenedor).
+- `/hiddenlayers`: un botón verde que, al clickearlo, hace aparecer un botón azul
+  superpuesto exactamente en el mismo lugar (mismo `bounding_box()`), confirmado por
+  `ClickEventHandler` agregando un nuevo `.spa-view` con z-index más alto dentro del
+  mismo contenedor `position: relative`. Un segundo click normal de Playwright sobre
+  el locator del botón verde ya tapado no clickea a ciegas lo que haya debajo: el
+  chequeo de actionability exige que el punto reciba eventos de puntero, y como el
+  azul está encima, el click reintenta hasta el timeout sin dispararse nunca. Forzar
+  ese click (`force=True`) tampoco "engaña" a la página para tratarlo como un click en
+  el verde: el evento se dispara en esas coordenadas, pero el navegador resuelve el
+  `target` real por hit-testing contra lo que hay ahí en ese momento, y el propio
+  handler de la página lo confirma logueando "Blue button pressed", no "Green button
+  pressed". La forma correcta de automatizar el escenario -- el que la propia página
+  describe como "make sure that green button can not be hit twice" -- no es forzar el
+  locator viejo, sino clickear el locator del elemento vigente (`#blueButton`), que
+  pasa el chequeo de actionability sin problema porque de verdad es el tope del stack.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v
