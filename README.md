@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **212 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **217 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,7 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 96 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 49 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 54 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 17 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -294,7 +294,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias, un input que un div superpuesto vacía solo si se escribe sin escrollarlo antes a la vista, y un botón verde que queda tapado por uno azul idéntico en posición al clickearlo
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias, un input que un div superpuesto vacía solo si se escribe sin escrollarlo antes a la vista, un botón verde que queda tapado por uno azul idéntico en posición al clickearlo, y un botón que solo cambia de nombre si el campo se edita de una forma que el navegador reconoce como real
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -556,6 +556,28 @@ no el sitio completo).
   describe como "make sure that green button can not be hit twice" -- no es forzar el
   locator viejo, sino clickear el locator del elemento vigente (`#blueButton`), que
   pasa el chequeo de actionability sin problema porque de verdad es el tope del stack.
+- `/textinput`: un botón cuyo texto cambia al valor escrito en un input, pero solo si
+  el navegador considera que el campo fue editado de verdad, no por cualquier forma de
+  llenarlo. Depende de dos variables globales que la página actualiza por separado
+  (`document.NewButtonNameI` en cada evento `input`, `document.NewButtonNameC` en cada
+  evento `change`) y solo cambia el botón cuando, al clickearlo, las dos coinciden.
+  `fill()` no dispara `change` por sí mismo -- confirmado leyendo
+  `document.NewButtonNameC` justo después de un `fill()` sin haber clickeado nada
+  todavía, que da `None` -- pero sí deja el campo marcado como "editado" para el
+  navegador, así que el `change` real llega recién al perder el foco, que es lo que
+  hace el propio click del botón, y con el valor correcto. El tipeo físico
+  (`press_sequentially()`) llega al mismo resultado por el mismo motivo. Asignar
+  `.value` por script en vez de con `fill()` no deja al campo marcado como "editado":
+  perder el foco después no dispara ningún `change` nativo, y el botón se queda con su
+  texto original. Un evento `input` disparado a mano con `dispatchEvent()` sí
+  actualiza `NewButtonNameI` (el handler no distingue de dónde vino el evento), pero
+  tampoco pasa por ninguna API real de edición de texto: el `change` nativo al perder
+  foco nunca llega y `NewButtonNameC` queda `undefined`. Esto separa dos cosas que a
+  simple vista parecen la misma: si un evento `input`/`change` se disparó, y si el
+  navegador considera que el campo fue editado por el usuario a los fines de un
+  `change` nativo posterior -- lo primero no implica lo segundo. Por último, disparar
+  `input` y `change` a mano pero con valores distintos entre sí tampoco actualiza el
+  botón: el handler exige que ambas variables coincidan, no solo que existan.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v
