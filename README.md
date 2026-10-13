@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **217 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **257 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,8 +14,8 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 96 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 54 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 103 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 62 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 17 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -294,7 +294,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias, un input que un div superpuesto vacía solo si se escribe sin escrollarlo antes a la vista, un botón verde que queda tapado por uno azul idéntico en posición al clickearlo, y un botón que solo cambia de nombre si el campo se edita de una forma que el navegador reconoce como real
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias, un input que un div superpuesto vacía solo si se escribe sin escrollarlo antes a la vista, un botón verde que queda tapado por uno azul idéntico en posición al clickearlo, un botón que solo cambia de nombre si el campo se edita de una forma que el navegador reconoce como real, y un segundo diálogo nativo que aparece recién un segundo después de responder al primero
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -365,6 +365,12 @@ no el sitio completo).
   un selector CSS por clase sí encuentra exactamente el botón correcto, que clickearlo
   dispara un `alert` nativo con el texto exacto que distingue a ese botón de los otros
   dos, y que clickear cualquiera de los otros dos no dispara ningún diálogo.
+- `/alerts`: tres botones (Alert, Confirm, Prompt) que abren diálogos nativos del
+  navegador, verificando el mensaje exacto de cada uno, que aceptar o cancelar el
+  Confirm dispare, un segundo después, un SEGUNDO `alert` con "Yes" o "No" según la
+  respuesta, que aceptar el Prompt con un texto dispare ese mismo texto en el segundo
+  alert ("User value: ..."), y que cancelarlo lo reemplace por "no answer" en vez de un
+  valor vacío.
 
 **Desafíos técnicos resueltos:**
 - `is_visible()` de Playwright no es un sinónimo de "el usuario lo ve": solo mira el
@@ -578,6 +584,21 @@ no el sitio completo).
   `change` nativo posterior -- lo primero no implica lo segundo. Por último, disparar
   `input` y `change` a mano pero con valores distintos entre sí tampoco actualiza el
   botón: el handler exige que ambas variables coincidan, no solo que existan.
+- `/alerts` no deja ningún rastro en el DOM de qué pasó: a diferencia de
+  `/javascript_alerts` (DesafiosPlaywright), acá Confirm y Prompt no escriben ningún
+  resultado en una página -- lo único que producen es un SEGUNDO `alert()` que la
+  propia página dispara con `setTimeout(fn, 1000)` recién después de responder al
+  primero. Un `page.once("dialog", ...)` como el que alcanza para `/javascript_alerts`
+  se queda corto acá: hay dos diálogos por interacción, no uno, así que el test
+  registra el handler con `page.on()` (no `once`) para capturar ambos, y lo saca
+  explícitamente con `page.remove_listener()` al final de cada caso para no dejarlo
+  pegado. Como el segundo diálogo llega después de que el primer `click()` ya
+  retornó, hace falta un `page.wait_for_timeout()` posterior antes de poder leer la
+  lista de diálogos capturados -- no hay ningún elemento al que hacerle `expect()`
+  que resuelva la espera por sí solo. El valor del Prompt cancelado tampoco es un
+  string vacío: el propio JS de la página reemplaza el `null` que devuelve
+  `dialog.dismiss()` por el string `"no answer"` antes de mostrar el segundo alert,
+  así que cancelar y aceptar con un campo vacío no dan el mismo resultado.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v
