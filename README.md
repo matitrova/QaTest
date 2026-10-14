@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **261 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **264 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,7 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 103 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 66 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 69 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 17 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -294,7 +294,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias, un input que un div superpuesto vacía solo si se escribe sin escrollarlo antes a la vista, un botón verde que queda tapado por uno azul idéntico en posición al clickearlo, un botón que solo cambia de nombre si el campo se edita de una forma que el navegador reconoce como real, un segundo diálogo nativo que aparece recién un segundo después de responder al primero, y un generador de GUID escondido dentro de un shadow root que el DOM global ni siquiera puede ver
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias, un input que un div superpuesto vacía solo si se escribe sin escrollarlo antes a la vista, un botón verde que queda tapado por uno azul idéntico en posición al clickearlo, un botón que solo cambia de nombre si el campo se edita de una forma que el navegador reconoce como real, un segundo diálogo nativo que aparece recién un segundo después de responder al primero, un generador de GUID escondido dentro de un shadow root que el DOM global ni siquiera puede ver, y un botón que un contenedor con scroll recorta fuera de su área visible sin que `is_visible()` se dé cuenta
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -380,6 +380,14 @@ no el sitio completo).
   el input, que dos clicks seguidos dan dos GUIDs distintos, y que el botón
   de copiar al clipboard dispara un error real de la página en este deploy
   puntual en vez de copiar nada.
+- `/scrollbars`: un botón ubicado dentro de un contenido de 600x300 recortado
+  por un contenedor de 300x150 con scroll propio, verificando que la posición
+  real del botón cae afuera del rectángulo visible del contenedor en los dos
+  ejes a la vez, que `is_visible()` de Playwright no detecta ese recorte y
+  sigue dando `True`, que clickearlo sin ningún scroll manual previo escrolea
+  el contenedor automáticamente en ambos ejes antes de clickear, y que
+  `force=True` -- que bypassea otras verificaciones de "actionability" --
+  sigue escrolleando igual, porque ese paso no depende de `force`.
 
 **Desafíos técnicos resueltos:**
 - `is_visible()` de Playwright no es un sinónimo de "el usuario lo ve": solo mira el
@@ -632,6 +640,21 @@ no el sitio completo).
   test verifica ese error real en vez de simular el escenario completo que
   la página describe, que en este deploy es directamente imposible de
   automatizar tal como está escrito.
+- `/scrollbars` recorta un botón fuera del área visible de un contenedor de
+  300x150 con scroll propio (su contenido real mide 600x300), así que su
+  posición de página cae afuera del rectángulo visible en los dos ejes a la
+  vez -- y aun así `is_visible()` sigue dando `True`, porque solo mira
+  layout y estilos del elemento mismo, no si un ancestro con `overflow`
+  lo está recortando. A diferencia de Selenium, donde este caso clásico
+  exige un `scrollIntoView()` manual antes de clickear (o falla
+  directamente), el paso de "actionability" de `locator.click()` de
+  Playwright escrolea el contenedor más cercano por su cuenta, en ambos
+  ejes, antes de clickear -- confirmado leyendo `scrollLeft`/`scrollTop`
+  del contenedor antes y después del click, sin ningún scroll manual de
+  por medio. Ese scroll además es un paso aparte de las demás
+  verificaciones de "actionability" (visible, habilitado, estable, que
+  nada más reciba el evento): `force=True`, que sí bypassea esas otras,
+  sigue escrollando igual.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v
