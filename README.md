@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **257 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **261 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,7 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 103 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 62 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 66 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 17 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -294,7 +294,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias, un input que un div superpuesto vacía solo si se escribe sin escrollarlo antes a la vista, un botón verde que queda tapado por uno azul idéntico en posición al clickearlo, un botón que solo cambia de nombre si el campo se edita de una forma que el navegador reconoce como real, y un segundo diálogo nativo que aparece recién un segundo después de responder al primero
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias, un input que un div superpuesto vacía solo si se escribe sin escrollarlo antes a la vista, un botón verde que queda tapado por uno azul idéntico en posición al clickearlo, un botón que solo cambia de nombre si el campo se edita de una forma que el navegador reconoce como real, un segundo diálogo nativo que aparece recién un segundo después de responder al primero, y un generador de GUID escondido dentro de un shadow root que el DOM global ni siquiera puede ver
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -371,6 +371,15 @@ no el sitio completo).
   respuesta, que aceptar el Prompt con un texto dispare ese mismo texto en el segundo
   alert ("User value: ..."), y que cancelarlo lo reemplace por "no answer" en vez de un
   valor vacío.
+- `/shadowdom`: un componente `<guid-generator>` (Custom Element con
+  `attachShadow({mode: "open"})`) que vive en un shadow root propio, fuera
+  del documento principal, verificando que `page.locator("#editField")` lo
+  encuentra igual que a cualquier otro elemento mientras que
+  `document.querySelector("#editField")` desde el documento global no ve
+  nada, que el botón de generar carga un valor con formato de GUID válido en
+  el input, que dos clicks seguidos dan dos GUIDs distintos, y que el botón
+  de copiar al clipboard dispara un error real de la página en este deploy
+  puntual en vez de copiar nada.
 
 **Desafíos técnicos resueltos:**
 - `is_visible()` de Playwright no es un sinónimo de "el usuario lo ve": solo mira el
@@ -599,6 +608,30 @@ no el sitio completo).
   string vacío: el propio JS de la página reemplaza el `null` que devuelve
   `dialog.dismiss()` por el string `"no answer"` antes de mostrar el segundo alert,
   así que cancelar y aceptar con un campo vacío no dan el mismo resultado.
+- `/shadowdom` mete el input y los dos botones dentro de un shadow root
+  abierto (`attachShadow({mode: "open"})`) de un Custom Element
+  (`<guid-generator>`), no en el `<body>` del documento. Confirmado con
+  `document.querySelector("#editField")` ejecutado por `page.evaluate()`
+  desde el documento principal: devuelve `null`, porque las APIs nativas del
+  DOM no atraviesan el límite de un shadow root por default. `page.locator()`
+  de Playwright sí lo encuentra con el mismo selector CSS de toda la vida
+  (`#editField`), sin ninguna sintaxis especial ni tener que pedir
+  `shadowRoot` a mano -- a diferencia de Selenium clásico, donde hay que
+  resolver el `shadow-root` como un paso explícito antes de poder buscar
+  dentro. El enunciado de la propia página pide comparar el valor del
+  clipboard contra el input después de clickear "copiar", pero contra este
+  deploy puntual (servido por `http://`, no `https://`) eso no se puede
+  cumplir: la Clipboard API ni siquiera existe ahí, confirmado con
+  `typeof navigator.clipboard === "undefined"` antes de clickear nada -- no
+  es un permiso denegado (`context.grant_permissions()` no cambia nada,
+  probado explícitamente), es que el navegador no expone esa API fuera de un
+  contexto seguro (https o localhost). El handler de la página llama a
+  `navigator.clipboard.writeText(...)` sin ningún `try/catch` alrededor, así
+  que el click no falla en silencio: dispara un error real de la página,
+  capturado con `page.on("pageerror")`, con "writeText" en el mensaje. El
+  test verifica ese error real en vez de simular el escenario completo que
+  la página describe, que en este deploy es directamente imposible de
+  automatizar tal como está escrito.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v
