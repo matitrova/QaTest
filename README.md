@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **264 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **267 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 103 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 106 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 69 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 17 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante y scroll infinito
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito y un link cuya URL relativa redirige a otra página
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -143,6 +143,12 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   vista, verificando tanto la posición resultante tras un scroll largo como
   que vuelve exactamente a su posición original al volver arriba, y que los
   links del menú siguen siendo clickeables mientras está "flotando"
+- Redirector (`/redirector`): un link cuyo `href` es la URL relativa
+  `redirect`, sin barra inicial -- verificando contra la API real que esa
+  URL relativa resuelve contra la raíz del sitio (`/redirect`, un 302 con
+  header `Location` hacia `/status_codes`) y no contra la carpeta que
+  sugiere el nombre de la página (`/redirector/redirect`, que da 404), y
+  que un click en el navegador efectivamente termina en `/status_codes`
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -287,6 +293,17 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   llega al fondo (`window.scrollTo(0, 50)`) se prueba por separado contra
   uno que sí llega (`document.body.scrollHeight`): solo el segundo agrega
   contenido.
+- `/redirector` linkea con `href='redirect'`, una URL relativa sin barra
+  inicial. La regla de resolución de URLs relativas no toma el nombre de
+  la página actual como si fuera una carpeta: como `/redirector` no
+  termina en `/`, su "directorio" es la raíz del sitio, así que el link
+  resuelve a `{BASE_URL}/redirect`, no a `{BASE_URL}/redirector/redirect`
+  como sugeriría intuitivamente el nombre de la página (esa URL ni
+  siquiera existe, devuelve 404). El test lo verifica con `requests`
+  contra las dos URLs antes de tocar el navegador, para separar la
+  resolución de la URL del comportamiento del click, y después confirma
+  con `page.expect_navigation()` que clickear el link real termina en
+  `/status_codes`.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
