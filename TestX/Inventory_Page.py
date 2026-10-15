@@ -5,6 +5,9 @@ class InventoryPage:
         self.selector_orden = page.locator(".product_sort_container")
         self.nombres = page.locator(".inventory_item_name")
         self.imagenes = page.locator("img.inventory_item_img")
+        self.boton_menu = page.locator("#react-burger-menu-btn")
+        self.link_logout = page.locator("#logout_sidebar_link")
+        self.mensaje_error = page.locator("[data-test='error']")
 
     def agregar_al_carrito(self, nombre_producto):
         selector = f"#add-to-cart-{nombre_producto}"
@@ -23,3 +26,8 @@ class InventoryPage:
     def srcs_imagenes(self):
         count = self.imagenes.count()
         return [self.imagenes.nth(i).get_attribute("src") for i in range(count)]
+
+    def cerrar_sesion(self):
+        self.boton_menu.click()
+        self.link_logout.wait_for(state="visible")
+        self.link_logout.click()

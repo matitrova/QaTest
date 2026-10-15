@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **267 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **270 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -16,7 +16,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 106 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 69 | UI |
-| [`TestX`](TestX) | SauceDemo (e-commerce) | 17 | UI |
+| [`TestX`](TestX) | SauceDemo (e-commerce) | 20 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
 | [`ApiTest`](ApiTest) | API de JSONPlaceholder | 5 | API |
@@ -679,12 +679,12 @@ cd UiTestingPlaygroundTest && python3 -m pytest -v
 
 ---
 
-## SauceDemo — Login, carrito, checkout completo y usuarios especiales
+## SauceDemo — Login, carrito, checkout completo, logout y usuarios especiales
 
 Tests de login (casos exitosos, errores y validaciones), agregado de productos al
-carrito, el flujo completo de compra y los usuarios de prueba que SauceDemo ofrece a
-propósito con bugs y comportamientos distintos, con Page Objects para el login, el
-inventario y el checkout.
+carrito, el flujo completo de compra, el cierre de sesión y los usuarios de prueba que
+SauceDemo ofrece a propósito con bugs y comportamientos distintos, con Page Objects
+para el login, el inventario y el checkout.
 
 **Cubre:**
 - Checkout de principio a fin: agregar un producto, ir al carrito, completar los tres
@@ -699,6 +699,10 @@ inventario y el checkout.
   no reordena la lista (contra `standard_user`, donde sí la reordena correctamente)
 - `performance_glitch_user`: el login se repite varias veces con sesiones nuevas para
   confirmar que el delay artificial de ~5 segundos es intermitente, no constante
+- Logout desde el menú hamburguesa: vuelve a la pantalla de login con el campo de
+  usuario vacío, y la sesión queda realmente invalidada del lado cliente, no solo
+  "oculta" -- ni volviendo con el botón atrás del navegador ni entrando de nuevo a
+  `/inventory.html` a mano se puede ver el catálogo sin loguearse otra vez
 
 **Desafíos técnicos resueltos:**
 - La versión actual de SauceDemo es una SPA (bundle servido con Vite): al hacer clic en
@@ -732,6 +736,17 @@ inventario y el checkout.
   `click()` del login entero, no solo el `wait_for_url()` posterior -- el delay ocurre
   durante la propia respuesta al click, así que medir después de que `login()` ya
   retornó siempre da un tiempo casi nulo, aunque el login en sí haya tardado 5 segundos.
+- Después de hacer logout, pulsar atrás en el navegador deja la barra de direcciones
+  apuntando de nuevo a `/inventory.html`, pero eso no es que la sesión haya quedado
+  "viva" en caché: la propia app detecta que no hay sesión y redirige sola a `/`, solo
+  que esa redirección es asíncrona. Leer la URL o el contenido del DOM justo después de
+  `go_back()` es flaky -- a veces se llega a ver `/inventory.html` en blanco, sin
+  productos, a mitad de camino de la redirección todavía no terminada. La solución es
+  esperar explícitamente con `wait_for_url()` a que la URL vuelva a `/` antes de afirmar
+  nada, en vez de confiar en que `go_back()` ya deja todo resuelto.
+- Entrar directo a `/inventory.html` sin haber hecho login nunca dispara el mismo
+  chequeo del lado cliente que usa logout: no hace falta loguearse y desloguearse para
+  probar la protección de la ruta, alcanza con navegar directo a la URL protegida.
 
 ```bash
 python3 -m pytest TestX -v
