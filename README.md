@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **274 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **279 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,7 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 106 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 69 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 74 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 24 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -311,7 +311,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias, un input que un div superpuesto vacía solo si se escribe sin escrollarlo antes a la vista, un botón verde que queda tapado por uno azul idéntico en posición al clickearlo, un botón que solo cambia de nombre si el campo se edita de una forma que el navegador reconoce como real, un segundo diálogo nativo que aparece recién un segundo después de responder al primero, un generador de GUID escondido dentro de un shadow root que el DOM global ni siquiera puede ver, y un botón que un contenedor con scroll recorta fuera de su área visible sin que `is_visible()` se dé cuenta
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias, un input que un div superpuesto vacía solo si se escribe sin escrollarlo antes a la vista, un botón verde que queda tapado por uno azul idéntico en posición al clickearlo, un botón que solo cambia de nombre si el campo se edita de una forma que el navegador reconoce como real, un segundo diálogo nativo que aparece recién un segundo después de responder al primero, un generador de GUID escondido dentro de un shadow root que el DOM global ni siquiera puede ver, un botón que un contenedor con scroll recorta fuera de su área visible sin que `is_visible()` se dé cuenta, y un texto visible en pantalla que no es igual, carácter a carácter, al nodo de texto crudo del DOM que lo contiene
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -405,6 +405,18 @@ no el sitio completo).
   el contenedor automáticamente en ambos ejes antes de clickear, y que
   `force=True` -- que bypassea otras verificaciones de "actionability" --
   sigue escrolleando igual, porque ese paso no depende de `force`.
+- `/verifytext`: un `<span>` cuyo texto visible en pantalla ("Welcome
+  UserName!") no es el mismo string que su nodo de texto crudo del DOM --
+  tiene un `<span>` anidado alrededor de "UserName" y espacios/saltos de
+  línea de más que el navegador normaliza al renderizar --, verificando que
+  un XPath de igualdad exacta (`//span[.='Welcome UserName!']`) no encuentra
+  nada, que la misma comparación con `normalize-space()` sí encuentra
+  exactamente ese span, que `get_by_text(exact=True)` de Playwright coincide
+  con el mismo elemento, y que la variante sin `exact` -- que busca la frase
+  como substring en toda la página -- también matchea, sin ninguna relación
+  con lo que hay que automatizar, los dos bloques `<code>` de la propia
+  tabla "Does not work / Works" que imprimen el enunciado de la página como
+  texto plano.
 
 **Desafíos técnicos resueltos:**
 - `is_visible()` de Playwright no es un sinónimo de "el usuario lo ve": solo mira el
@@ -672,6 +684,33 @@ no el sitio completo).
   verificaciones de "actionability" (visible, habilitado, estable, que
   nada más reciba el evento): `force=True`, que sí bypassea esas otras,
   sigue escrollando igual.
+- `/verifytext` tiene, dentro de `div.bg-primary`, un único
+  `span.badge-secondary` con el markup `Welcome <span>UserName</span>!`
+  envuelto en indentación y saltos de línea propios del HTML fuente. El
+  string-value de XPath de ese span (`.`) concatena el texto de todos sus
+  nodos descendientes tal cual están en el markup, así que
+  `//span[.='Welcome UserName!']` no es igual, carácter a carácter, al
+  resultado -- confirmado leyendo `text_content()` del propio elemento,
+  que devuelve la frase rodeada de espacios y saltos de línea en vez del
+  string limpio. `normalize-space()` colapsa ese espacio en blanco interno
+  y recorta los extremos antes de comparar, y encuentra el span sin
+  ambigüedad porque es el único elemento de toda la página cuyo texto
+  normalizado es exactamente esa frase. `get_by_text(exact=True)` de
+  Playwright se comporta igual que `normalize-space()` -- normaliza
+  espacios antes de comparar -- y coincide con el mismo span, sin que el
+  test necesite escribir ningún XPath. La variante sin `exact` (substring,
+  sin acotar a ninguna sección) es la que expone el caso más interesante:
+  la propia tabla "Does not work / Works" de la página imprime las dos
+  expresiones XPath del enunciado como texto plano dentro de bloques
+  `<code>`, y ese texto también contiene, de forma literal, la frase
+  "Welcome UserName!" -- un locator por texto flexible sin acotar a la
+  sección correcta encuentra 3 elementos en vez de 1, confirmado leyendo
+  el `tagName` de cada coincidencia (`CODE`, `CODE`, `SPAN`), y dos de
+  ellos son justamente el enunciado que describe el problema, no el
+  elemento a automatizar. Acotar el locator al contenedor `div.bg-primary`
+  de la sección "Playground" -- en vez de perseguir una condición de texto
+  más estricta -- alcanza para que incluso la variante sin `exact=True`
+  vuelva a dar 1 sola coincidencia.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v
