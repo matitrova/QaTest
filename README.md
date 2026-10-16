@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **270 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **274 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -16,7 +16,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 106 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 69 | UI |
-| [`TestX`](TestX) | SauceDemo (e-commerce) | 20 | UI |
+| [`TestX`](TestX) | SauceDemo (e-commerce) | 24 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
 | [`ApiTest`](ApiTest) | API de JSONPlaceholder | 5 | API |
@@ -679,14 +679,19 @@ cd UiTestingPlaygroundTest && python3 -m pytest -v
 
 ---
 
-## SauceDemo — Login, carrito, checkout completo, logout y usuarios especiales
+## SauceDemo — Login, carrito, checkout completo, logout, ordenar productos y usuarios especiales
 
 Tests de login (casos exitosos, errores y validaciones), agregado de productos al
-carrito, el flujo completo de compra, el cierre de sesión y los usuarios de prueba que
-SauceDemo ofrece a propósito con bugs y comportamientos distintos, con Page Objects
-para el login, el inventario y el checkout.
+carrito, el flujo completo de compra, el cierre de sesión, el ordenamiento del
+catálogo y los usuarios de prueba que SauceDemo ofrece a propósito con bugs y
+comportamientos distintos, con Page Objects para el login, el inventario y el
+checkout.
 
 **Cubre:**
+- Ordenar el catálogo por precio (`lohi`, de menor a mayor, y `hilo`, de mayor a
+  menor) con `standard_user`, verificando que el resultado coincide con la lista de
+  precios ordenada numéricamente, y que dos productos con el mismo precio
+  ($15.99) mantienen su orden relativo original en ambos sentidos
 - Checkout de principio a fin: agregar un producto, ir al carrito, completar los tres
   pasos del checkout y llegar a la pantalla de confirmación
 - Verificación de que el impuesto (8% del subtotal) y el total se calculan de verdad, no
@@ -695,8 +700,10 @@ para el login, el inventario y el checkout.
 - Validación del formulario de checkout: continuar sin completar los datos personales
   muestra un error y no avanza de pantalla
 - `problem_user`: las seis imágenes del catálogo apuntan al mismo archivo (contra
-  `standard_user`, donde las seis son distintas), y el selector de orden "Name (Z to A)"
-  no reordena la lista (contra `standard_user`, donde sí la reordena correctamente)
+  `standard_user`, donde las seis son distintas), y el selector de orden no reordena
+  la lista para **ningún** criterio -- ni "Name (Z to A)" ni ninguno de los dos
+  órdenes por precio (contra `standard_user`, donde los tres sí reordenan
+  correctamente)
 - `performance_glitch_user`: el login se repite varias veces con sesiones nuevas para
   confirmar que el delay artificial de ~5 segundos es intermitente, no constante
 - Logout desde el menú hamburguesa: vuelve a la pantalla de login con el campo de
@@ -705,6 +712,21 @@ para el login, el inventario y el checkout.
   `/inventory.html` a mano se puede ver el catálogo sin loguearse otra vez
 
 **Desafíos técnicos resueltos:**
+- El test que ya existía para `problem_user` solo probaba que "Name (Z to A)" no
+  reordenaba el catálogo, y la descripción original del bug hablaba de ese criterio
+  puntual. Probando los otros tres contra el sitio real antes de escribir el test de
+  ordenar por precio, el `<select>` de orden tampoco reordena nada al elegir "Price
+  (low to high)" ni "Price (high to low)": el bug no es específico de un criterio, es
+  que el handler de cambio de orden no hace nada para ningún valor del `<select>` con
+  este usuario. El test nuevo generaliza esa cobertura a los dos criterios de precio en
+  vez de dar por sentado que solo afecta al que ya estaba probado.
+- El catálogo tiene dos productos al mismo precio ($15.99: "Sauce Labs Bolt T-Shirt" y
+  "Test.allTheThings() T-Shirt (Red)"), confirmado leyendo los precios reales antes de
+  escribir el test. Comparar solo la lista de precios ordenada no alcanza para detectar
+  un sort inestable que invirtiera el orden de los empatados entre `lohi` y `hilo` --
+  numéricamente seguiría dando la lista correcta igual. El test de empate verifica por
+  separado que esos dos nombres puntuales mantienen su orden relativo original en
+  ambos sentidos, confirmando que el sort es estable y no solo numéricamente correcto.
 - La versión actual de SauceDemo es una SPA (bundle servido con Vite): al hacer clic en
   "Checkout" o en "Continue", la URL cambia primero (`history.pushState`) y el
   componente de la página nueva recién se monta un instante después. Un locator

@@ -4,6 +4,7 @@ class InventoryPage:
         self.cantidad_carrito = page.locator(".shopping_cart_badge")
         self.selector_orden = page.locator(".product_sort_container")
         self.nombres = page.locator(".inventory_item_name")
+        self.precios = page.locator(".inventory_item_price")
         self.imagenes = page.locator("img.inventory_item_img")
         self.boton_menu = page.locator("#react-burger-menu-btn")
         self.link_logout = page.locator("#logout_sidebar_link")
@@ -22,6 +23,9 @@ class InventoryPage:
 
     def nombres_productos(self):
         return self.nombres.all_inner_texts()
+
+    def precios_productos(self):
+        return [float(p.replace("$", "")) for p in self.precios.all_inner_texts()]
 
     def srcs_imagenes(self):
         count = self.imagenes.count()
