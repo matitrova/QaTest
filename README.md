@@ -866,8 +866,17 @@ fixture y se envía en la cookie de las operaciones que lo requieren.
 - Filtros de Restful Booker (`GET /booking?firstname=...&lastname=...&checkin=...&checkout=...`):
   por nombre solo, por nombre y apellido combinados, sin coincidencias, y por rango de
   fechas de estadía
+- Contrato de schema de ReqRes (`jsonschema`): valida que `GET /users/<id>`, la lista de
+  `GET /users` y el `POST /users` de creación cumplan la forma exacta del JSON que
+  prometen (tipos, campos obligatorios, formato de `email` y de `avatar`), más dos tests
+  que confirman que el propio esquema rechaza un documento inválido, para no confiar en
+  un esquema que por error aceptara cualquier cosa
 
 **Desafíos técnicos resueltos:**
+- El `id` de un usuario es un entero en el `GET` (`"id": 2`) pero un **string** en la
+  respuesta del `POST` de creación (`"id": "649"`). Son dos contratos distintos aunque
+  el campo se llame igual: el esquema de creación no puede reusar el del `GET`, y el test
+  de contrato lo deja explícito en vez de descubrirlo por un fallo críptico de tipos.
 - Pedir una página que no existe (`?page=999`) no da 404: ReqRes responde **200** con
   `data: []`, y encima refleja el número de página pedido en el cuerpo aunque no exista.
   Un test que solo mirara el status code daría esa respuesta por una página más. El caso
