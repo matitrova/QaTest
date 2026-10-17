@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **279 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **285 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -15,7 +15,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 106 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 74 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 80 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 24 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
@@ -311,7 +311,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias, un input que un div superpuesto vacía solo si se escribe sin escrollarlo antes a la vista, un botón verde que queda tapado por uno azul idéntico en posición al clickearlo, un botón que solo cambia de nombre si el campo se edita de una forma que el navegador reconoce como real, un segundo diálogo nativo que aparece recién un segundo después de responder al primero, un generador de GUID escondido dentro de un shadow root que el DOM global ni siquiera puede ver, un botón que un contenedor con scroll recorta fuera de su área visible sin que `is_visible()` se dé cuenta, y un texto visible en pantalla que no es igual, carácter a carácter, al nodo de texto crudo del DOM que lo contiene
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias, un input que un div superpuesto vacía solo si se escribe sin escrollarlo antes a la vista, un botón verde que queda tapado por uno azul idéntico en posición al clickearlo, un botón que solo cambia de nombre si el campo se edita de una forma que el navegador reconoce como real, un segundo diálogo nativo que aparece recién un segundo después de responder al primero, un generador de GUID escondido dentro de un shadow root que el DOM global ni siquiera puede ver, un botón que un contenedor con scroll recorta fuera de su área visible sin que `is_visible()` se dé cuenta, un texto visible en pantalla que no es igual, carácter a carácter, al nodo de texto crudo del DOM que lo contiene, y un formulario de login cuyos campos empiezan con id="username"/id="password" en el HTML real pero quedan con un GUID al azar apenas termina de cargar la página
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -417,6 +417,15 @@ no el sitio completo).
   con lo que hay que automatizar, los dos bloques `<code>` de la propia
   tabla "Does not work / Works" que imprimen el enunciado de la página como
   texto plano.
+- `/sampleapp`: un formulario de login donde cualquier nombre de usuario no
+  vacío junto con la password `pwd` loguea con éxito, verificando el mensaje
+  de bienvenida con el nombre ingresado, que una password incorrecta y un
+  usuario vacío (con la password correcta) dan el mismo mensaje de error y
+  limpian los dos campos, que el mismo botón pasa de "Log In" a "Log Out" al
+  loguearse y que clickearlo de nuevo ya logueado revierte todo el estado al
+  original, y que el id real de los campos de usuario y contraseña no es un
+  valor fijo: no existe apenas carga la página y cambia otra vez en cada
+  recarga.
 
 **Desafíos técnicos resueltos:**
 - `is_visible()` de Playwright no es un sinónimo de "el usuario lo ve": solo mira el
@@ -711,6 +720,22 @@ no el sitio completo).
   de la sección "Playground" -- en vez de perseguir una condición de texto
   más estricta -- alcanza para que incluso la variante sin `exact=True`
   vuelva a dar 1 sola coincidencia.
+- `/sampleapp` manda un HTML donde los inputs de usuario y contraseña tienen
+  literalmente `id="username"` e `id="password"` -- confirmado pidiendo la
+  página con `requests`, sin ejecutar ningún JavaScript. Pero un `<script>`
+  inline, ubicado más abajo en el mismo documento, le asigna a cada uno un
+  GUID al azar como nuevo id apenas el parser llega a esa línea -- antes de
+  que Playwright termine de cargar la página y devuelva el control tras
+  `goto()`. Un locator por `#username` no encuentra nada desde el primer
+  momento, y ni copiando el GUID vigente alcanzaría para el día siguiente:
+  se recalcula en cada recarga, confirmado comparando el id antes y después
+  de un `page.reload()`. El atributo `name` (`UserName`/`Password`), que ese
+  script nunca toca, es el único identificador estable entre cargas. El
+  botón de login tampoco distingue entre dos elementos: es el mismo
+  `<button id="login">` el que pasa a actuar como logout con solo cambiar
+  una variable interna (`loggedIn`) y su propio texto visible, así que el
+  test clickea ese mismo locator en los dos sentidos en vez de buscar un
+  botón de logout que no existe como tal.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v
