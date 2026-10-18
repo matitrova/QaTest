@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **285 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **291 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -18,7 +18,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 80 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 24 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
-| [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 15 | API |
+| [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 21 | API |
 | [`ApiTest`](ApiTest) | API de JSONPlaceholder | 5 | API |
 | [`postman/`](postman) | API de Restful Booker, en Postman + Newman | 22 | API |
 | [`practica/`](practica) | Ejercicios de Python y repaso de Playwright | 10 | Práctica |
@@ -877,6 +877,11 @@ fixture y se envía en la cookie de las operaciones que lo requieren.
 - Filtros de Restful Booker (`GET /booking?firstname=...&lastname=...&checkin=...&checkout=...`):
   por nombre solo, por nombre y apellido combinados, sin coincidencias, y por rango de
   fechas de estadía
+- Códigos de error específicos de Restful Booker: `/auth` con password incorrecta, con
+  username incorrecto y sin credenciales (los tres casos devuelven 200, no 401/403), un
+  `PUT` sin token y uno con un token inventado (ambos 403, confirmando que la API valida
+  el contenido del token y no solo que la cookie exista), y una reserva pedida con un id
+  no numérico (404, el mismo que un id numérico inexistente)
 - Contrato de schema de ReqRes (`jsonschema`): valida que `GET /users/<id>`, la lista de
   `GET /users` y el `POST /users` de creación cumplan la forma exacta del JSON que
   prometen (tipos, campos obligatorios, formato de `email` y de `avatar`), más dos tests
