@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito y un link cuya URL relativa redirige a otra página
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página y un DOM enorme anidado 50 niveles de profundidad
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -304,6 +304,17 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   resolución de la URL del comportamiento del click, y después confirma
   con `page.expect_navigation()` que clickear el link real termina en
   `/status_codes`.
+- DOM enorme y anidado (`/large`): un elemento sin hermanos envuelto en 50
+  `<div>` sin class ni id, uno dentro del otro, que se ubica por id tan
+  directo como si estuviera en la raíz del documento. La sección "Siblings"
+  resulta no ser tan plana como su nombre sugiere: item-2 e item-3 de cada
+  tier sí son hermanos reales entre sí, pero item-1 no es su hermano sino su
+  padre, y ese mismo `<div>` se queda abierto hasta contener completo al
+  tier siguiente -- el item-1 del tier 1 termina siendo ancestro de los 49
+  tiers restantes. Por último, la tabla de la página es una grilla completa
+  de 50 filas por 50 columnas (2500 celdas) con un `<thead>` propio, no las
+  6 columnas visibles sin hacer scroll horizontal -- contar `tr` sin
+  filtrar por `tbody` da 51 filas en vez de 50.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
