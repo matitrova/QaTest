@@ -968,7 +968,7 @@ validaba algo que esa API nunca promete. Ahora se valida la respuesta de la oper
 misma, que es lo único que ReqRes garantiza.
 
 **Cada suite corre desde su propia carpeta.** Varias carpetas tienen módulos con el
-mismo nombre (`config.py` en tres de ellas). Corriendo todo junto desde la raíz, Python
+mismo nombre (`config.py` en cuatro de ellas). Corriendo todo junto desde la raíz, Python
 importa el primero que encuentra y las demás suites usan la configuración equivocada:
 los tests de ReqRes le pegaban a otro sitio y daban 404. La integración continua corre
 cada suite como un trabajo aparte, desde su carpeta, sin tocar el código de los tests.
@@ -991,6 +991,18 @@ toca ningún locator ni ninguna aserción) y se verificó corriendo las tres sui
 completas, dos veces seguidas cada una, antes de commitear — mismos tests, mismos
 resultados, con menos código repetido y con tipado explícito en el único punto que
 todas comparten.
+
+**La URL de JSONPlaceholder repetida a mano en los cuatro tests de `ApiTest`.** A
+diferencia de `ReqResTest`, `RestfulBookerTest` y `UiTestingPlaygroundTest`, que ya
+leen su URL base desde un `config.py` con `os.environ.get(...)`, `ApiTest` tenía
+`"https://jsonplaceholder.typicode.com"` escrito literalmente en los cuatro archivos
+de test. Cambiar de ambiente significaba editar cuatro strings sueltos en vez de una
+sola constante, y nada impedía que alguno quedara desactualizado. Se sumó
+`ApiTest/config.py` con el mismo patrón que las otras suites (`BASE_URL` con default y
+override por variable de entorno) y los cuatro tests pasaron a importar `BASE_URL` en
+vez de repetir la URL. Las aserciones y el comportamiento de cada test quedaron
+idénticos: se corrió la suite dos veces seguidas antes de commitear, mismos 5 tests,
+mismo resultado.
 
 ## Instalación
 

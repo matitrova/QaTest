@@ -1,4 +1,5 @@
 import requests
+from config import BASE_URL
 
 def test_modificar_post():
     post_actualizado = {
@@ -6,9 +7,8 @@ def test_modificar_post():
         "body": "Contenido actualizado",
         "userId": 1
     }
- 
+
     respuesta = requests.put(
-        "https://jsonplaceholder.typicode.com/posts/1",
+        f"{BASE_URL}/posts/1",
         json=post_actualizado)
     assert respuesta.status_code == 200
-    

@@ -1,4 +1,5 @@
 import requests
+from config import BASE_URL
 
 def test_crear_post():
     nuevo_post = {
@@ -7,7 +8,6 @@ def test_crear_post():
         "userId": 1
     }
     respuesta = requests.post(
-        "https://jsonplaceholder.typicode.com/posts",
+        f"{BASE_URL}/posts",
         json=nuevo_post)
     assert respuesta.status_code == 201
-    
