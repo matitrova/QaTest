@@ -1,6 +1,10 @@
-class HorizontalSliderPage:
-    def __init__(self, page):
-        self.page = page
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
+class HorizontalSliderPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.slider = page.locator("input[type=range]")
         self.valor_mostrado = page.locator("#range")
 

@@ -1,6 +1,10 @@
-class ScrollbarsPage:
-    def __init__(self, page):
-        self.page = page
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
+class ScrollbarsPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         # El contenedor scrolleable es el único div con overflow-y/overflow-x
         # en la página: scrollea tanto vertical como horizontalmente porque
         # el contenido interno (600x300) es más grande que la ventana visible

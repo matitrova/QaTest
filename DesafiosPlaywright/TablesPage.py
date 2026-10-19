@@ -1,11 +1,15 @@
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
 import re
 
 from playwright.sync_api import expect
 
 
-class TablesPage:
-    def __init__(self, page):
-        self.page = page
+class TablesPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         # Tabla 1: sin class ni id en <td>, hay que ubicar por posición.
         self.apellidos_tabla1 = page.locator("#table1 tbody tr td:nth-child(1)")
         # Tabla 2: con class en cada <td>, se puede ubicar por atributo.

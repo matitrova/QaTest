@@ -1,10 +1,14 @@
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
 ESPACIO_NORMAL = " "
 ESPACIO_NO_SEPARABLE = " "
 
 
-class NbspPage:
-    def __init__(self, page):
-        self.page = page
+class NbspPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         # Por rol y texto visible: el propio motor de texto de Playwright
         # normaliza el nbsp a un espacio común al comparar, así que este
         # locator encuentra el botón sin que haga falta saber que el

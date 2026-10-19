@@ -1,6 +1,10 @@
-class MouseOverPage:
-    def __init__(self, page):
-        self.page = page
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
+class MouseOverPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.contador_click_me = page.locator("#clickCount")
         self.contador_link_button = page.locator("#clickButtonCount")
 

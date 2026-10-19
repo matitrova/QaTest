@@ -1,11 +1,15 @@
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
 import re
 
 ID_DINAMICO = re.compile(r"^[0-9a-f-]{36}$")
 
 
-class DynamicIdPage:
-    def __init__(self, page):
-        self.page = page
+class DynamicIdPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         # Por nombre y rol, no por id: es justamente lo que esta página pide
         # verificar ("make sure that ID is not used for button identification").
         self.boton = page.get_by_role("button", name="Button with Dynamic ID")

@@ -1,8 +1,12 @@
-class HiddenLayersPage:
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
+class HiddenLayersPage(BasePage):
     CLASE_BOTON_VERDE = "btn btn-success"
 
-    def __init__(self, page):
-        self.page = page
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.boton_verde = page.locator("#greenButton")
         self.boton_azul = page.locator("#blueButton")
         self.aviso = page.locator(".bg-warning")

@@ -1,9 +1,13 @@
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
 import re
 
 
-class DynamicTablePage:
-    def __init__(self, page):
-        self.page = page
+class DynamicTablePage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.encabezados = page.locator('[role="columnheader"]')
         self.filas = page.locator('[role="rowgroup"]').nth(1).locator('[role="row"]')
         self.label_cpu = page.locator(".bg-warning")

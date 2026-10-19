@@ -1,6 +1,10 @@
-class AddRemoveElementsPage:
-    def __init__(self, page):
-        self.page = page
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
+class AddRemoveElementsPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.boton_agregar = page.get_by_role("button", name="Add Element")
         # Los botones de eliminar son todos idénticos (misma clase, sin id
         # ni atributo que los distinga entre sí) -- no hay forma de

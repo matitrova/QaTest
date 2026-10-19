@@ -1,6 +1,10 @@
-class OverlappedPage:
-    def __init__(self, page):
-        self.page = page
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
+class OverlappedPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.id_input = page.locator("#id")
         self.name_input = page.locator("#name")
         self.subject_input = page.locator("#subject")

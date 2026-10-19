@@ -1,6 +1,10 @@
-class CheckoutPage:
-    def __init__(self, page):
-        self.page = page
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
+class CheckoutPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.first_name_input = page.locator("[data-test='firstName']")
         self.last_name_input = page.locator("[data-test='lastName']")
         self.postal_code_input = page.locator("[data-test='postalCode']")

@@ -1,9 +1,13 @@
-class ClickPage:
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
+class ClickPage(BasePage):
     CLASE_INICIAL = "btn btn-primary"
     CLASE_AL_CLICKEAR = "btn btn-success"
 
-    def __init__(self, page):
-        self.page = page
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.boton = page.locator("#badButton")
 
     def clickear_via_js(self):

@@ -1,6 +1,10 @@
-class TextInputPage:
-    def __init__(self, page):
-        self.page = page
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
+class TextInputPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.nombre_input = page.locator("#newButtonName")
         self.boton = page.locator("#updatingButton")
 

@@ -1,9 +1,13 @@
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
 FRASE_OBJETIVO = "Welcome UserName!"
 
 
-class VerifyTextPage:
-    def __init__(self, page):
-        self.page = page
+class VerifyTextPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         # El <span> real de la sección "Playground" vive dentro de un único
         # div.bg-primary en toda la página -- es el contenedor que acota la
         # búsqueda al elemento correcto en vez de a cualquier otro lugar de

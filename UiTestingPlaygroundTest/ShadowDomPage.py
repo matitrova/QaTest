@@ -1,3 +1,7 @@
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
 import re
 
 PATRON_GUID = re.compile(
@@ -5,9 +9,9 @@ PATRON_GUID = re.compile(
 )
 
 
-class ShadowDomPage:
-    def __init__(self, page):
-        self.page = page
+class ShadowDomPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.campo_guid = page.locator("#editField")
         self.boton_generar = page.locator("#buttonGenerate")
         self.boton_copiar = page.locator("#buttonCopy")

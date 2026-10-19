@@ -1,6 +1,10 @@
-class ClientDelayPage:
-    def __init__(self, page):
-        self.page = page
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
+class ClientDelayPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.boton_cliente = page.locator("#ajaxButton")
         self.spinner = page.locator("#spinner")
         self.contenido = page.locator("#content")

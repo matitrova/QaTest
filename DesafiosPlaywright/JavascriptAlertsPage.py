@@ -1,6 +1,10 @@
-class JavascriptAlertsPage:
-    def __init__(self, page):
-        self.page = page
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
+class JavascriptAlertsPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.alert_button = page.locator('button[onclick="jsAlert()"]')
         self.confirm_button = page.locator('button[onclick="jsConfirm()"]')
         self.prompt_button = page.locator('button[onclick="jsPrompt()"]')

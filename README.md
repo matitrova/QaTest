@@ -981,6 +981,17 @@ solo cambió mayúsculas: macOS no las distingue en los nombres de archivo y, po
 no siempre registra ese tipo de cambio. El archivo se renombró a minúsculas, que además
 es la convención de Python.
 
+**Un `__init__` idéntico repetido en 49 Page Objects.** `DesafiosPlaywright`,
+`UiTestingPlaygroundTest` y `TestX` tenían exactamente el mismo patrón en cada Page
+Object: `def __init__(self, page): self.page = page`, sin ningún type hint, copiado y
+pegado 49 veces. Cada carpeta suma ahora un `base_page.py` con una clase `BasePage`
+tipada (`page: Page`) de la que heredan todos sus Page Objects, que llaman a
+`super().__init__(page)` en vez de repetir la asignación. El cambio es mecánico (no
+toca ningún locator ni ninguna aserción) y se verificó corriendo las tres suites
+completas, dos veces seguidas cada una, antes de commitear — mismos tests, mismos
+resultados, con menos código repetido y con tipado explícito en el único punto que
+todas comparten.
+
 ## Instalación
 
 ```bash

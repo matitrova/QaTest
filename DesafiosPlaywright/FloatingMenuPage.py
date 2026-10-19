@@ -1,6 +1,10 @@
-class FloatingMenuPage:
-    def __init__(self, page):
-        self.page = page
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
+class FloatingMenuPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.menu = page.locator("#menu")
         self.link_home = page.locator("#menu a[href='#home']")
 

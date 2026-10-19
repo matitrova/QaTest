@@ -1,6 +1,10 @@
-class WindowsPage:
-    def __init__(self, page):
-        self.page = page
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
+class WindowsPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         # El <a> de esta página tiene un HTML medio roto (coma suelta entre
         # atributos: href='...', target='_blank'), así que en vez de
         # depender del href literal se ubica por rol + texto visible.

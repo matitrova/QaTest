@@ -1,9 +1,13 @@
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 
-class VisibilityPage:
-    def __init__(self, page):
-        self.page = page
+class VisibilityPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.boton_hide = page.locator("#hideButton")
         self.boton_removed = page.locator("#removedButton")
         self.boton_zero_width = page.locator("#zeroWidthButton")

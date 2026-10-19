@@ -1,9 +1,13 @@
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
 import re
 
 
-class ProgressBarPage:
-    def __init__(self, page):
-        self.page = page
+class ProgressBarPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.boton_start = page.locator("#startButton")
         self.boton_stop = page.locator("#stopButton")
         self.barra_progreso = page.locator("#progressBar")

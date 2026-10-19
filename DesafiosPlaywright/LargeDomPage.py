@@ -1,6 +1,10 @@
-class LargeDomPage:
-    def __init__(self, page):
-        self.page = page
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
+class LargeDomPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.no_siblings = page.locator("#no-siblings")
         self.tabla = page.locator("#large-table")
 

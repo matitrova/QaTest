@@ -1,3 +1,7 @@
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
 TARGET_TEXT = "Important Information You're Looking For"
 
 KNOWN_LINES = {
@@ -9,9 +13,9 @@ KNOWN_LINES = {
 }
 
 
-class ShiftingContentListPage:
-    def __init__(self, page):
-        self.page = page
+class ShiftingContentListPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.contenedor = page.locator(".example .large-6.columns.large-centered")
 
     def locator_exacto_del_registro_fijo(self):

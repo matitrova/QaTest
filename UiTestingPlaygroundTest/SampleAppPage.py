@@ -1,6 +1,10 @@
-class SampleAppPage:
-    def __init__(self, page):
-        self.page = page
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
+class SampleAppPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         # El HTML que manda el servidor trae id="username"/id="password" en
         # los dos inputs, pero un script inline -- ubicado más abajo en la
         # misma página -- les asigna un GUID al azar como nuevo id apenas

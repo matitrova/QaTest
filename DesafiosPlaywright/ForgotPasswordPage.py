@@ -1,6 +1,10 @@
-class ForgotPasswordPage:
-    def __init__(self, page):
-        self.page = page
+from base_page import BasePage
+from playwright.sync_api import Page
+
+
+class ForgotPasswordPage(BasePage):
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
         self.email = page.locator("#email")
         self.submit = page.locator("#form_submit")
         self.titulo_resultado = page.locator("h1")
