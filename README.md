@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **291 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **295 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -19,7 +19,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 24 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 21 | API |
-| [`ApiTest`](ApiTest) | API de JSONPlaceholder | 5 | API |
+| [`ApiTest`](ApiTest) | API de JSONPlaceholder | 9 | API |
 | [`postman/`](postman) | API de Restful Booker, en Postman + Newman | 22 | API |
 | [`practica/`](practica) | Ejercicios de Python y repaso de Playwright | 10 | Práctica |
 
@@ -887,6 +887,11 @@ fixture y se envía en la cookie de las operaciones que lo requieren.
   prometen (tipos, campos obligatorios, formato de `email` y de `avatar`), más dos tests
   que confirman que el propio esquema rechaza un documento inválido, para no confiar en
   un esquema que por error aceptara cualquier cosa
+- JSONPlaceholder, parametrizado contra datos reales: tres usuarios conocidos
+  (`id`, `name`, `email` verificados contra la API antes de escribirlos en el
+  test, no copiados de memoria) y tres ids inexistentes (`9999`, `0`, `-1`),
+  cada grupo corriendo como un solo `test_...[caso]` por `pytest.mark.parametrize`
+  en vez de una función por caso
 
 **Desafíos técnicos resueltos:**
 - El `id` de un usuario es un entero en el `GET` (`"id": 2`) pero un **string** en la
@@ -909,6 +914,15 @@ fixture y se envía en la cookie de las operaciones que lo requieren.
   propias reservas con un `firstname` único por corrida (`uuid4`) y verifican pertenencia
   al resultado en vez de igualdad exacta de listas, para no depender de qué otros datos
   haya en ese momento en el sandbox — y las borran al terminar.
+- `ApiTest` era la única suite de API sin `conftest.py`: cada test llamaba a
+  `requests.get/post/put/delete` suelto, abriendo y cerrando una conexión TCP
+  nueva por request en vez de reusarla como sí hacen `ReqResTest` y
+  `RestfulBookerTest` con sus propios fixtures. Se agregó un fixture
+  `session` (`requests.Session`, cerrada al terminar cada test) que ahora
+  usan los cuatro archivos, y los dos tests de usuarios se migraron a
+  `pytest.mark.parametrize` — antes eran tres funciones fijas (un usuario
+  conocido y un único id inexistente, `9999`), ahora son dos listas de casos
+  que se leen como datos, no como código repetido.
 
 ```bash
 cd ReqResTest && python3 -m pytest -v
