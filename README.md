@@ -923,6 +923,15 @@ fixture y se envía en la cookie de las operaciones que lo requieren.
   `pytest.mark.parametrize` — antes eran tres funciones fijas (un usuario
   conocido y un único id inexistente, `9999`), ahora son dos listas de casos
   que se leen como datos, no como código repetido.
+- `RestfulBookerTest` era la única de las tres suites de API sin `config.py`:
+  `conftest.py` y `test_bookings.py` tenían la URL base escrita a mano en cada
+  request (`test_bookings.py` la repetía 21 veces), mientras que
+  `test_auth_errores.py` y `test_filtros.py` ya la habían extraído cada uno a
+  su propia constante local, duplicada entre los dos archivos. Se agregó un
+  `config.py` con el mismo patrón que `ApiTest`/`ReqResTest`
+  (`BASE_URL = os.environ.get('BASE_URL', ...)`, así se puede apuntar a otro
+  entorno sin tocar código) y los cuatro archivos ahora importan la misma
+  constante en vez de tener cada uno su copia.
 
 ```bash
 cd ReqResTest && python3 -m pytest -v

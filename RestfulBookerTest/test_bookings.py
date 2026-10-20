@@ -1,13 +1,15 @@
 import requests
 import pytest
 
+from config import BASE_URL
+
 def test_obtener_token():
     credenciales = {
         "username": "admin",
         "password": "password123"
     }
     respuesta = requests.post(
-        "https://restful-booker.herokuapp.com/auth",
+        f"{BASE_URL}/auth",
         json=credenciales
     )
     assert respuesta.status_code == 200
@@ -23,7 +25,7 @@ def test_usar_token(token):
 
 def test_obtener_reservas(token):
     respuesta = requests.get(
-        "https://restful-booker.herokuapp.com/booking")
+        f"{BASE_URL}/booking")
     datos = respuesta.json()
     assert respuesta.status_code == 200
     assert isinstance(datos, list)
@@ -41,7 +43,7 @@ def test_crear_reserva(token):
         "additionalneeds": "Breakfast"
     }
     respuesta = requests.post(
-        "https://restful-booker.herokuapp.com/booking",
+        f"{BASE_URL}/booking",
         json=nueva_reserva
     )
     assert respuesta.status_code == 200
@@ -51,7 +53,7 @@ def test_crear_reserva(token):
     booking_id = datos["bookingid"]
     
     respuesta = requests.get(
-        f"https://restful-booker.herokuapp.com/booking/{booking_id}")
+        f"{BASE_URL}/booking/{booking_id}")
     datos = respuesta.json()    
     assert respuesta.status_code == 200
 
@@ -69,7 +71,7 @@ def test_modificar_reserva(token):
         "additionalneeds": "Lunch"
     }
     respuesta = requests.post(
-        "https://restful-booker.herokuapp.com/booking",
+        f"{BASE_URL}/booking",
         json=nueva_reserva
     )
     booking_id = respuesta.json()["bookingid"]
@@ -86,7 +88,7 @@ def test_modificar_reserva(token):
         "additionalneeds": "Dinner"
     }
     respuesta = requests.put(
-        f"https://restful-booker.herokuapp.com/booking/{booking_id}",
+        f"{BASE_URL}/booking/{booking_id}",
         json=reserva_modificada,
         headers={"Cookie": f"token={token}"}
     )
@@ -96,7 +98,7 @@ def test_modificar_reserva(token):
     assert datos["totalprice"] == 250
 
     respuesta = requests.get(
-        f"https://restful-booker.herokuapp.com/booking/{booking_id}")
+        f"{BASE_URL}/booking/{booking_id}")
     datos = respuesta.json()
     assert datos["lastname"] == "Doe"
     assert datos["totalprice"] == 250
@@ -114,7 +116,7 @@ def test_flujo_completo(token):
         "additionalneeds": "Breakfast"
     }
     respuesta = requests.post(
-        "https://restful-booker.herokuapp.com/booking",
+        f"{BASE_URL}/booking",
         json=nueva_reserva
     )
     assert respuesta.status_code == 200
@@ -132,26 +134,26 @@ def test_flujo_completo(token):
         "additionalneeds": "Lunch"
     }
     respuesta = requests.put(
-        f"https://restful-booker.herokuapp.com/booking/{booking_id}",
+        f"{BASE_URL}/booking/{booking_id}",
         json=reserva_modificada,
         headers={"Cookie": f"token={token}"}
     )
     assert respuesta.status_code == 200
     
     respuesta = requests.get(
-        f"https://restful-booker.herokuapp.com/booking/{booking_id}")
+        f"{BASE_URL}/booking/{booking_id}")
     datos = respuesta.json()
     assert datos["lastname"] == "Williams"
     assert datos["totalprice"] == 350
 
     respuesta = requests.delete(
-        f"https://restful-booker.herokuapp.com/booking/{booking_id}",
+        f"{BASE_URL}/booking/{booking_id}",
         headers={"Cookie": f"token={token}"}
     )
     assert respuesta.status_code == 201
     
     respuesta = requests.get(
-        f"https://restful-booker.herokuapp.com/booking/{booking_id}")
+        f"{BASE_URL}/booking/{booking_id}")
     assert respuesta.status_code == 404
 
 def test_patch_reserva(token):
@@ -167,7 +169,7 @@ def test_patch_reserva(token):
         "additionalneeds": "Breakfast"
     }
     respuesta = requests.post(
-        "https://restful-booker.herokuapp.com/booking",
+        f"{BASE_URL}/booking",
         json=nueva_reserva
     )
     booking_id = respuesta.json()["bookingid"]
@@ -177,7 +179,7 @@ def test_patch_reserva(token):
         "additionalneeds": "Dinner"
     }
     respuesta = requests.patch(
-        f"https://restful-booker.herokuapp.com/booking/{booking_id}",
+        f"{BASE_URL}/booking/{booking_id}",
         json=patch_data,
         headers={"Cookie": f"token={token}"}
     )
@@ -187,20 +189,20 @@ def test_patch_reserva(token):
     assert datos["additionalneeds"] == "Dinner"
 
     respuesta = requests.get(
-        f"https://restful-booker.herokuapp.com/booking/{booking_id}")
+        f"{BASE_URL}/booking/{booking_id}")
     datos = respuesta.json()
     assert datos["totalprice"] == 450
     assert datos["additionalneeds"] == "Dinner"
 
     respuesta = requests.get(
-        f"https://restful-booker.herokuapp.com/booking/{booking_id}")
+        f"{BASE_URL}/booking/{booking_id}")
     assert respuesta.status_code == 200
     datos = respuesta.json()
     assert datos["totalprice"] == 450
   
 def test_reserva_patch(token):
     respuesta = requests.post(
-        "https://restful-booker.herokuapp.com/booking",
+        f"{BASE_URL}/booking",
         json={
             "firstname": "Charlie",
             "lastname": "Davis",
@@ -223,7 +225,7 @@ def test_reserva_patch(token):
     }
 
     respuesta = requests.patch(
-        f"https://restful-booker.herokuapp.com/booking/{booking_id}",
+        f"{BASE_URL}/booking/{booking_id}",
         json=patch_data,
         
     )
@@ -231,12 +233,12 @@ def test_reserva_patch(token):
 
 def test_booking_inexists(token):
     respuesta = requests.get(
-        f"https://restful-booker.herokuapp.com/booking/999999")
+        f"{BASE_URL}/booking/999999")
     assert respuesta.status_code == 404
 
 def test_delete_booking_exists_sin_token():
     respuesta = requests.delete(
-        f"https://restful-booker.herokuapp.com/booking/1",
+        f"{BASE_URL}/booking/1",
 
     )
     assert respuesta.status_code == 403

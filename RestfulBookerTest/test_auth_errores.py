@@ -1,6 +1,6 @@
 import requests
 
-BASE_URL = "https://restful-booker.herokuapp.com"
+from config import BASE_URL
 
 
 def crear_reserva():

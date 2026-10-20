@@ -1,6 +1,8 @@
 import pytest
 import requests
 
+from config import BASE_URL
+
 @pytest.fixture
 def token():
     credenciales = {
@@ -8,7 +10,7 @@ def token():
         "password": "password123"
     }
     respuesta = requests.post(
-        "https://restful-booker.herokuapp.com/auth",
+        f"{BASE_URL}/auth",
         json=credenciales
     )
     return respuesta.json()["token"]
