@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **295 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **301 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 106 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 112 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 80 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 24 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página y un DOM enorme anidado 50 niveles de profundidad
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad y un formulario de login con sesión real de servidor
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -149,6 +149,14 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   header `Location` hacia `/status_codes`) y no contra la carpeta que
   sugiere el nombre de la página (`/redirector/redirect`, que da 404), y
   que un click en el navegador efectivamente termina en `/status_codes`
+- Formulario de login (`/login`): credenciales correctas redirigen a
+  `/secure` con un mensaje de éxito y el botón de logout visible; usuario
+  inválido y contraseña inválida muestran cada uno su propio mensaje de
+  error puntual sin redirigir, y cuando los dos están mal el servidor
+  informa solo el del usuario, nunca los dos juntos; logout termina la
+  sesión y vuelve a `/login`; y entrar directo a `/secure` sin haber
+  iniciado sesión en ese mismo browser context redirige a `/login` en vez
+  de mostrar la página
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -315,6 +323,18 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   de 50 filas por 50 columnas (2500 celdas) con un `<thead>` propio, no las
   6 columnas visibles sin hacer scroll horizontal -- contar `tr` sin
   filtrar por `tbody` da 51 filas en vez de 50.
+- `/login` mantiene sesión real del lado del servidor (una cookie
+  `rack.session`, no un token en `localStorage` ni un router de puro
+  cliente): la prueba de que `/secure` está protegida de verdad no es
+  afirmar un `expect()` sobre un mensaje en pantalla, sino navegar
+  directo a `/secure` en un `page` nuevo, sin haber llamado a `login()`
+  antes, y confirmar que el propio servidor redirige a `/login` --
+  reproduciendo con curl el mismo POST a `/authenticate` confirmó antes de
+  escribir el test que el error de usuario inválido y el de contraseña
+  inválida son mensajes de texto distintos (`"Your username is invalid!"`
+  vs. `"Your password is invalid!"`), y que mandar los dos mal a la vez
+  prioriza siempre el de usuario, sin mezclar ambos mensajes en una sola
+  aserción genérica de "hubo un error".
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
