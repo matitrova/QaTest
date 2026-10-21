@@ -1,10 +1,4 @@
-from TestX.LoginPage import LoginPage
-from TestX.Inventory_Page import InventoryPage
-
-def test_agregar_carrito(page):
-    login = LoginPage(page)
-    login.navigate()
-    login.login("standard_user", "secret_sauce")
-    inventory = InventoryPage(page)
+def test_agregar_carrito(inventory_as):
+    inventory = inventory_as("standard_user")
     inventory.agregar_al_carrito("sauce-labs-backpack")
     assert inventory.obtener_cantidad_carrito() == "1"

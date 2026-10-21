@@ -1,16 +1,8 @@
 from playwright.sync_api import expect
 
-from TestX.LoginPage import LoginPage
-from TestX.Inventory_Page import InventoryPage
 
-
-def test_standard_user_ordenar_por_precio_de_menor_a_mayor(page):
-    login = LoginPage(page)
-    login.navigate()
-    login.login("standard_user", "secret_sauce")
-    page.wait_for_url("**/inventory.html")
-
-    inventory = InventoryPage(page)
+def test_standard_user_ordenar_por_precio_de_menor_a_mayor(inventory_as):
+    inventory = inventory_as("standard_user")
     expect(inventory.nombres.first).to_be_visible()
     precios_inicial = inventory.precios_productos()
     inventory.ordenar("lohi")
@@ -19,13 +11,8 @@ def test_standard_user_ordenar_por_precio_de_menor_a_mayor(page):
     assert precios_lohi == sorted(precios_inicial)
 
 
-def test_standard_user_ordenar_por_precio_de_mayor_a_menor(page):
-    login = LoginPage(page)
-    login.navigate()
-    login.login("standard_user", "secret_sauce")
-    page.wait_for_url("**/inventory.html")
-
-    inventory = InventoryPage(page)
+def test_standard_user_ordenar_por_precio_de_mayor_a_menor(inventory_as):
+    inventory = inventory_as("standard_user")
     expect(inventory.nombres.first).to_be_visible()
     precios_inicial = inventory.precios_productos()
     inventory.ordenar("hilo")
@@ -34,7 +21,7 @@ def test_standard_user_ordenar_por_precio_de_mayor_a_menor(page):
     assert precios_hilo == sorted(precios_inicial, reverse=True)
 
 
-def test_standard_user_el_empate_de_precio_mantiene_el_orden_original(page):
+def test_standard_user_el_empate_de_precio_mantiene_el_orden_original(inventory_as):
     # El catálogo tiene dos productos al mismo precio ($15.99): "Sauce Labs
     # Bolt T-Shirt" y "Test.allTheThings() T-Shirt (Red)", en ese orden en
     # el catálogo original. Un sort inestable podría invertirlos entre
@@ -44,12 +31,7 @@ def test_standard_user_el_empate_de_precio_mantiene_el_orden_original(page):
     # que los dos productos empatados conservan su orden relativo original
     # en ambos sentidos de orden -- la implementación usa un sort estable,
     # no uno que reordene arbitrariamente a los iguales.
-    login = LoginPage(page)
-    login.navigate()
-    login.login("standard_user", "secret_sauce")
-    page.wait_for_url("**/inventory.html")
-
-    inventory = InventoryPage(page)
+    inventory = inventory_as("standard_user")
     expect(inventory.nombres.first).to_be_visible()
 
     nombres_inicial = inventory.nombres_productos()
@@ -68,7 +50,7 @@ def test_standard_user_el_empate_de_precio_mantiene_el_orden_original(page):
         assert orden_resultante == empatados
 
 
-def test_problem_user_el_orden_no_cambia_con_ningun_criterio(page):
+def test_problem_user_el_orden_no_cambia_con_ningun_criterio(inventory_as):
     # test_usuarios_especiales.py ya prueba que a problem_user elegir "Name
     # (Z to A)" no le reordena la lista. Pero el bug real no es específico
     # de ese criterio: el <select> de orden no dispara ningún reordenamiento
@@ -76,12 +58,7 @@ def test_problem_user_el_orden_no_cambia_con_ningun_criterio(page):
     # contra el sitio real antes de escribir este test: ni "lohi" ni "hilo"
     # cambian ni los nombres ni los precios mostrados, a diferencia de
     # standard_user donde las dos opciones sí reordenan de verdad.
-    login = LoginPage(page)
-    login.navigate()
-    login.login("problem_user", "secret_sauce")
-    page.wait_for_url("**/inventory.html")
-
-    inventory = InventoryPage(page)
+    inventory = inventory_as("problem_user")
     expect(inventory.nombres.first).to_be_visible()
     nombres_inicial = inventory.nombres_productos()
     precios_inicial = inventory.precios_productos()

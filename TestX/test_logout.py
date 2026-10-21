@@ -1,13 +1,10 @@
 from playwright.sync_api import expect
 
-from TestX.LoginPage import LoginPage
 from TestX.Inventory_Page import InventoryPage
 
 
-def test_logout_vuelve_a_la_pantalla_de_login(page):
-    login = LoginPage(page)
-    login.navigate()
-    login.login("standard_user", "secret_sauce")
+def test_logout_vuelve_a_la_pantalla_de_login(page, login_as):
+    login = login_as("standard_user")
     page.wait_for_url("**/inventory.html")
 
     inventory = InventoryPage(page)
@@ -18,13 +15,8 @@ def test_logout_vuelve_a_la_pantalla_de_login(page):
     expect(login.username_input).to_have_value("")
 
 
-def test_logout_protege_inventory_ante_navegacion_con_atras(page):
-    login = LoginPage(page)
-    login.navigate()
-    login.login("standard_user", "secret_sauce")
-    page.wait_for_url("**/inventory.html")
-
-    inventory = InventoryPage(page)
+def test_logout_protege_inventory_ante_navegacion_con_atras(page, inventory_as):
+    inventory = inventory_as("standard_user")
     inventory.cerrar_sesion()
     expect(page).to_have_url("https://www.saucedemo.com/")
 

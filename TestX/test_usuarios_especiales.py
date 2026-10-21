@@ -3,21 +3,16 @@ import time
 from playwright.sync_api import expect
 
 from TestX.LoginPage import LoginPage
-from TestX.Inventory_Page import InventoryPage
 
 
-def test_problem_user_todas_las_imagenes_son_la_misma(page):
-    login = LoginPage(page)
-    login.navigate()
-    login.login("problem_user", "secret_sauce")
-    page.wait_for_url("**/inventory.html")
+def test_problem_user_todas_las_imagenes_son_la_misma(inventory_as):
+    inventory = inventory_as("problem_user")
 
     # Igual que en el checkout (ver test_checkout_completo.py): la URL de
     # esta SPA cambia antes de que el componente nuevo termine de montarse,
     # así que hay que esperar a un elemento propio de la página de inventario
     # antes de leer nada, en vez de asumir que wait_for_url ya implica que el
     # contenido está listo.
-    inventory = InventoryPage(page)
     expect(inventory.imagenes.first).to_be_visible()
     srcs = inventory.srcs_imagenes()
 
@@ -31,13 +26,9 @@ def test_problem_user_todas_las_imagenes_son_la_misma(page):
     assert len(set(srcs)) == 1
 
 
-def test_standard_user_cada_producto_tiene_su_propia_imagen(page):
-    login = LoginPage(page)
-    login.navigate()
-    login.login("standard_user", "secret_sauce")
-    page.wait_for_url("**/inventory.html")
+def test_standard_user_cada_producto_tiene_su_propia_imagen(inventory_as):
+    inventory = inventory_as("standard_user")
 
-    inventory = InventoryPage(page)
     expect(inventory.imagenes.first).to_be_visible()
     srcs = inventory.srcs_imagenes()
 
@@ -45,13 +36,9 @@ def test_standard_user_cada_producto_tiene_su_propia_imagen(page):
     assert len(set(srcs)) == 6
 
 
-def test_problem_user_el_orden_no_cambia_al_elegir_otro_criterio(page):
-    login = LoginPage(page)
-    login.navigate()
-    login.login("problem_user", "secret_sauce")
-    page.wait_for_url("**/inventory.html")
+def test_problem_user_el_orden_no_cambia_al_elegir_otro_criterio(inventory_as):
+    inventory = inventory_as("problem_user")
 
-    inventory = InventoryPage(page)
     expect(inventory.nombres.first).to_be_visible()
     orden_inicial = inventory.nombres_productos()
     inventory.ordenar("za")
@@ -62,13 +49,9 @@ def test_problem_user_el_orden_no_cambia_al_elegir_otro_criterio(page):
     assert inventory.nombres_productos() == orden_inicial
 
 
-def test_standard_user_el_orden_si_cambia_al_elegir_otro_criterio(page):
-    login = LoginPage(page)
-    login.navigate()
-    login.login("standard_user", "secret_sauce")
-    page.wait_for_url("**/inventory.html")
+def test_standard_user_el_orden_si_cambia_al_elegir_otro_criterio(inventory_as):
+    inventory = inventory_as("standard_user")
 
-    inventory = InventoryPage(page)
     expect(inventory.nombres.first).to_be_visible()
     orden_inicial = inventory.nombres_productos()
     inventory.ordenar("za")

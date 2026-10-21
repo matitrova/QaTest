@@ -20,7 +20,6 @@ class InventoryPage(BasePage):
 
     def obtener_cantidad_carrito(self):
         return self.cantidad_carrito.inner_text()
-        assert self.obtener_cantidad_carrito() == "1"
 
     def ordenar(self, opcion):
         self.selector_orden.select_option(opcion)

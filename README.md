@@ -864,6 +864,14 @@ checkout.
 - Entrar directo a `/inventory.html` sin haber hecho login nunca dispara el mismo
   chequeo del lado cliente que usa logout: no hace falta loguearse y desloguearse para
   probar la protección de la ruta, alcanza con navegar directo a la URL protegida.
+- Trece tests repetían a mano el mismo bloque de tres líneas (crear el `LoginPage`,
+  navegar y loguearse) para después operar sobre el inventario. Ahora `TestX/conftest.py`
+  suma dos fixtures, `login_as` y `inventory_as`, que reciben el usuario y devuelven el
+  Page Object ya logueado -- `inventory_as` además espera a que la navegación a
+  `/inventory.html` termine antes de devolver el `InventoryPage`. Los dos tests que
+  miden cuánto tarda el login en sí (`performance_glitch_user` y la aserción de
+  velocidad de `standard_user`) se dejaron sin tocar porque necesitan cronometrar el
+  `login()` directamente, no un helper que ya incluye la espera.
 
 ```bash
 python3 -m pytest TestX -v
@@ -1046,6 +1054,15 @@ override por variable de entorno) y los cuatro tests pasaron a importar `BASE_UR
 vez de repetir la URL. Las aserciones y el comportamiento de cada test quedaron
 idénticos: se corrió la suite dos veces seguidas antes de commitear, mismos 5 tests,
 mismo resultado.
+
+**Una línea muerta disfrazada de verificación, en `TestX/Inventory_Page.py`.**
+`obtener_cantidad_carrito()` tenía un `assert self.obtener_cantidad_carrito() == "1"`
+escrito *después* del `return` del método -- nunca se ejecutaba, y si por algún cambio
+hubiera pasado a ejecutarse habría sido una llamada recursiva infinita. Probablemente
+un `assert` de depuración que quedó pegado al método en vez de borrarse. Se eliminó al
+sumar las fixtures `login_as`/`inventory_as` de `TestX/conftest.py` (ver SauceDemo más
+arriba), que es lo que de verdad reduce la duplicación que el `assert` fallido
+pretendía cubrir.
 
 ## Instalación
 
