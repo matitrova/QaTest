@@ -986,6 +986,21 @@ fixture y se envía en la cookie de las operaciones que lo requieren.
   (`BASE_URL = os.environ.get('BASE_URL', ...)`, así se puede apuntar a otro
   entorno sin tocar código) y los cuatro archivos ahora importan la misma
   constante en vez de tener cada uno su copia.
+- `test_bookings.py` creaba reservas con `POST` en cinco tests
+  (`test_crear_reserva`, `test_modificar_reserva`, `test_patch_reserva`,
+  `test_reserva_patch`) y nunca las borraba, a diferencia de
+  `test_filtros.py`, que ya limpia cada reserva que crea con un
+  `try/finally` propio. Como Restful Booker es una API pública compartida,
+  esas reservas quedaban acumulándose para siempre, sin que correr la suite
+  de nuevo las borrara. Se agregó un fixture `reservas_creadas` en
+  `conftest.py`: una lista vacía que el test llena con los `bookingid` que
+  crea, y que el fixture recorre borrando uno por uno en su teardown
+  (`DELETE /booking/<id>` con la cookie de `token`), corra el test con éxito
+  o falle. Un test nuevo (`test_borrado_con_cookie_de_token_elimina_la_reserva_de_verdad`)
+  prueba ese mismo mecanismo de borrado de punta a punta: crea una reserva,
+  la borra con el `DELETE` + cookie exacto que usa el fixture, y confirma
+  con un `GET` posterior que da 404 — no alcanza con que el `DELETE`
+  responda 201, hay que confirmar que la reserva realmente deja de existir.
 
 ```bash
 cd ReqResTest && python3 -m pytest -v
