@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **301 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **307 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 112 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 118 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 80 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 24 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad y un formulario de login con sesión real de servidor
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -157,6 +157,15 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   sesión y vuelve a `/login`; y entrar directo a `/secure` sin haber
   iniciado sesión en ese mismo browser context redirige a `/login` en vez
   de mostrar la página
+- Controles dinámicos (`/dynamic_controls`): un checkbox que un botón
+  elimina del DOM y luego reinserta, y un input que otro botón habilita y
+  deshabilita, ambos con un delay real de 3 segundos simulado con
+  `setTimeout`, verificando que el checkbox desaparece y reaparece del todo
+  (no se oculta con CSS), que el input pasa de no poder tipearse a poder
+  hacerlo y viceversa, que el botón queda deshabilitado mientras dura el
+  delay -- bloqueando un segundo click en vez de ignorarlo en silencio -- y
+  que cada mensaje de resultado ("It's gone!", "It's back!", "It's
+  enabled!", "It's disabled!") reemplaza al anterior en vez de acumularse
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -335,6 +344,23 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   vs. `"Your password is invalid!"`), y que mandar los dos mal a la vez
   prioriza siempre el de usuario, sin mezclar ambos mensajes en una sola
   aserción genérica de "hubo un error".
+- `/dynamic_controls` no deshabilita el botón con un atributo CSS ni con
+  una clase: `disableButton()` hace `$(locator).attr("disabled", true)`
+  de forma sincrónica, dentro del mismo handler de click, antes de arrancar
+  el `setTimeout` de 3 segundos. Eso significa que un segundo click
+  disparado mientras el primero todavía está en el delay nunca llega a
+  ejecutar nada -- Playwright rechaza clickear un botón disabled y tira
+  timeout de "actionability" en vez de silenciosamente no hacer nada, y el
+  test usa ese mismo timeout como la prueba de que el bloqueo es real.
+- El checkbox que `toggleCheckboxControls()` reinserta no es el mismo HTML
+  que el original: la página arranca con `<div id="checkbox"><input></div>`
+  (el id vive en el div contenedor, el input no tiene ninguno), pero al
+  agregarlo de nuevo el script inserta
+  `<div><input id='checkbox'></div>` -- el id se mudó del div al input. Un
+  locator que dependiera de "el input dentro de `#checkbox`" encontraría el
+  checkbox inicial pero no el que vuelve tras un ciclo de quitar/agregar.
+  La solución es ubicarlo por `#checkbox-example input[type='checkbox']`,
+  que no le importa en qué elemento quedó el id en cada estado.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
