@@ -17,28 +17,28 @@ class CheckoutPage(BasePage):
         self.complete_header = page.locator("[data-test='complete-header']")
         self.cart_badge = page.locator("[data-test='shopping-cart-badge']")
 
-    def ir_a_carrito(self):
+    def ir_a_carrito(self) -> None:
         self.page.locator(".shopping_cart_link").click()
 
-    def iniciar_checkout(self):
+    def iniciar_checkout(self) -> None:
         self.page.locator("[data-test='checkout']").click()
 
-    def completar_datos(self, nombre, apellido, codigo_postal):
+    def completar_datos(self, nombre: str, apellido: str, codigo_postal: str) -> None:
         self.first_name_input.fill(nombre)
         self.last_name_input.fill(apellido)
         self.postal_code_input.fill(codigo_postal)
 
-    def continuar(self):
+    def continuar(self) -> None:
         self.continue_button.click()
 
-    def finalizar(self):
+    def finalizar(self) -> None:
         self.finish_button.click()
 
-    def subtotal(self):
+    def subtotal(self) -> float:
         return float(self.subtotal_label.inner_text().replace("Item total: $", ""))
 
-    def impuesto(self):
+    def impuesto(self) -> float:
         return float(self.tax_label.inner_text().replace("Tax: $", ""))
 
-    def total(self):
+    def total(self) -> float:
         return float(self.total_label.inner_text().replace("Total: $", ""))

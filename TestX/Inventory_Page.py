@@ -14,27 +14,27 @@ class InventoryPage(BasePage):
         self.link_logout = page.locator("#logout_sidebar_link")
         self.mensaje_error = page.locator("[data-test='error']")
 
-    def agregar_al_carrito(self, nombre_producto):
+    def agregar_al_carrito(self, nombre_producto: str) -> None:
         selector = f"#add-to-cart-{nombre_producto}"
         self.page.locator(selector).click()
 
-    def obtener_cantidad_carrito(self):
+    def obtener_cantidad_carrito(self) -> str:
         return self.cantidad_carrito.inner_text()
 
-    def ordenar(self, opcion):
+    def ordenar(self, opcion: str) -> None:
         self.selector_orden.select_option(opcion)
 
-    def nombres_productos(self):
+    def nombres_productos(self) -> list[str]:
         return self.nombres.all_inner_texts()
 
-    def precios_productos(self):
+    def precios_productos(self) -> list[float]:
         return [float(p.replace("$", "")) for p in self.precios.all_inner_texts()]
 
-    def srcs_imagenes(self):
+    def srcs_imagenes(self) -> list[str | None]:
         count = self.imagenes.count()
         return [self.imagenes.nth(i).get_attribute("src") for i in range(count)]
 
-    def cerrar_sesion(self):
+    def cerrar_sesion(self) -> None:
         self.boton_menu.click()
         self.link_logout.wait_for(state="visible")
         self.link_logout.click()

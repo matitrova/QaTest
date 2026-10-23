@@ -1096,6 +1096,18 @@ vez de repetir la URL. Las aserciones y el comportamiento de cada test quedaron
 idénticos: se corrió la suite dos veces seguidas antes de commitear, mismos 5 tests,
 mismo resultado.
 
+**Tipado incompleto en los Page Objects de `TestX`.** El pool de casos nuevos de
+the-internet, UI Testing Playground, SauceDemo y las APIs (ReqRes/Restful Booker) se
+agotó por completo (la única excepción deliberada es `nested_frames` de the-internet,
+descartado antes por quedar solo-lectura en sandboxes). `LoginPage`, `InventoryPage` y
+`CheckoutPage` ya heredaban de `BasePage` tipado, pero sus propios métodos no: `login()`
+recibía `username`/`password` sin anotar, `ordenar()` tomaba `opcion` como lo que fuera,
+y siete métodos como `subtotal()` o `nombres_productos()` no declaraban qué devuelven
+(`float`, `list[str]`, `list[float]`, `list[str | None]`). Se sumó tipado explícito a los
+18 métodos que faltaban en los tres archivos, sin tocar ningún locator ni ninguna
+aserción — se verificó corriendo la suite completa (24 tests) dos veces seguidas antes
+de commitear, mismos resultados.
+
 **Una línea muerta disfrazada de verificación, en `TestX/Inventory_Page.py`.**
 `obtener_cantidad_carrito()` tenía un `assert self.obtener_cantidad_carrito() == "1"`
 escrito *después* del `return` del método -- nunca se ejecutaba, y si por algún cambio
