@@ -1,61 +1,33 @@
+import pytest
 from playwright.sync_api import expect
 
 from config import BASE_URL
 from KeyPressesPage import KeyPressesPage
 
 
-def test_letra_muestra_su_nombre_en_mayuscula(page):
+@pytest.mark.parametrize(
+    "tecla, texto_esperado",
+    [
+        ("a", "You entered: A"),
+        ("7", "You entered: 7"),
+        (" ", "You entered: SPACE"),
+        ("Escape", "You entered: ESCAPE"),
+        ("Backspace", "You entered: BACK_SPACE"),
+        ("ArrowLeft", "You entered: LEFT"),
+    ],
+    ids=["letra", "digito", "espacio", "escape", "backspace", "flecha"],
+)
+def test_tecla_muestra_el_nombre_esperado(page, tecla, texto_esperado):
+    # Cada tecla pasa por el mismo mapeo de KeyboardEvent.code a texto --
+    # son seis variantes del mismo comportamiento, no seis comportamientos
+    # distintos, así que un solo test parametrizado cubre los mismos casos
+    # que antes vivían en seis funciones casi idénticas.
     key_presses_page = KeyPressesPage(page)
     page.goto(f"{BASE_URL}/key_presses")
 
-    key_presses_page.presionar("a")
+    key_presses_page.presionar(tecla)
 
-    expect(key_presses_page.resultado).to_have_text("You entered: A")
-
-
-def test_digito_muestra_el_numero(page):
-    key_presses_page = KeyPressesPage(page)
-    page.goto(f"{BASE_URL}/key_presses")
-
-    key_presses_page.presionar("7")
-
-    expect(key_presses_page.resultado).to_have_text("You entered: 7")
-
-
-def test_barra_espaciadora_muestra_space(page):
-    key_presses_page = KeyPressesPage(page)
-    page.goto(f"{BASE_URL}/key_presses")
-
-    key_presses_page.presionar(" ")
-
-    expect(key_presses_page.resultado).to_have_text("You entered: SPACE")
-
-
-def test_escape_muestra_escape(page):
-    key_presses_page = KeyPressesPage(page)
-    page.goto(f"{BASE_URL}/key_presses")
-
-    key_presses_page.presionar("Escape")
-
-    expect(key_presses_page.resultado).to_have_text("You entered: ESCAPE")
-
-
-def test_backspace_muestra_back_space_con_guion_bajo(page):
-    key_presses_page = KeyPressesPage(page)
-    page.goto(f"{BASE_URL}/key_presses")
-
-    key_presses_page.presionar("Backspace")
-
-    expect(key_presses_page.resultado).to_have_text("You entered: BACK_SPACE")
-
-
-def test_flecha_muestra_la_direccion(page):
-    key_presses_page = KeyPressesPage(page)
-    page.goto(f"{BASE_URL}/key_presses")
-
-    key_presses_page.presionar("ArrowLeft")
-
-    expect(key_presses_page.resultado).to_have_text("You entered: LEFT")
+    expect(key_presses_page.resultado).to_have_text(texto_esperado)
 
 
 def test_cada_tecla_pisa_el_resultado_anterior(page):

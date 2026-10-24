@@ -1117,6 +1117,21 @@ sumar las fixtures `login_as`/`inventory_as` de `TestX/conftest.py` (ver SauceDe
 arriba), que es lo que de verdad reduce la duplicación que el `assert` fallido
 pretendía cubrir.
 
+**Seis tests casi idénticos en `DesafiosPlaywright/test_key_presses.py`.** Con el pool
+de casos nuevos agotado, toca mejorar lo existente. `test_letra_muestra_su_nombre_en_mayuscula`,
+`test_digito_muestra_el_numero`, `test_barra_espaciadora_muestra_space`,
+`test_escape_muestra_escape`, `test_backspace_muestra_back_space_con_guion_bajo` y
+`test_flecha_muestra_la_direccion` eran la misma secuencia (`goto` → `presionar(tecla)` →
+`expect` del texto resultante) repetida seis veces, solo cambiando la tecla y el texto
+esperado. Se reemplazaron por un único `test_tecla_muestra_el_nombre_esperado` con
+`pytest.mark.parametrize` sobre los seis pares `(tecla, texto_esperado)`, con `ids`
+explícitos para que cada caso siga identificable en el reporte de CI. Los otros dos
+tests del archivo (`test_cada_tecla_pisa_el_resultado_anterior` y el de Enter, que
+cubren un comportamiento distinto: persistencia entre teclas y submit implícito del
+formulario) quedaron igual. Se corrieron los 8 tests del archivo dos veces seguidas
+antes de commitear: mismos 8 casos, mismos resultados, con una sexta parte del código
+de antes.
+
 ## Instalación
 
 ```bash
