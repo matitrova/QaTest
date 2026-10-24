@@ -8,5 +8,5 @@ class DynamicLoadingPage(BasePage):
         self.start_button = page.locator("#start button")
         self.finish_text = page.locator("#finish")
 
-    def hacer_clic_en_start(self):
+    def hacer_clic_en_start(self) -> None:
         self.start_button.click()

@@ -9,10 +9,10 @@ class ExitIntentPage(BasePage):
         self.contenido_modal = page.locator("#ouibounce-modal .modal-body")
         self.cerrar = page.locator("#ouibounce-modal .modal-footer")
 
-    def modal_visible(self):
+    def modal_visible(self) -> bool:
         return self.modal.is_visible()
 
-    def simular_salida_del_mouse_por_arriba(self):
+    def simular_salida_del_mouse_por_arriba(self) -> None:
         # ouibounce solo dispara si el mouse sale del viewport con clientY
         # por debajo del umbral de sensibilidad (20px) -- hay que entrar a
         # la página primero y recién después salir por arriba, no alcanza
@@ -21,12 +21,12 @@ class ExitIntentPage(BasePage):
         self.page.mouse.move(400, 0)
         self.page.mouse.move(400, -50)
 
-    def mover_mouse_sin_salir_por_arriba(self):
+    def mover_mouse_sin_salir_por_arriba(self) -> None:
         self.page.mouse.move(400, 300)
         self.page.mouse.move(400, 700)
 
-    def hacer_clic_dentro_del_modal(self):
+    def hacer_clic_dentro_del_modal(self) -> None:
         self.contenido_modal.click()
 
-    def cerrar_modal(self):
+    def cerrar_modal(self) -> None:
         self.cerrar.click()

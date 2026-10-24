@@ -7,5 +7,5 @@ class DisappearingElementsPage(BasePage):
         super().__init__(page)
         self.items = page.locator(".example ul li a")
 
-    def textos(self):
+    def textos(self) -> list[str]:
         return self.items.all_inner_texts()

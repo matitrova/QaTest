@@ -7,14 +7,14 @@ class InputsPage(BasePage):
         super().__init__(page)
         self.input_numero = page.locator("input[type=number]")
 
-    def escribir(self, texto):
+    def escribir(self, texto: str) -> None:
         self.input_numero.fill("")
         self.input_numero.type(texto)
 
-    def presionar_flecha_arriba(self, veces=1):
+    def presionar_flecha_arriba(self, veces: int = 1) -> None:
         for _ in range(veces):
             self.input_numero.press("ArrowUp")
 
-    def presionar_flecha_abajo(self, veces=1):
+    def presionar_flecha_abajo(self, veces: int = 1) -> None:
         for _ in range(veces):
             self.input_numero.press("ArrowDown")

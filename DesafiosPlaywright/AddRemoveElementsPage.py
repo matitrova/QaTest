@@ -11,11 +11,11 @@ class AddRemoveElementsPage(BasePage):
         # verificar "cuál" se eliminó, solo cuántos quedan.
         self.botones_eliminar = page.locator("button.added-manually")
 
-    def agregar_elemento(self, veces=1):
+    def agregar_elemento(self, veces: int = 1) -> None:
         for _ in range(veces):
             self.boton_agregar.click()
 
-    def eliminar_elemento(self):
+    def eliminar_elemento(self) -> None:
         # El JS de la página remueve `#elements button:first-child`: el
         # primero agregado, no el último (FIFO, no LIFO como uno podría
         # asumir de un botón que dice "Delete" al lado del más reciente).

@@ -1,5 +1,5 @@
 from base_page import BasePage
-from playwright.sync_api import Page
+from playwright.sync_api import Locator, Page
 
 
 TARGET_TEXT = "Important Information You're Looking For"
@@ -18,12 +18,12 @@ class ShiftingContentListPage(BasePage):
         super().__init__(page)
         self.contenedor = page.locator(".example .large-6.columns.large-centered")
 
-    def locator_exacto_del_registro_fijo(self):
+    def locator_exacto_del_registro_fijo(self) -> Locator:
         return self.page.get_by_text(TARGET_TEXT, exact=True)
 
-    def lineas(self):
+    def lineas(self) -> list[str]:
         texto = self.contenedor.inner_text()
         return [linea.strip() for linea in texto.splitlines() if linea.strip()]
 
-    def posicion_del_registro_fijo(self):
+    def posicion_del_registro_fijo(self) -> int:
         return self.lineas().index(TARGET_TEXT)

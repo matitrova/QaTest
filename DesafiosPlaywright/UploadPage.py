@@ -9,6 +9,6 @@ class UploadPage(BasePage):
         self.submit_button = page.locator("#file-submit")
         self.uploaded_files = page.locator("#uploaded-files")
 
-    def subir_archivo(self, ruta_archivo):
+    def subir_archivo(self, ruta_archivo: str) -> None:
         self.file_input.set_input_files(ruta_archivo)
         self.submit_button.click()

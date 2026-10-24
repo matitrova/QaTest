@@ -8,7 +8,7 @@ class KeyPressesPage(BasePage):
         self.input = page.locator("#target")
         self.resultado = page.locator("#result")
 
-    def presionar(self, tecla):
+    def presionar(self, tecla: str) -> None:
         # locator.press() re-enfoca el input antes de la tecla, igual que en
         # HorizontalSliderPage -- necesario porque el listener de esta
         # página está en document.keydown, así que si el foco se pierde la

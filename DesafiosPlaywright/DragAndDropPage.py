@@ -1,5 +1,5 @@
 from base_page import BasePage
-from playwright.sync_api import Page
+from playwright.sync_api import Locator, Page
 
 
 class DragAndDropPage(BasePage):
@@ -8,10 +8,10 @@ class DragAndDropPage(BasePage):
         self.columna_a = page.locator("#column-a")
         self.columna_b = page.locator("#column-b")
 
-    def texto_de(self, columna):
+    def texto_de(self, columna: Locator) -> str:
         return columna.locator("header").inner_text()
 
-    def arrastrar_a_hacia_b(self):
+    def arrastrar_a_hacia_b(self) -> None:
         # Esta página implementa el intercambio a mano con los eventos nativos de
         # HTML5 Drag and Drop (dragstart/dragover/drop), no con una librería como
         # jQuery UI. drag_to() de Playwright dispara esa secuencia completa vía CDP,

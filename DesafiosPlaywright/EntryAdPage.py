@@ -10,14 +10,14 @@ class EntryAdPage(BasePage):
         self.cerrar = page.locator("#modal .modal-footer")
         self.reiniciar = page.locator("#restart-ad")
 
-    def anuncio_visible(self):
+    def anuncio_visible(self) -> bool:
         return self.modal.is_visible()
 
-    def hacer_clic_dentro_del_modal(self):
+    def hacer_clic_dentro_del_modal(self) -> None:
         self.modal_body.click()
 
-    def cerrar_anuncio(self):
+    def cerrar_anuncio(self) -> None:
         self.cerrar.click()
 
-    def hacer_clic_en_reiniciar(self):
+    def hacer_clic_en_reiniciar(self) -> None:
         self.reiniciar.click()

@@ -7,7 +7,7 @@ class BrokenImagesPage(BasePage):
         super().__init__(page)
         self.imagenes = page.locator(".example img")
 
-    def esta_rota(self, indice):
+    def esta_rota(self, indice: int) -> bool:
         # `complete` da True en los tres <img> apenas el navegador termina
         # de intentar cargarlos, se hayan roto o no -- no sirve para
         # distinguir una imagen rota de una que cargó bien. naturalWidth/

@@ -7,5 +7,5 @@ class DropdownPage(BasePage):
         super().__init__(page)
         self.dropdown = page.locator("#dropdown")
 
-    def seleccionar_por_valor(self, valor):
+    def seleccionar_por_valor(self, valor: str) -> None:
         self.dropdown.select_option(value=valor)

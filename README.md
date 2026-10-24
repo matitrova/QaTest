@@ -361,6 +361,14 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   checkbox inicial pero no el que vuelve tras un ciclo de quitar/agregar.
   La solución es ubicarlo por `#checkbox-example input[type='checkbox']`,
   que no le importa en qué elemento quedó el id en cada estado.
+- Los 29 Page Objects de esta suite heredaban de `BasePage` tipado, pero sus
+  propios métodos no: parámetros como `indice`, `valor` o `ruta_archivo` sin
+  anotar, y métodos que devuelven un `Locator`, un booleano o directamente
+  nada sin declararlo. Se tipan los 58 métodos que faltaban en los 25
+  archivos que los tenían sin anotar, sin tocar ningún locator ni ninguna
+  aserción -- verificado corriendo los 118 tests que no dependen de
+  comportamiento ya roto en el sitio real dos veces seguidas antes de
+  commitear.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v

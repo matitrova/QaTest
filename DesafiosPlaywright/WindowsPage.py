@@ -11,7 +11,7 @@ class WindowsPage(BasePage):
         self.abrir_ventana_link = page.get_by_role("link", name="Click Here")
         self.titulo = page.locator("h3")
 
-    def hacer_clic_en_abrir_ventana(self):
+    def hacer_clic_en_abrir_ventana(self) -> Page:
         # target="_blank" abre una pestaña nueva, no navega la actual --
         # hay que engancharse al evento "page" del context ANTES del click
         # para no perder la referencia a esa pestaña nueva.

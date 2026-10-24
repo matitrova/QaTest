@@ -7,8 +7,8 @@ class ContextMenuPage(BasePage):
         super().__init__(page)
         self.hot_spot = page.locator("#hot-spot")
 
-    def hacer_clic_derecho_en_hot_spot(self):
+    def hacer_clic_derecho_en_hot_spot(self) -> None:
         self.hot_spot.click(button="right")
 
-    def hacer_clic_izquierdo_en_hot_spot(self):
+    def hacer_clic_izquierdo_en_hot_spot(self) -> None:
         self.hot_spot.click()

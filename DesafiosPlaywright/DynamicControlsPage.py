@@ -18,14 +18,14 @@ class DynamicControlsPage(BasePage):
         self.loading_input = page.locator("#input-example #loading")
         self.mensaje = page.locator("#message")
 
-    def quitar_checkbox(self):
+    def quitar_checkbox(self) -> None:
         self.boton_checkbox.click()
 
-    def agregar_checkbox(self):
+    def agregar_checkbox(self) -> None:
         self.boton_checkbox.click()
 
-    def habilitar_input(self):
+    def habilitar_input(self) -> None:
         self.boton_input.click()
 
-    def deshabilitar_input(self):
+    def deshabilitar_input(self) -> None:
         self.boton_input.click()
