@@ -16,17 +16,17 @@ class ShadowDomPage(BasePage):
         self.boton_generar = page.locator("#buttonGenerate")
         self.boton_copiar = page.locator("#buttonCopy")
 
-    def generar_guid(self):
+    def generar_guid(self) -> None:
         self.boton_generar.click()
 
-    def copiar_guid(self):
+    def copiar_guid(self) -> None:
         self.boton_copiar.click()
 
-    def valor_actual(self):
+    def valor_actual(self) -> str:
         return self.campo_guid.input_value()
 
-    def esta_dentro_de_un_shadow_root(self):
+    def esta_dentro_de_un_shadow_root(self) -> bool:
         return self.campo_guid.evaluate("el => el.getRootNode() instanceof ShadowRoot")
 
-    def encontrable_desde_el_document_global(self):
+    def encontrable_desde_el_document_global(self) -> bool:
         return self.page.evaluate("() => document.querySelector('#editField')") is not None

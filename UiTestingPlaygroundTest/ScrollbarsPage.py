@@ -12,11 +12,11 @@ class ScrollbarsPage(BasePage):
         self.contenedor = page.locator("div[style*='overflow-y: scroll']")
         self.boton = page.locator("#hidingButton")
 
-    def box_contenedor(self):
+    def box_contenedor(self) -> dict | None:
         return self.contenedor.bounding_box()
 
-    def box_boton(self):
+    def box_boton(self) -> dict | None:
         return self.boton.bounding_box()
 
-    def scroll_actual(self):
+    def scroll_actual(self) -> list[float]:
         return self.contenedor.evaluate("el => [el.scrollLeft, el.scrollTop]")

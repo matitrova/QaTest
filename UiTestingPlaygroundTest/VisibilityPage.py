@@ -18,7 +18,7 @@ class VisibilityPage(BasePage):
         self.boton_not_displayed = page.locator("#notdisplayedButton")
         self.boton_offscreen = page.locator("#offscreenButton")
 
-    def ocultar(self):
+    def ocultar(self) -> None:
         self._esperar_que_jquery_este_disponible()
         self.boton_hide.click()
         # La capa que tapa a #overlappedButton se posiciona calculando el
@@ -31,7 +31,7 @@ class VisibilityPage(BasePage):
             "document.getElementById('hidingLayer').getBoundingClientRect().height > 0"
         )
 
-    def _esperar_que_jquery_este_disponible(self, intentos=3):
+    def _esperar_que_jquery_este_disponible(self, intentos: int = 3) -> None:
         # El botón Hide depende de un handler de jQuery cargado desde un CDN
         # externo (code.jquery.com). Si ese script no llega a tiempo -- una
         # red lenta o inestable, nada relacionado con este sitio -- el click

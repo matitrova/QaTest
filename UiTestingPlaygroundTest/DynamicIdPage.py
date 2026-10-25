@@ -14,10 +14,10 @@ class DynamicIdPage(BasePage):
         # verificar ("make sure that ID is not used for button identification").
         self.boton = page.get_by_role("button", name="Button with Dynamic ID")
 
-    def id_actual(self):
+    def id_actual(self) -> str | None:
         return self.boton.get_attribute("id")
 
-    def existe_un_elemento_con_id(self, id_buscado):
+    def existe_un_elemento_con_id(self, id_buscado: str) -> bool:
         # No sirve interpolar el id en un selector `#id`: al ser un UUID,
         # suele empezar con un dígito, y un selector CSS de id no puede
         # arrancar con un dígito sin escaparlo -- `#3b35...` tira

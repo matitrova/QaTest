@@ -9,11 +9,11 @@ class ClassAttributePage(BasePage):
         self.boton_warning = page.locator("button.btn-warning")
         self.boton_primary = page.locator("button.btn-primary")
 
-    def hacer_clic_en_primary(self):
+    def hacer_clic_en_primary(self) -> None:
         self.boton_primary.click()
 
-    def hacer_clic_en_success(self):
+    def hacer_clic_en_success(self) -> None:
         self.boton_success.click()
 
-    def hacer_clic_en_warning(self):
+    def hacer_clic_en_warning(self) -> None:
         self.boton_warning.click()

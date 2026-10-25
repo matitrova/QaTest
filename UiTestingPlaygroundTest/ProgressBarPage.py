@@ -13,16 +13,18 @@ class ProgressBarPage(BasePage):
         self.barra_progreso = page.locator("#progressBar")
         self.resultado = page.locator("#result")
 
-    def iniciar(self):
+    def iniciar(self) -> None:
         self.boton_start.click()
 
-    def detener(self):
+    def detener(self) -> None:
         self.boton_stop.click()
 
-    def porcentaje_actual(self):
-        return int(self.barra_progreso.get_attribute("aria-valuenow"))
+    def porcentaje_actual(self) -> int:
+        valor = self.barra_progreso.get_attribute("aria-valuenow")
+        assert valor is not None
+        return int(valor)
 
-    def esperar_porcentaje_minimo(self, valor, timeout=35000):
+    def esperar_porcentaje_minimo(self, valor: int, timeout: int = 35000) -> None:
         # El incremento real (ratio += 1) ocurre dentro del propio setTimeout
         # de la página, a un ritmo aleatorio -- no hay forma de calcular de
         # antemano cuándo va a llegar a un valor puntual. Sondear la barra
@@ -41,8 +43,10 @@ class ProgressBarPage(BasePage):
             timeout=timeout,
         )
 
-    def resultado_numerico(self):
+    def resultado_numerico(self) -> int | None:
         texto = self.resultado.inner_text()
         if "n/a" in texto:
             return None
-        return int(re.search(r"Result: (-?\d+)", texto).group(1))
+        match = re.search(r"Result: (-?\d+)", texto)
+        assert match is not None
+        return int(match.group(1))

@@ -17,19 +17,19 @@ class SampleAppPage(BasePage):
         self.boton_login = page.locator("#login")
         self.estado = page.locator("#loginstatus")
 
-    def login(self, usuario, clave):
+    def login(self, usuario: str, clave: str) -> None:
         self.usuario.fill(usuario)
         self.clave.fill(clave)
         self.boton_login.click()
 
-    def texto_estado(self):
+    def texto_estado(self) -> str:
         return self.estado.inner_text()
 
-    def clase_estado(self):
+    def clase_estado(self) -> str | None:
         return self.estado.get_attribute("class")
 
-    def texto_boton(self):
+    def texto_boton(self) -> str:
         return self.boton_login.inner_text()
 
-    def id_usuario(self):
+    def id_usuario(self) -> str | None:
         return self.usuario.get_attribute("id")

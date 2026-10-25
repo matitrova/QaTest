@@ -10,7 +10,7 @@ class ClickPage(BasePage):
         super().__init__(page)
         self.boton = page.locator("#badButton")
 
-    def clickear_via_js(self):
+    def clickear_via_js(self) -> None:
         # El handler de esta página filtra el evento de click por
         # `event.screenX > 0`: un click sintético disparado por JavaScript
         # (`.click()` del propio DOM) no trae coordenadas de pantalla

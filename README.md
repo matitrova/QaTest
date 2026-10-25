@@ -801,6 +801,20 @@ no el sitio completo).
   una variable interna (`loggedIn`) y su propio texto visible, así que el
   test clickea ese mismo locator en los dos sentidos en vez de buscar un
   botón de logout que no existe como tal.
+- Los 18 Page Objects de esta suite heredaban de `BasePage` tipado, pero sus
+  propios métodos no: parámetros como `texto`, `valor` o `id_buscado` sin
+  anotar, y métodos que devuelven un `Locator`, un `float`, un booleano o
+  directamente nada sin declararlo. Se tipan los 69 métodos que faltaban en
+  los 18 archivos, sin tocar ningún locator ni ninguna aserción -- el mismo
+  refactor que ya se había hecho en `DesafiosPlaywright` y `TestX`, acá
+  completando la tercera suite de UI del repo. Dos casos puntuales
+  (`DynamicTablePage._porcentaje_a_float` y `ProgressBarPage.resultado_numerico`)
+  usaban `re.search(...).group()` encadenado sin chequear que el patrón
+  matcheara -- `mypy` marca esa cadena como un error porque `re.search()`
+  puede devolver `None`, así que se separó en una variable con un `assert`
+  explícito en el medio, sin cambiar el resultado en el camino real donde
+  el patrón siempre matchea. Verificado corriendo los 80 tests de la suite
+  dos veces seguidas antes de commitear.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v

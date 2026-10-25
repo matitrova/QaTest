@@ -1,5 +1,5 @@
 from base_page import BasePage
-from playwright.sync_api import Page
+from playwright.sync_api import Locator, Page
 
 
 class MouseOverPage(BasePage):
@@ -8,25 +8,25 @@ class MouseOverPage(BasePage):
         self.contador_click_me = page.locator("#clickCount")
         self.contador_link_button = page.locator("#clickButtonCount")
 
-    def link_click_me(self):
+    def link_click_me(self) -> Locator:
         # El hover reemplaza este nodo por un clon (ver clase) -- por eso
         # cada método lo busca de nuevo en vez de guardar una referencia fija.
         return self.page.locator("a", has_text="Click me")
 
-    def link_button(self):
+    def link_button(self) -> Locator:
         return self.page.locator("a", has_text="Link Button")
 
-    def hover_click_me(self):
+    def hover_click_me(self) -> None:
         self.link_click_me().hover()
 
-    def click_click_me(self):
+    def click_click_me(self) -> None:
         self.link_click_me().click()
 
-    def click_link_button(self):
+    def click_link_button(self) -> None:
         self.link_button().click()
 
-    def clicks_click_me(self):
+    def clicks_click_me(self) -> int:
         return int(self.contador_click_me.inner_text())
 
-    def clicks_link_button(self):
+    def clicks_link_button(self) -> int:
         return int(self.contador_link_button.inner_text())

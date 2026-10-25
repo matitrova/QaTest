@@ -1,5 +1,5 @@
 from base_page import BasePage
-from playwright.sync_api import Page
+from playwright.sync_api import Locator, Page
 
 
 ESPACIO_NORMAL = " "
@@ -15,11 +15,11 @@ class NbspPage(BasePage):
         # espacio real es distinto.
         self.boton = page.get_by_role("button", name="My Button")
 
-    def xpath_con_espacio_normal(self):
+    def xpath_con_espacio_normal(self) -> Locator:
         return self.page.locator(f"xpath=//button[text()='My{ESPACIO_NORMAL}Button']")
 
-    def xpath_con_nbsp(self):
+    def xpath_con_nbsp(self) -> Locator:
         return self.page.locator(f"xpath=//button[text()='My{ESPACIO_NO_SEPARABLE}Button']")
 
-    def texto_crudo(self):
+    def texto_crudo(self) -> str | None:
         return self.boton.text_content()

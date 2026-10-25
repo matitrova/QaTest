@@ -11,10 +11,10 @@ class HiddenLayersPage(BasePage):
         self.boton_azul = page.locator("#blueButton")
         self.aviso = page.locator(".bg-warning")
 
-    def clickear_boton_verde(self):
+    def clickear_boton_verde(self) -> None:
         self.boton_verde.click()
 
-    def clickear_boton_verde_forzado(self):
+    def clickear_boton_verde_forzado(self) -> None:
         # `force=True` salta el chequeo de actionability de Playwright (que
         # incluye "no está tapado por otro elemento"), pero sigue
         # disparando un click real vía CDP en las coordenadas del elemento.

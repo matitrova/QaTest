@@ -9,11 +9,11 @@ class AlertsPage(BasePage):
         self.confirm_button = page.locator("#confirmButton")
         self.prompt_button = page.locator("#promptButton")
 
-    def hacer_clic_en_alert(self):
+    def hacer_clic_en_alert(self) -> None:
         self.alert_button.click()
 
-    def hacer_clic_en_confirm(self):
+    def hacer_clic_en_confirm(self) -> None:
         self.confirm_button.click()
 
-    def hacer_clic_en_prompt(self):
+    def hacer_clic_en_prompt(self) -> None:
         self.prompt_button.click()
