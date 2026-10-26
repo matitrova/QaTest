@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **307 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **312 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -16,7 +16,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
 | [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 118 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 80 | UI |
-| [`TestX`](TestX) | SauceDemo (e-commerce) | 24 | UI |
+| [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 21 | API |
 | [`ApiTest`](ApiTest) | API de JSONPlaceholder | 9 | API |
@@ -849,6 +849,11 @@ checkout.
   correctamente)
 - `performance_glitch_user`: el login se repite varias veces con sesiones nuevas para
   confirmar que el delay artificial de ~5 segundos es intermitente, no constante
+- `error_user`: agregar los seis productos al carrito deja el contador en 3, no en 6,
+  porque tres de los seis botones "Add to cart" no hacen nada al clickearse (ni su
+  propio texto cambia a "Remove" ni suman al contador), siempre los mismos tres
+  productos y nunca los otros tres (contra `standard_user`, donde agregar un producto
+  sí suma al contador)
 - Logout desde el menú hamburguesa: vuelve a la pantalla de login con el campo de
   usuario vacío, y la sesión queda realmente invalidada del lado cliente, no solo
   "oculta" -- ni volviendo con el botón atrás del navegador ni entrando de nuevo a
@@ -912,6 +917,26 @@ checkout.
 - Entrar directo a `/inventory.html` sin haber hecho login nunca dispara el mismo
   chequeo del lado cliente que usa logout: no hace falta loguearse y desloguearse para
   probar la protección de la ruta, alcanza con navegar directo a la URL protegida.
+- El id de cada botón "Add to cart" (`#add-to-cart-sauce-labs-backpack`, etc.) incluye
+  el nombre del producto tal cual lo usa el sitio, y uno de los seis es
+  `test.allthethings()-t-shirt-(red)` -- con puntos y paréntesis, caracteres que un
+  selector CSS de id necesita escapar. `boton_agregar()` seguía armando un `#id` crudo
+  porque ningún test anterior había tocado ese producto puntual; con él, Playwright
+  tira `Unexpected token "allthethings("` al intentar clickear. La solución es un
+  selector por atributo (`[id="..."]`) en vez de `#id`, que no necesita escapar nada
+  por ir entre comillas.
+- Confirmar cuáles de los seis productos fallan para `error_user` no se puede asumir
+  por nombre: hubo que clickear los seis botones contra el sitio real y comparar el
+  contador final contra el texto de cada botón uno por uno. Son siempre "Sauce Labs
+  Bolt T-Shirt", "Sauce Labs Fleece Jacket" y "Test.allTheThings() T-Shirt (Red)" los
+  que no responden, y siempre los otros tres los que sí -- no es aleatorio ni depende
+  del orden en que se clickean.
+- El botón que sí funciona no se puede re-consultar después del click para verificar
+  que su texto cambió a "Remove": al clickearse, SauceDemo le cambia el `id` de
+  `add-to-cart-...` a `remove-...`, así que el locator armado con el id original ya no
+  encuentra nada. El test del producto sano verifica el contador del carrito en vez de
+  releer el mismo botón, que alcanza para mostrar el contraste con los tres rotos sin
+  depender de un locator que el propio sitio invalida.
 - Trece tests repetían a mano el mismo bloque de tres líneas (crear el `LoginPage`,
   navegar y loguearse) para después operar sobre el inventario. Ahora `TestX/conftest.py`
   suma dos fixtures, `login_as` y `inventory_as`, que reciben el usuario y devuelven el

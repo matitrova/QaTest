@@ -1,8 +1,15 @@
 import time
 
+import pytest
 from playwright.sync_api import expect
 
 from TestX.LoginPage import LoginPage
+
+PRODUCTOS_ROTOS_PARA_ERROR_USER = [
+    "sauce-labs-bolt-t-shirt",
+    "sauce-labs-fleece-jacket",
+    "test.allthethings()-t-shirt-(red)",
+]
 
 
 def test_problem_user_todas_las_imagenes_son_la_misma(inventory_as):
@@ -90,6 +97,58 @@ def test_performance_glitch_user_el_delay_es_intermitente_no_constante(browser):
         context.close()
 
     assert any(d > 2 for d in duraciones)
+
+
+def test_error_user_el_contador_del_carrito_no_refleja_los_seis_productos_agregados(inventory_as):
+    inventory = inventory_as("error_user")
+
+    expect(inventory.nombres.first).to_be_visible()
+    productos = [
+        "sauce-labs-backpack",
+        "sauce-labs-bike-light",
+        "sauce-labs-fleece-jacket",
+        "sauce-labs-bolt-t-shirt",
+        "sauce-labs-onesie",
+        "test.allthethings()-t-shirt-(red)",
+    ]
+    for producto in productos:
+        inventory.agregar_al_carrito(producto)
+
+    # Clickear "Add to cart" en los seis productos no deja el contador en 6:
+    # tres de los seis botones (ver PRODUCTOS_ROTOS_PARA_ERROR_USER) no hacen
+    # nada al clickearse, ni cambian su propio texto ni suman al contador.
+    # No es intermitente ni depende del orden de clicks: contra el sitio
+    # real, siempre son los mismos tres productos los que fallan y los
+    # otros tres los que nunca fallan.
+    assert inventory.obtener_cantidad_carrito() == "3"
+
+
+@pytest.mark.parametrize("producto", PRODUCTOS_ROTOS_PARA_ERROR_USER)
+def test_error_user_los_productos_rotos_no_cambian_su_boton_a_remove(inventory_as, producto):
+    inventory = inventory_as("error_user")
+
+    expect(inventory.nombres.first).to_be_visible()
+    boton = inventory.boton_agregar(producto)
+    boton.click()
+
+    # No hay excepción ni mensaje de error visible: el botón sigue diciendo
+    # "Add to cart" como si el click nunca hubiera llegado al handler.
+    expect(boton).to_have_text("Add to cart")
+
+
+def test_error_user_un_producto_sano_si_suma_al_contador(inventory_as):
+    inventory = inventory_as("error_user")
+
+    expect(inventory.nombres.first).to_be_visible()
+    # A diferencia del botón roto (ver test anterior), el botón sano cambia
+    # de id al clickearse -- de "add-to-cart-..." a "remove-..." -- así que
+    # no se puede reconsultar el mismo locator para ver su nuevo texto.
+    # El contador del carrito no tiene ese problema y alcanza para mostrar
+    # el contraste: el bug no es general a error_user, es específico de los
+    # tres productos de PRODUCTOS_ROTOS_PARA_ERROR_USER.
+    inventory.agregar_al_carrito("sauce-labs-backpack")
+
+    assert inventory.obtener_cantidad_carrito() == "1"
 
 
 def test_standard_user_el_login_es_rapido(page):

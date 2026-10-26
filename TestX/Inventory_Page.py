@@ -1,5 +1,5 @@
 from base_page import BasePage
-from playwright.sync_api import Page
+from playwright.sync_api import Locator, Page
 
 
 class InventoryPage(BasePage):
@@ -14,9 +14,15 @@ class InventoryPage(BasePage):
         self.link_logout = page.locator("#logout_sidebar_link")
         self.mensaje_error = page.locator("[data-test='error']")
 
+    def boton_agregar(self, nombre_producto: str) -> Locator:
+        # Selector por atributo, no "#id": el producto
+        # "test.allthethings()-t-shirt-(red)" tiene un id con puntos y
+        # paréntesis, caracteres que un selector CSS de id ("#...") necesita
+        # escapar. Como atributo entre comillas no hace falta escapar nada.
+        return self.page.locator(f'[id="add-to-cart-{nombre_producto}"]')
+
     def agregar_al_carrito(self, nombre_producto: str) -> None:
-        selector = f"#add-to-cart-{nombre_producto}"
-        self.page.locator(selector).click()
+        self.boton_agregar(nombre_producto).click()
 
     def obtener_cantidad_carrito(self) -> str:
         return self.cantidad_carrito.inner_text()
