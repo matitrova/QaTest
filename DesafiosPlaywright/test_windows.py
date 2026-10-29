@@ -1,19 +1,7 @@
-import pytest
 from playwright.sync_api import expect
 
 from config import BASE_URL
 from WindowsPage import WindowsPage
-
-
-@pytest.fixture(autouse=True)
-def bloquear_analitica_externa(page):
-    # El layout de the-internet.herokuapp.com carga un script de Optimizely
-    # (dominio externo, ajeno a lo que se está probando). Si esa red está
-    # lenta o inaccesible, el evento "load" puede colgarse esperándolo y
-    # la navegación se vuelve flaky -- se aborta ese pedido explícitamente
-    # para que el test dependa solo del sitio bajo prueba.
-    page.route("**/*.optimizely.com/**", lambda route: route.abort())
-    yield
 
 
 def test_abrir_nueva_ventana(page):

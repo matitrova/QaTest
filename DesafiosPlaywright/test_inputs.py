@@ -1,17 +1,7 @@
-import pytest
 from playwright.sync_api import expect
 
 from config import BASE_URL
 from InputsPage import InputsPage
-
-
-@pytest.fixture(autouse=True)
-def bloquear_analitica_externa(page):
-    # Mismo motivo que en el resto de la suite: el layout del sitio carga un
-    # script de Optimizely ajeno a lo que se prueba, y si esa red está lenta
-    # o inaccesible el evento "load" puede colgarse esperándolo.
-    page.route("**/*.optimizely.com/**", lambda route: route.abort())
-    yield
 
 
 def test_arranca_vacio(page):

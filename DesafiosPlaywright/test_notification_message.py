@@ -10,14 +10,6 @@ MENSAJES_CONOCIDOS = {
 }
 
 
-@pytest.fixture(autouse=True)
-def bloquear_analitica_externa(page):
-    # Mismo problema que en test_windows.py y test_context_menu.py: el
-    # script externo de Optimizely puede colgar el evento "load".
-    page.route("**/*.optimizely.com/**", lambda route: route.abort())
-    yield
-
-
 # Cada visita a /notification_message elige uno de los dos mensajes al azar
 # y redirige a /notification_message_rendered -- no hay forma de pedir "el
 # mensaje de éxito" puntualmente, así que el test solo puede afirmar que el

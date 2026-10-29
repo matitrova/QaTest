@@ -7,15 +7,6 @@ ITEMS_BASE = ["Home", "About", "Contact Us", "Portfolio"]
 ITEM_EXTRA = "Gallery"
 
 
-@pytest.fixture(autouse=True)
-def bloquear_analitica_externa(page):
-    # Mismo problema que en test_windows.py y otros: el script externo de
-    # Optimizely puede colgar el evento "load" si esa red está lenta o
-    # inaccesible.
-    page.route("**/*.optimizely.com/**", lambda route: route.abort())
-    yield
-
-
 def test_los_cuatro_items_base_siempre_aparecen_en_el_mismo_orden(page):
     disappearing_elements_page = DisappearingElementsPage(page)
 

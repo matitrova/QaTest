@@ -1,16 +1,6 @@
-import pytest
 
 from config import BASE_URL
 from InfiniteScrollPage import InfiniteScrollPage
-
-
-@pytest.fixture(autouse=True)
-def bloquear_analitica_externa(page):
-    # Mismo problema que en test_windows.py, test_shifting_content.py y
-    # varios otros: el script externo de Optimizely puede colgar el evento
-    # "load" si esa red está lenta o inaccesible.
-    page.route("**/*.optimizely.com/**", lambda route: route.abort())
-    yield
 
 
 def test_la_pagina_carga_al_menos_un_parrafo_sin_necesidad_de_scrollear(page):

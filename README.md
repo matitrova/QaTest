@@ -381,6 +381,21 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   vez del contenido literal, que también es aleatorio. El canvas, en
   cambio, sí tiene un id fijo (`#canvas`): un contraste útil con los
   botones y la tabla, que demuestra que no toda la página es dinámica.
+- Las cuatro fuentes del pool de casos nuevos (the-internet, UI Testing
+  Playground, SauceDemo, ReqRes/Restful Booker) ya están cubiertas por
+  completo, así que el refactor del día fue sobre la suite existente: 15
+  archivos de test tenían copiada y pegada la misma fixture autouse
+  (`bloquear_analitica_externa`, que aborta el script externo de
+  Optimizely para que ningún test dependa de esa red) -- varios de sus
+  propios comentarios decían literalmente "mismo problema que en
+  test_windows.py y otros". Se extrajo una sola vez a un `conftest.py`
+  nuevo en la raíz de la suite, que pytest aplica automáticamente a los
+  130 tests sin que cada archivo tenga que declararla, y se borró el
+  `import pytest` que había quedado sin uso en los 12 archivos donde esa
+  fixture era el único lugar que lo usaba. Verificado corriendo los 130
+  tests (menos 4 que ya fallaban igual en el código sin tocar, por un
+  cambio de comportamiento del sitio real) dos veces seguidas antes de
+  commitear.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v

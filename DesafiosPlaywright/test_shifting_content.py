@@ -1,16 +1,6 @@
-import pytest
 
 from config import BASE_URL
 from ShiftingContentPage import KNOWN_LINES, TARGET_TEXT, ShiftingContentListPage
-
-
-@pytest.fixture(autouse=True)
-def bloquear_analitica_externa(page):
-    # Mismo problema que en test_windows.py y test_disappearing_elements.py: el
-    # script externo de Optimizely puede colgar el evento "load" si esa red
-    # está lenta o inaccesible.
-    page.route("**/*.optimizely.com/**", lambda route: route.abort())
-    yield
 
 
 def test_las_mismas_cinco_lineas_aparecen_siempre_aunque_cambien_de_orden(page):

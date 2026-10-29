@@ -1,17 +1,7 @@
-import pytest
 from playwright.sync_api import expect
 
 from config import BASE_URL
 from ForgotPasswordPage import ForgotPasswordPage
-
-
-@pytest.fixture(autouse=True)
-def bloquear_analitica_externa(page):
-    # Mismo problema que en el resto de la suite: el script externo de
-    # Optimizely puede colgar el evento "load" si esa red está lenta o
-    # inaccesible.
-    page.route("**/*.optimizely.com/**", lambda route: route.abort())
-    yield
 
 
 # El campo de este formulario es <input type="text">, no type="email": el

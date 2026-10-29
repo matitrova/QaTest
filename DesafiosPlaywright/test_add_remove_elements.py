@@ -1,18 +1,7 @@
-import pytest
 from playwright.sync_api import expect
 
 from config import BASE_URL
 from AddRemoveElementsPage import AddRemoveElementsPage
-
-
-@pytest.fixture(autouse=True)
-def bloquear_analitica_externa(page):
-    # Mismo motivo que en test_windows.py y test_horizontal_slider.py: el
-    # layout del sitio carga un script de Optimizely ajeno a lo que se
-    # prueba, y si esa red está lenta o inaccesible el evento "load" puede
-    # colgarse esperándolo.
-    page.route("**/*.optimizely.com/**", lambda route: route.abort())
-    yield
 
 
 def test_arranca_sin_elementos(page):

@@ -1,18 +1,9 @@
 import re
 
-import pytest
 from playwright.sync_api import expect
 
 from config import BASE_URL
 from TablesPage import TablesPage
-
-
-@pytest.fixture(autouse=True)
-def bloquear_analitica_externa(page):
-    # Mismo motivo que en el resto de los tests de the-internet: un script
-    # de Optimizely ajeno a lo que se prueba puede colgar el evento "load".
-    page.route("**/*.optimizely.com/**", lambda route: route.abort())
-    yield
 
 
 def test_tabla_sin_class_arranca_en_el_orden_original(page):

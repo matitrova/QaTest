@@ -1,17 +1,7 @@
-import pytest
 from playwright.sync_api import expect
 
 from config import BASE_URL
 from EntryAdPage import EntryAdPage
-
-
-@pytest.fixture(autouse=True)
-def bloquear_analitica_externa(page):
-    # Mismo problema que en test_windows.py, test_context_menu.py y
-    # test_notification_message.py: el script externo de Optimizely que
-    # carga el layout de esta página puede colgar el evento "load".
-    page.route("**/*.optimizely.com/**", lambda route: route.abort())
-    yield
 
 
 def test_anuncio_aparece_al_cargar(page):

@@ -5,14 +5,6 @@ from config import BASE_URL
 from LargeDomPage import LargeDomPage
 
 
-@pytest.fixture(autouse=True)
-def bloquear_analitica_externa(page):
-    # Mismo motivo que en el resto de los tests de the-internet: un script
-    # de Optimizely ajeno a lo que se prueba puede colgar el evento "load".
-    page.route("**/*.optimizely.com/**", lambda route: route.abort())
-    yield
-
-
 @pytest.fixture
 def large_dom_page(page):
     page.goto(f"{BASE_URL}/large")

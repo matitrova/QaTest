@@ -1,18 +1,7 @@
-import pytest
 from playwright.sync_api import expect
 
 from config import BASE_URL
 from FloatingMenuPage import FloatingMenuPage
-
-
-@pytest.fixture(autouse=True)
-def bloquear_analitica_externa(page):
-    # Mismo problema que en test_windows.py, test_context_menu.py,
-    # test_notification_message.py, test_entry_ad.py y test_exit_intent.py:
-    # el script externo de Optimizely que carga el layout de esta página
-    # puede colgar el evento "load".
-    page.route("**/*.optimizely.com/**", lambda route: route.abort())
-    yield
 
 
 def test_menu_arranca_en_su_posicion_original(page):
