@@ -1,13 +1,7 @@
-from config import BASE_URL
-from TextInputPage import TextInputPage
-
 TEXTO_ORIGINAL = "Button That Should Change it's Name Based on Input Value"
 
 
-def test_fill_cambia_el_nombre_del_boton(page):
-    text_input_page = TextInputPage(page)
-    page.goto(f"{BASE_URL}/textinput")
-
+def test_fill_cambia_el_nombre_del_boton(text_input_page):
     text_input_page.escribir_con_fill("Hola Fill")
     text_input_page.click_boton()
 
@@ -20,10 +14,7 @@ def test_fill_cambia_el_nombre_del_boton(page):
     assert text_input_page.texto_boton() == "Hola Fill"
 
 
-def test_teclado_fisico_cambia_el_nombre_del_boton(page):
-    text_input_page = TextInputPage(page)
-    page.goto(f"{BASE_URL}/textinput")
-
+def test_teclado_fisico_cambia_el_nombre_del_boton(text_input_page):
     text_input_page.escribir_con_teclado("Hola Teclado")
     text_input_page.click_boton()
 
@@ -35,10 +26,7 @@ def test_teclado_fisico_cambia_el_nombre_del_boton(page):
     assert text_input_page.texto_boton() == "Hola Teclado"
 
 
-def test_js_sin_eventos_no_cambia_el_nombre_del_boton(page):
-    text_input_page = TextInputPage(page)
-    page.goto(f"{BASE_URL}/textinput")
-
+def test_js_sin_eventos_no_cambia_el_nombre_del_boton(text_input_page):
     text_input_page.escribir_con_js_sin_eventos("Hola JS")
     text_input_page.click_boton()
 
@@ -51,10 +39,7 @@ def test_js_sin_eventos_no_cambia_el_nombre_del_boton(page):
     assert text_input_page.texto_boton() == TEXTO_ORIGINAL
 
 
-def test_evento_input_manual_no_alcanza_para_cambiar_el_boton(page):
-    text_input_page = TextInputPage(page)
-    page.goto(f"{BASE_URL}/textinput")
-
+def test_evento_input_manual_no_alcanza_para_cambiar_el_boton(text_input_page):
     text_input_page.escribir_con_evento_input_manual("Hola Input Manual")
     text_input_page.click_boton()
 
@@ -69,10 +54,7 @@ def test_evento_input_manual_no_alcanza_para_cambiar_el_boton(page):
     assert text_input_page.texto_boton() == TEXTO_ORIGINAL
 
 
-def test_valores_distintos_en_input_y_change_no_actualiza_el_boton(page):
-    text_input_page = TextInputPage(page)
-    page.goto(f"{BASE_URL}/textinput")
-
+def test_valores_distintos_en_input_y_change_no_actualiza_el_boton(text_input_page):
     text_input_page.escribir_valores_distintos_en_input_y_change("Primero", "Segundo")
     text_input_page.click_boton()
 

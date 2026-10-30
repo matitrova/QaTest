@@ -2,18 +2,12 @@ from config import BASE_URL
 from ClientDelayPage import ClientDelayPage
 
 
-def test_no_hay_contenido_cargado_antes_de_hacer_click(page):
-    client_delay_page = ClientDelayPage(page)
-    page.goto(f"{BASE_URL}/clientDelay")
-
+def test_no_hay_contenido_cargado_antes_de_hacer_click(client_delay_page):
     assert client_delay_page.contenido.inner_text() == ""
     assert not client_delay_page.spinner.is_visible()
 
 
-def test_al_hacer_click_el_spinner_aparece_de_inmediato(page):
-    client_delay_page = ClientDelayPage(page)
-    page.goto(f"{BASE_URL}/clientDelay")
-
+def test_al_hacer_click_el_spinner_aparece_de_inmediato(client_delay_page):
     client_delay_page.disparar_calculo()
 
     # El propio CreateLabel() muestra el spinner con $('#spinner').show()
@@ -23,10 +17,7 @@ def test_al_hacer_click_el_spinner_aparece_de_inmediato(page):
     assert client_delay_page.contenido.inner_text() == ""
 
 
-def test_despues_de_esperar_aparece_el_texto_calculado(page):
-    client_delay_page = ClientDelayPage(page)
-    page.goto(f"{BASE_URL}/clientDelay")
-
+def test_despues_de_esperar_aparece_el_texto_calculado(client_delay_page):
     client_delay_page.disparar_calculo()
     client_delay_page.esperar_etiqueta()
 

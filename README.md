@@ -842,6 +842,23 @@ no el sitio completo).
   explícito en el medio, sin cambiar el resultado en el camino real donde
   el patrón siempre matchea. Verificado corriendo los 80 tests de la suite
   dos veces seguidas antes de commitear.
+- Los ~80 tests de esta suite repetían, como primeras dos líneas de cada
+  función, instanciar el Page Object correspondiente y navegar con
+  `page.goto(f"{BASE_URL}/<ruta>")` -- la misma URL fija para todos los
+  tests de un mismo archivo, copiada y pegada en cada uno. Se agregó un
+  `conftest.py` con 18 fixtures (una por Page Object: `click_page`,
+  `dynamic_id_page`, `sample_app_page`, etc.), cada una navegando una sola
+  vez y devolviendo el Page Object ya listo para usar. Quedaron afuera a
+  propósito los tests que necesitan algo distinto de "navegar y listo":
+  los que miden el tiempo que tarda el propio `goto()` (`/loaddelay`), los
+  que registran un listener de red o de diálogo antes de navegar para no
+  perderse el primer evento, y el único test que navega dentro de un loop
+  (`/dynamictable`, para comparar varias cargas entre sí) -- esos siguen
+  instanciando el Page Object a mano, porque forzarlos a la fixture les
+  cambiaría el comportamiento, no solo el estilo. 73 de los 80 tests
+  pasaron a usar la fixture; los otros 7 quedaron como estaban.
+  Verificado corriendo los 80 tests de la suite dos veces seguidas antes de
+  commitear.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v

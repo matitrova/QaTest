@@ -1,11 +1,4 @@
-from config import BASE_URL
-from OverlappedPage import OverlappedPage
-
-
-def test_escribir_sin_scroll_el_div_superpuesto_borra_el_texto(page):
-    overlapped_page = OverlappedPage(page)
-    page.goto(f"{BASE_URL}/overlapped")
-
+def test_escribir_sin_scroll_el_div_superpuesto_borra_el_texto(overlapped_page):
     overlapped_page.escribir_name_sin_scroll("Matias")
 
     # El listener `input` de la página calcula el centro del input y pregunta
@@ -15,10 +8,7 @@ def test_escribir_sin_scroll_el_div_superpuesto_borra_el_texto(page):
     assert overlapped_page.valor_name() == ""
 
 
-def test_escribir_con_scroll_previo_el_texto_queda_cargado(page):
-    overlapped_page = OverlappedPage(page)
-    page.goto(f"{BASE_URL}/overlapped")
-
+def test_escribir_con_scroll_previo_el_texto_queda_cargado(overlapped_page):
     overlapped_page.escribir_name_con_scroll("Matias")
 
     # Al hacer scroll del contenedor interno, el input se desplaza fuera del
@@ -29,10 +19,7 @@ def test_escribir_con_scroll_previo_el_texto_queda_cargado(page):
     assert overlapped_page.valor_name() == "Matias"
 
 
-def test_el_input_subject_tambien_esta_tapado_y_se_libera_con_el_mismo_scroll(page):
-    overlapped_page = OverlappedPage(page)
-    page.goto(f"{BASE_URL}/overlapped")
-
+def test_el_input_subject_tambien_esta_tapado_y_se_libera_con_el_mismo_scroll(overlapped_page):
     # El mismo scroll que libera a #name también corre a #subject, que
     # arranca más abajo en el contenedor y queda totalmente visible. Lo
     # relevante no es el campo en sí (no tiene el listener que borra el

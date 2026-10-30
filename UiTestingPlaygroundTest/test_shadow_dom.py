@@ -14,18 +14,12 @@ from ShadowDomPage import PATRON_GUID, ShadowDomPage
 # shadow roots abiertos de forma transparente.
 
 
-def test_el_campo_vive_en_un_shadow_root_pero_no_es_visible_para_el_document_global(page):
-    shadow_dom_page = ShadowDomPage(page)
-    page.goto(f"{BASE_URL}/shadowdom")
-
+def test_el_campo_vive_en_un_shadow_root_pero_no_es_visible_para_el_document_global(shadow_dom_page):
     assert shadow_dom_page.esta_dentro_de_un_shadow_root() is True
     assert shadow_dom_page.encontrable_desde_el_document_global() is False
 
 
-def test_generar_guid_carga_un_valor_con_formato_de_guid_en_el_input(page):
-    shadow_dom_page = ShadowDomPage(page)
-    page.goto(f"{BASE_URL}/shadowdom")
-
+def test_generar_guid_carga_un_valor_con_formato_de_guid_en_el_input(shadow_dom_page):
     assert shadow_dom_page.valor_actual() == ""
 
     shadow_dom_page.generar_guid()
@@ -33,10 +27,7 @@ def test_generar_guid_carga_un_valor_con_formato_de_guid_en_el_input(page):
     assert PATRON_GUID.match(shadow_dom_page.valor_actual())
 
 
-def test_dos_clicks_en_generar_dan_dos_guids_distintos(page):
-    shadow_dom_page = ShadowDomPage(page)
-    page.goto(f"{BASE_URL}/shadowdom")
-
+def test_dos_clicks_en_generar_dan_dos_guids_distintos(page, shadow_dom_page):
     shadow_dom_page.generar_guid()
     primer_guid = shadow_dom_page.valor_actual()
 

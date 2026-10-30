@@ -1,22 +1,15 @@
 import pytest
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
-from config import BASE_URL
 from HiddenLayersPage import HiddenLayersPage
 
 
-def test_boton_verde_arranca_visible_y_sin_boton_azul(page):
-    hidden_layers_page = HiddenLayersPage(page)
-    page.goto(f"{BASE_URL}/hiddenlayers")
-
+def test_boton_verde_arranca_visible_y_sin_boton_azul(hidden_layers_page):
     assert hidden_layers_page.boton_verde.get_attribute("class") == HiddenLayersPage.CLASE_BOTON_VERDE
     assert hidden_layers_page.boton_azul.count() == 0
 
 
-def test_click_en_boton_verde_agrega_un_boton_azul_en_las_mismas_coordenadas(page):
-    hidden_layers_page = HiddenLayersPage(page)
-    page.goto(f"{BASE_URL}/hiddenlayers")
-
+def test_click_en_boton_verde_agrega_un_boton_azul_en_las_mismas_coordenadas(hidden_layers_page):
     hidden_layers_page.clickear_boton_verde()
 
     # El handler de la página no reemplaza al botón verde: agrega un nuevo
@@ -29,10 +22,7 @@ def test_click_en_boton_verde_agrega_un_boton_azul_en_las_mismas_coordenadas(pag
     assert hidden_layers_page.boton_verde.bounding_box() == hidden_layers_page.boton_azul.bounding_box()
 
 
-def test_un_segundo_click_normal_sobre_el_locator_verde_tapado_termina_en_timeout(page):
-    hidden_layers_page = HiddenLayersPage(page)
-    page.goto(f"{BASE_URL}/hiddenlayers")
-
+def test_un_segundo_click_normal_sobre_el_locator_verde_tapado_termina_en_timeout(hidden_layers_page):
     hidden_layers_page.clickear_boton_verde()
 
     # Es exactamente el escenario que la propia página describe: "make sure
@@ -47,10 +37,7 @@ def test_un_segundo_click_normal_sobre_el_locator_verde_tapado_termina_en_timeou
         hidden_layers_page.boton_verde.click(timeout=3000)
 
 
-def test_forzar_el_click_en_el_boton_verde_tapado_dispara_el_boton_azul_de_verdad(page):
-    hidden_layers_page = HiddenLayersPage(page)
-    page.goto(f"{BASE_URL}/hiddenlayers")
-
+def test_forzar_el_click_en_el_boton_verde_tapado_dispara_el_boton_azul_de_verdad(page, hidden_layers_page):
     mensajes_consola = []
     page.on("console", lambda msg: mensajes_consola.append(msg.text))
 
@@ -70,10 +57,7 @@ def test_forzar_el_click_en_el_boton_verde_tapado_dispara_el_boton_azul_de_verda
     assert hidden_layers_page.aviso.count() == 0
 
 
-def test_clickear_el_boton_azul_por_su_propio_locator_si_funciona_sin_force(page):
-    hidden_layers_page = HiddenLayersPage(page)
-    page.goto(f"{BASE_URL}/hiddenlayers")
-
+def test_clickear_el_boton_azul_por_su_propio_locator_si_funciona_sin_force(page, hidden_layers_page):
     mensajes_consola = []
     page.on("console", lambda msg: mensajes_consola.append(msg.text))
 

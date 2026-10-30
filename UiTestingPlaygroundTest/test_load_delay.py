@@ -1,7 +1,6 @@
 import time
 
 from config import BASE_URL
-from LoadDelayPage import LoadDelayPage
 
 
 def test_la_navegacion_tarda_al_menos_lo_que_demora_el_servidor(page):
@@ -16,10 +15,7 @@ def test_la_navegacion_tarda_al_menos_lo_que_demora_el_servidor(page):
     assert duracion >= 4
 
 
-def test_el_boton_ya_esta_visible_apenas_termina_la_navegacion(page):
-    load_delay_page = LoadDelayPage(page)
-    page.goto(f"{BASE_URL}/loaddelay")
-
+def test_el_boton_ya_esta_visible_apenas_termina_la_navegacion(load_delay_page):
     # goto() ya esperó el evento load del navegador: a diferencia de
     # ClientDelayPage, no hace falta ningún wait_for adicional después para
     # ver el botón -- si la navegación terminó, el botón ya está.

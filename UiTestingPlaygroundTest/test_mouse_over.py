@@ -1,11 +1,4 @@
-from config import BASE_URL
-from MouseOverPage import MouseOverPage
-
-
-def test_el_hover_reemplaza_el_link_y_cambia_su_titulo_y_clase(page):
-    mouse_over_page = MouseOverPage(page)
-    page.goto(f"{BASE_URL}/mouseover")
-
+def test_el_hover_reemplaza_el_link_y_cambia_su_titulo_y_clase(mouse_over_page):
     link = mouse_over_page.link_click_me()
     assert link.get_attribute("title") == "Click me"
     assert link.get_attribute("class") == "text-primary"
@@ -21,10 +14,7 @@ def test_el_hover_reemplaza_el_link_y_cambia_su_titulo_y_clase(page):
     assert link.get_attribute("class") == "text-warning"
 
 
-def test_dos_clicks_consecutivos_incrementan_el_contador_en_dos(page):
-    mouse_over_page = MouseOverPage(page)
-    page.goto(f"{BASE_URL}/mouseover")
-
+def test_dos_clicks_consecutivos_incrementan_el_contador_en_dos(mouse_over_page):
     assert mouse_over_page.clicks_click_me() == 0
 
     # El escenario que plantea la propia página ("record 2 consecutive
@@ -41,10 +31,7 @@ def test_dos_clicks_consecutivos_incrementan_el_contador_en_dos(page):
     assert mouse_over_page.clicks_click_me() == 2
 
 
-def test_referencia_obsoleta_al_elemento_no_se_puede_clickear_tras_el_hover(page):
-    mouse_over_page = MouseOverPage(page)
-    page.goto(f"{BASE_URL}/mouseover")
-
+def test_referencia_obsoleta_al_elemento_no_se_puede_clickear_tras_el_hover(page, mouse_over_page):
     # A diferencia de un Locator, un ElementHandle sí apunta a un nodo
     # concreto del DOM, resuelto una sola vez en el momento en que se pide.
     # Es el equivalente de Playwright al WebElement de Selenium, y sirve
@@ -76,10 +63,7 @@ def test_referencia_obsoleta_al_elemento_no_se_puede_clickear_tras_el_hover(page
     assert mouse_over_page.clicks_click_me() == 1
 
 
-def test_el_segundo_link_mantiene_su_titulo_pero_tambien_cambia_de_clase(page):
-    mouse_over_page = MouseOverPage(page)
-    page.goto(f"{BASE_URL}/mouseover")
-
+def test_el_segundo_link_mantiene_su_titulo_pero_tambien_cambia_de_clase(mouse_over_page):
     link_button = mouse_over_page.link_button()
     assert link_button.get_attribute("title") == "Link Button"
     assert link_button.get_attribute("class") == "text-primary"

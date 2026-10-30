@@ -1,19 +1,9 @@
-from config import BASE_URL
-from AjaxDataPage import AjaxDataPage
-
-
-def test_no_hay_contenido_cargado_antes_de_hacer_click(page):
-    ajax_data_page = AjaxDataPage(page)
-    page.goto(f"{BASE_URL}/ajax")
-
+def test_no_hay_contenido_cargado_antes_de_hacer_click(ajax_data_page):
     assert ajax_data_page.contenido.inner_text() == ""
     assert not ajax_data_page.spinner.is_visible()
 
 
-def test_al_hacer_click_el_spinner_aparece_de_inmediato(page):
-    ajax_data_page = AjaxDataPage(page)
-    page.goto(f"{BASE_URL}/ajax")
-
+def test_al_hacer_click_el_spinner_aparece_de_inmediato(ajax_data_page):
     ajax_data_page.disparar_pedido()
 
     # El spinner lo muestra el propio handler de click, antes del $.get():
@@ -23,10 +13,7 @@ def test_al_hacer_click_el_spinner_aparece_de_inmediato(page):
     assert ajax_data_page.contenido.inner_text() == ""
 
 
-def test_despues_de_esperar_aparece_el_texto_cargado_por_ajax(page):
-    ajax_data_page = AjaxDataPage(page)
-    page.goto(f"{BASE_URL}/ajax")
-
+def test_despues_de_esperar_aparece_el_texto_cargado_por_ajax(ajax_data_page):
     ajax_data_page.disparar_pedido()
     ajax_data_page.esperar_etiqueta()
 

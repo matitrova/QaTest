@@ -14,9 +14,7 @@ def test_cpu_de_chrome_coincide_con_el_label(page):
         assert dynamic_table_page.cpu_de_chrome() == dynamic_table_page.cpu_del_label()
 
 
-def test_el_orden_de_las_columnas_cambia_entre_recargas(page):
-    dynamic_table_page = DynamicTablePage(page)
-    page.goto(f"{BASE_URL}/dynamictable")
+def test_el_orden_de_las_columnas_cambia_entre_recargas(page, dynamic_table_page):
     primer_orden = dynamic_table_page.nombres_de_columnas()
 
     # La columna de nombre del proceso es la única que siempre queda
@@ -34,9 +32,7 @@ def test_el_orden_de_las_columnas_cambia_entre_recargas(page):
     assert ordenes_distintos
 
 
-def test_la_fila_de_chrome_cambia_de_posicion_entre_recargas(page):
-    dynamic_table_page = DynamicTablePage(page)
-    page.goto(f"{BASE_URL}/dynamictable")
+def test_la_fila_de_chrome_cambia_de_posicion_entre_recargas(page, dynamic_table_page):
     primera_posicion = dynamic_table_page.nombres_de_procesos_en_orden().index("Chrome")
 
     posiciones_distintas = False

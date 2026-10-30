@@ -1,19 +1,9 @@
-from config import BASE_URL
-from ProgressBarPage import ProgressBarPage
-
-
-def test_arranca_en_25_por_ciento_sin_haber_iniciado(page):
-    progress_bar_page = ProgressBarPage(page)
-    page.goto(f"{BASE_URL}/progressbar")
-
+def test_arranca_en_25_por_ciento_sin_haber_iniciado(progress_bar_page):
     assert progress_bar_page.porcentaje_actual() == 25
     assert progress_bar_page.resultado_numerico() is None
 
 
-def test_detener_antes_del_primer_segundo_no_deja_avanzar(page):
-    progress_bar_page = ProgressBarPage(page)
-    page.goto(f"{BASE_URL}/progressbar")
-
+def test_detener_antes_del_primer_segundo_no_deja_avanzar(progress_bar_page):
     # El primer incremento de la barra no sigue el delay aleatorio de los
     # siguientes: la página lo programa con un setTimeout fijo de 1000ms
     # (`setTimeout(_makeProgress, 1000)`), separado del delay random que
@@ -33,10 +23,7 @@ def test_detener_antes_del_primer_segundo_no_deja_avanzar(page):
     assert progress_bar_page.resultado_numerico() is None
 
 
-def test_detener_al_llegar_a_75_por_ciento_da_un_resultado_cercano_a_cero(page):
-    progress_bar_page = ProgressBarPage(page)
-    page.goto(f"{BASE_URL}/progressbar")
-
+def test_detener_al_llegar_a_75_por_ciento_da_un_resultado_cercano_a_cero(progress_bar_page):
     progress_bar_page.iniciar()
     progress_bar_page.esperar_porcentaje_minimo(75)
     progress_bar_page.detener()
@@ -54,10 +41,7 @@ def test_detener_al_llegar_a_75_por_ciento_da_un_resultado_cercano_a_cero(page):
     assert 0 <= porcentaje_al_detener - 75 <= 3
 
 
-def test_detener_frena_la_barra_y_ya_no_sigue_avanzando(page):
-    progress_bar_page = ProgressBarPage(page)
-    page.goto(f"{BASE_URL}/progressbar")
-
+def test_detener_frena_la_barra_y_ya_no_sigue_avanzando(page, progress_bar_page):
     progress_bar_page.iniciar()
     progress_bar_page.esperar_porcentaje_minimo(50)
     progress_bar_page.detener()

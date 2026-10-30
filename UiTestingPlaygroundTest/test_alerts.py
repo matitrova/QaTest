@@ -1,8 +1,5 @@
 import time
 
-from config import BASE_URL
-from AlertsPage import AlertsPage
-
 
 # A diferencia de /javascript_alerts (DesafiosPlaywright/JavascriptAlertsPage.py),
 # acá Confirm y Prompt no escriben ningún resultado en el DOM: lo único que
@@ -13,10 +10,7 @@ from AlertsPage import AlertsPage
 # cada test para no dejarlo pegado.
 
 
-def test_alert_simple(page):
-    alerts_page = AlertsPage(page)
-    page.goto(f"{BASE_URL}/alerts")
-
+def test_alert_simple(page, alerts_page):
     dialogos = []
 
     def manejar(dialog):
@@ -29,10 +23,7 @@ def test_alert_simple(page):
     assert dialogos == [("alert", "Today is a working day.\nOr less likely a holiday.")]
 
 
-def test_confirm_aceptado_dispara_un_segundo_alert_con_yes_despues_de_un_segundo(page):
-    alerts_page = AlertsPage(page)
-    page.goto(f"{BASE_URL}/alerts")
-
+def test_confirm_aceptado_dispara_un_segundo_alert_con_yes_despues_de_un_segundo(page, alerts_page):
     dialogos = []
     tiempos = []
 
@@ -56,10 +47,7 @@ def test_confirm_aceptado_dispara_un_segundo_alert_con_yes_despues_de_un_segundo
     assert tiempos[1] - tiempos[0] >= 0.9
 
 
-def test_confirm_cancelado_dispara_un_segundo_alert_con_no(page):
-    alerts_page = AlertsPage(page)
-    page.goto(f"{BASE_URL}/alerts")
-
+def test_confirm_cancelado_dispara_un_segundo_alert_con_no(page, alerts_page):
     dialogos = []
 
     def manejar(dialog):
@@ -77,10 +65,7 @@ def test_confirm_cancelado_dispara_un_segundo_alert_con_no(page):
     ]
 
 
-def test_prompt_con_texto_dispara_un_segundo_alert_con_el_valor_ingresado(page):
-    alerts_page = AlertsPage(page)
-    page.goto(f"{BASE_URL}/alerts")
-
+def test_prompt_con_texto_dispara_un_segundo_alert_con_el_valor_ingresado(page, alerts_page):
     texto_ingresado = "perros"
     dialogos = []
 
@@ -99,14 +84,7 @@ def test_prompt_con_texto_dispara_un_segundo_alert_con_el_valor_ingresado(page):
     ]
 
 
-def test_prompt_cancelado_el_segundo_alert_muestra_no_answer(page):
-    # El prompt cancelado no deja el valor vacío: la propia página reemplaza
-    # el null que devuelve dismiss() por el string "no answer" antes de
-    # mostrar el segundo alert, así que el resultado no es el mismo que
-    # aceptar el prompt con un campo en blanco.
-    alerts_page = AlertsPage(page)
-    page.goto(f"{BASE_URL}/alerts")
-
+def test_prompt_cancelado_el_segundo_alert_muestra_no_answer(page, alerts_page):
     dialogos = []
 
     def manejar(dialog):

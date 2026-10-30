@@ -1,5 +1,4 @@
-from config import BASE_URL
-from VerifyTextPage import FRASE_OBJETIVO, VerifyTextPage
+from VerifyTextPage import FRASE_OBJETIVO
 
 
 # El texto visible en pantalla ("Welcome UserName!") no es el mismo string
@@ -14,17 +13,11 @@ from VerifyTextPage import FRASE_OBJETIVO, VerifyTextPage
 # que hay que automatizar.
 
 
-def test_xpath_con_igualdad_exacta_no_encuentra_nada(page):
-    verify_text_page = VerifyTextPage(page)
-    page.goto(f"{BASE_URL}/verifytext")
-
+def test_xpath_con_igualdad_exacta_no_encuentra_nada(verify_text_page):
     assert verify_text_page.xpath_igualdad_exacta().count() == 0
 
 
-def test_xpath_con_normalize_space_encuentra_el_span_del_playground(page):
-    verify_text_page = VerifyTextPage(page)
-    page.goto(f"{BASE_URL}/verifytext")
-
+def test_xpath_con_normalize_space_encuentra_el_span_del_playground(verify_text_page):
     span = verify_text_page.xpath_normalize_space()
     assert span.count() == 1
     assert span.evaluate("el => el.tagName") == "SPAN"
@@ -38,10 +31,7 @@ def test_xpath_con_normalize_space_encuentra_el_span_del_playground(page):
     assert span.text_content().strip() == FRASE_OBJETIVO
 
 
-def test_get_by_text_exacto_coincide_con_el_mismo_span_que_normalize_space(page):
-    verify_text_page = VerifyTextPage(page)
-    page.goto(f"{BASE_URL}/verifytext")
-
+def test_get_by_text_exacto_coincide_con_el_mismo_span_que_normalize_space(verify_text_page):
     # get_by_text(exact=True) de Playwright normaliza espacios igual que
     # normalize-space() de XPath: encuentra un único elemento, el mismo
     # span.badge-secondary de la sección "Playground".
@@ -51,10 +41,7 @@ def test_get_by_text_exacto_coincide_con_el_mismo_span_que_normalize_space(page)
     assert por_texto.inner_text() == FRASE_OBJETIVO
 
 
-def test_get_by_text_sin_exact_tambien_matchea_los_ejemplos_de_codigo_del_enunciado(page):
-    verify_text_page = VerifyTextPage(page)
-    page.goto(f"{BASE_URL}/verifytext")
-
+def test_get_by_text_sin_exact_tambien_matchea_los_ejemplos_de_codigo_del_enunciado(verify_text_page):
     # exact=False busca la frase como substring en cualquier elemento de la
     # página, no solo en la sección "Playground" -- y la propia tabla
     # "Does not work / Works" imprime, como texto plano dentro de bloques
@@ -69,10 +56,7 @@ def test_get_by_text_sin_exact_tambien_matchea_los_ejemplos_de_codigo_del_enunci
     assert tags.count("SPAN") == 1
 
 
-def test_acotar_el_locator_al_contenedor_del_playground_evita_el_falso_positivo(page):
-    verify_text_page = VerifyTextPage(page)
-    page.goto(f"{BASE_URL}/verifytext")
-
+def test_acotar_el_locator_al_contenedor_del_playground_evita_el_falso_positivo(verify_text_page):
     # Acotar la búsqueda al div.bg-primary de la sección "Playground" -- en
     # vez de buscar la frase en toda la página -- alcanza para que incluso la
     # variante sin exact=True deje de confundirse con los bloques <code> del
