@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **324 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **331 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -18,7 +18,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 80 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
-| [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 21 | API |
+| [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 29 | API |
 | [`ApiTest`](ApiTest) | API de JSONPlaceholder | 9 | API |
 | [`postman/`](postman) | API de Restful Booker, en Postman + Newman | 22 | API |
 | [`practica/`](practica) | Ejercicios de Python y repaso de Playwright | 10 | Práctica |
@@ -1015,6 +1015,12 @@ fixture y se envía en la cookie de las operaciones que lo requieren.
   prometen (tipos, campos obligatorios, formato de `email` y de `avatar`), más dos tests
   que confirman que el propio esquema rechaza un documento inválido, para no confiar en
   un esquema que por error aceptara cualquier cosa
+- Contrato de schema de Restful Booker (`jsonschema`): valida que la reserva creada por
+  `POST /booking`, la reserva individual de `GET /booking/<id>` y cada item de la lista
+  de `GET /booking` cumplan la forma del JSON que prometen, incluyendo que
+  `additionalneeds` es el único campo que la API omite por completo de la respuesta
+  cuando no se lo envía (no lo devuelve vacío ni en `null`), más dos tests que confirman
+  que el esquema rechaza un documento inválido
 - JSONPlaceholder, parametrizado contra datos reales: tres usuarios conocidos
   (`id`, `name`, `email` verificados contra la API antes de escribirlos en el
   test, no copiados de memoria) y tres ids inexistentes (`9999`, `0`, `-1`),
@@ -1042,6 +1048,12 @@ fixture y se envía en la cookie de las operaciones que lo requieren.
   propias reservas con un `firstname` único por corrida (`uuid4`) y verifican pertenencia
   al resultado en vez de igualdad exacta de listas, para no depender de qué otros datos
   haya en ese momento en el sandbox — y las borran al terminar.
+- `totalprice` en Restful Booker está tipado como entero en la respuesta, incluso si se
+  manda un `float`: `111.9` y `111.1` vuelven los dos como `111`. No es que redondee,
+  **trunca** hacia abajo — el esquema de la reserva (`SCHEMA_RESERVA`) exige
+  `"type": "integer"` para ese campo, y un test dedicado confirma que lo que realmente
+  pasa es un truncamiento y no una pérdida silenciosa de precisión que un chequeo de
+  tipo nada más no detectaría.
 - `ApiTest` era la única suite de API sin `conftest.py`: cada test llamaba a
   `requests.get/post/put/delete` suelto, abriendo y cerrando una conexión TCP
   nueva por request en vez de reusarla como sí hacen `ReqResTest` y
