@@ -1104,6 +1104,23 @@ fixture y se envía en la cookie de las operaciones que lo requieren.
   la borra con el `DELETE` + cookie exacto que usa el fixture, y confirma
   con un `GET` posterior que da 404 — no alcanza con que el `DELETE`
   responda 201, hay que confirmar que la reserva realmente deja de existir.
+- Las cuatro fuentes del pool de casos nuevos siguen agotadas, así que el
+  refactor del día fue sobre `ReqResTest` y `RestfulBookerTest`: eran las dos
+  únicas suites de API sin tipado explícito (`ApiTest` ya lo tenía en su
+  `conftest.py`, y los Page Objects de las suites de UI ya se tiparon en
+  commits anteriores). Se agregan tipos a las fixtures de ambos
+  `conftest.py` y a las funciones sueltas de ayuda (`crear_reserva`,
+  `eliminar_reserva`, `ids_filtrados` en `test_filtros.py`; `crear_reserva`
+  en `test_auth_errores.py` y `test_contrato_schema.py`) sin tocar ninguna
+  aserción. De paso se encontró una duplicación real, no solo cosmética: el
+  `x-api-key` de ReqRes estaba repetido a mano en tres lugares distintos —
+  el fixture `headers` de `conftest.py`, el propio fixture `obtener_token`
+  (que armaba su propio dict de headers en vez de pedir el fixture ya
+  existente) y `test_obtener_token` en `test_users.py` (que repetía el
+  mismo armado inline). Las tres copias dependían ahora de un solo fixture
+  `headers`, así que si la clave cambia algún día alcanza con editarla en un
+  solo lugar. Verificado corriendo las dos suites completas (25 + 29 tests)
+  dos veces seguidas antes de commitear.
 
 ```bash
 cd ReqResTest && python3 -m pytest -v

@@ -5,7 +5,7 @@ import requests
 from config import BASE_URL
 
 
-def crear_reserva(firstname, lastname, checkin, checkout):
+def crear_reserva(firstname: str, lastname: str, checkin: str, checkout: str) -> int:
     respuesta = requests.post(
         f"{BASE_URL}/booking",
         json={
@@ -21,14 +21,14 @@ def crear_reserva(firstname, lastname, checkin, checkout):
     return respuesta.json()["bookingid"]
 
 
-def eliminar_reserva(booking_id, token):
+def eliminar_reserva(booking_id: int, token: str) -> None:
     requests.delete(
         f"{BASE_URL}/booking/{booking_id}",
         headers={"Cookie": f"token={token}"},
     )
 
 
-def ids_filtrados(**params):
+def ids_filtrados(**params: str) -> set[int]:
     respuesta = requests.get(f"{BASE_URL}/booking", params=params)
     assert respuesta.status_code == 200
     datos = respuesta.json()

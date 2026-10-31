@@ -43,7 +43,7 @@ SCHEMA_ITEM_LISTA = {
 }
 
 
-def crear_reserva(totalprice, additionalneeds=None):
+def crear_reserva(totalprice: int | float, additionalneeds: str | None = None) -> requests.Response:
     reserva = {
         "firstname": "Schema",
         "lastname": "Contract",

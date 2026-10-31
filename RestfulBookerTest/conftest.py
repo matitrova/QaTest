@@ -1,10 +1,12 @@
+from typing import Iterator
+
 import pytest
 import requests
 
 from config import BASE_URL
 
 @pytest.fixture
-def token():
+def token() -> str:
     credenciales = {
         "username": "admin",
         "password": "password123"
@@ -17,7 +19,7 @@ def token():
 
 
 @pytest.fixture
-def reservas_creadas(token):
+def reservas_creadas(token: str) -> Iterator[list[int]]:
     # Varios tests de test_bookings.py creaban reservas con POST y nunca las
     # borraban: quedaban acumulandose para siempre en la API publica
     # compartida (a diferencia de test_filtros.py, que ya las borra con un

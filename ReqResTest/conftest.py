@@ -1,15 +1,12 @@
-import requests 
+import requests
 import pytest
 from config import BASE_URL
 
 @pytest.fixture
-def obtener_token():
+def obtener_token(headers: dict[str, str]) -> str:
     credenciales = {
         "email": "eve.holt@reqres.in",
         "password": "cityslicka"
-    }
-    headers = {
-        "x-api-key": "pub_6a1e68915ef0cc65140fe1734bff08cba5902de72982365452e30482f9ac7ac8"
     }
 
     respuesta = requests.post(
@@ -23,7 +20,7 @@ def obtener_token():
     return datos["token"]
 
 @pytest.fixture
-def headers():
+def headers() -> dict[str, str]:
     return {
         "x-api-key": "pub_6a1e68915ef0cc65140fe1734bff08cba5902de72982365452e30482f9ac7ac8"
     }

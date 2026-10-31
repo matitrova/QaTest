@@ -4,13 +4,10 @@ import requests
 import pytest
 from config import BASE_URL
 
-def test_obtener_token():
+def test_obtener_token(headers: dict[str, str]):
     credenciales = {
         "email": "eve.holt@reqres.in",
         "password": "cityslicka"
-    }
-    headers = {
-        "x-api-key": "pub_6a1e68915ef0cc65140fe1734bff08cba5902de72982365452e30482f9ac7ac8"
     }
     respuesta = requests.post(
         f"{BASE_URL}/api/login",

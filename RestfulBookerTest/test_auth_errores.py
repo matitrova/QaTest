@@ -3,7 +3,7 @@ import requests
 from config import BASE_URL
 
 
-def crear_reserva():
+def crear_reserva() -> int:
     respuesta = requests.post(
         f"{BASE_URL}/booking",
         json={
