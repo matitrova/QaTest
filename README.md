@@ -403,7 +403,7 @@ cd DesafiosPlaywright && python3 -m pytest -v
 
 ---
 
-## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias, un input que un div superpuesto vacía solo si se escribe sin escrollarlo antes a la vista, un botón verde que queda tapado por uno azul idéntico en posición al clickearlo, un botón que solo cambia de nombre si el campo se edita de una forma que el navegador reconoce como real, un segundo diálogo nativo que aparece recién un segundo después de responder al primero, un generador de GUID escondido dentro de un shadow root que el DOM global ni siquiera puede ver, un botón que un contenedor con scroll recorta fuera de su área visible sin que `is_visible()` se dé cuenta, un texto visible en pantalla que no es igual, carácter a carácter, al nodo de texto crudo del DOM que lo contiene, y un formulario de login cuyos campos empiezan con id="username"/id="password" en el HTML real pero quedan con un GUID al azar apenas termina de cargar la página
+## UI Testing Playground — ocho formas distintas de estar "oculto", un botón que ignora clicks de JS, una tabla que se reordena sola, una barra de progreso al azar, un link que se reemplaza a sí mismo al pasarle el mouse, un botón cuyo id cambia en cada carga, un dato que tarda 15 segundos reales en llegar por AJAX, otro que tarda los mismos 15 segundos sin tocar la red, una página cuya propia carga tarda 5 segundos reales de servidor, un espacio invisible que rompe un XPath aparentemente correcto, tres botones idénticos a simple vista que solo se distinguen por una clase CSS entre varias, un input que un div superpuesto vacía solo si se escribe sin escrollarlo antes a la vista, un botón verde que queda tapado por uno azul idéntico en posición al clickearlo, un botón que solo cambia de nombre si el campo se edita de una forma que el navegador reconoce como real, un segundo diálogo nativo que aparece recién un segundo después de responder al primero, un generador de GUID escondido dentro de un shadow root que el DOM global ni siquiera puede ver, un botón que un contenedor con scroll recorta fuera de su área visible sin que `is_visible()` se dé cuenta, un texto visible en pantalla que no es igual, carácter a carácter, al nodo de texto crudo del DOM que lo contiene, un formulario de login cuyos campos empiezan con id="username"/id="password" en el HTML real pero quedan con un GUID al azar apenas termina de cargar la página, y nueve controles -- ocho de formulario y un `<div contenteditable>` -- que fill("") vacía por igual pero que no se leen todos con la misma API
 
 Suite sobre uitestingplayground.com, un sitio diseñado a propósito para casos difíciles
 de automatización (a diferencia de the-internet, acá el desafío es cada página puntual,
@@ -518,6 +518,17 @@ no el sitio completo).
   original, y que el id real de los campos de usuario y contraseña no es un
   valor fijo: no existe apenas carga la página y cambia otra vez en cada
   recarga.
+- `/clearinput`: nueve campos distintos (ocho controles de formulario --
+  texto, textarea, password, email, number, search, url, tel -- y un `<div
+  contenteditable>`) precargados con texto, verificando que `fill("")`
+  limpia por igual a los ocho controles estándar, que ese mismo método
+  también está permitido sobre el `contenteditable` aunque no sea un
+  control de formulario, que `input_value()` -- la forma correcta de leer
+  un control estándar -- falla explícitamente sobre el `contenteditable`
+  porque no tiene `.value`, que el label de estado de la página cuenta a
+  los nueve campos como vacíos después de limpiarlos a todos y a uno solo
+  como pendiente si se deja alguno sin tocar, y que `inner_text()` sobre el
+  `contenteditable` ya limpio no da un string vacío como podría esperarse.
 
 **Desafíos técnicos resueltos:**
 - `is_visible()` de Playwright no es un sinónimo de "el usuario lo ve": solo mira el
@@ -828,6 +839,20 @@ no el sitio completo).
   una variable interna (`loggedIn`) y su propio texto visible, así que el
   test clickea ese mismo locator en los dos sentidos en vez de buscar un
   botón de logout que no existe como tal.
+- `/clearinput` tiene un `<div contenteditable>` entre sus nueve campos, y
+  `fill("")` de Playwright lo acepta igual que a un `<input>` o
+  `<textarea>` -- es el tercer tipo de elemento que ese método admite --,
+  pero deja adentro un `<br>` huérfano en vez de un elemento vacío de
+  verdad (confirmado leyendo `innerHTML` después: queda `<br>`, no `""`).
+  `text_content()`, que es lo que la propia página usa para decidir si el
+  campo está vacío, ignora ese `<br>` y da `""`; `inner_text()` -- el texto
+  tal como se renderiza, que sí respeta los saltos de línea -- da `"\n"`,
+  no un string vacío. Una verificación escrita con `inner_text()` en vez de
+  `text_content()` fallaría ahí aunque el campo esté, a todo efecto
+  práctico y según la propia página, limpio. Además, `input_value()` --
+  la forma de leer los otros ocho campos -- no sirve para este: tira un
+  error explícito porque un `<div>` no tiene `.value`, aunque sea
+  contenteditable.
 - Los 18 Page Objects de esta suite heredaban de `BasePage` tipado, pero sus
   propios métodos no: parámetros como `texto`, `valor` o `id_buscado` sin
   anotar, y métodos que devuelven un `Locator`, un `float`, un booleano o

@@ -4,6 +4,7 @@ from config import BASE_URL
 from AjaxDataPage import AjaxDataPage
 from AlertsPage import AlertsPage
 from ClassAttributePage import ClassAttributePage
+from ClearInputPage import ClearInputPage
 from ClickPage import ClickPage
 from ClientDelayPage import ClientDelayPage
 from DynamicIdPage import DynamicIdPage
@@ -44,6 +45,12 @@ def alerts_page(page):
 def class_page(page):
     page.goto(f"{BASE_URL}/classattr")
     return ClassAttributePage(page)
+
+
+@pytest.fixture
+def clear_input_page(page):
+    page.goto(f"{BASE_URL}/clearinput")
+    return ClearInputPage(page)
 
 
 @pytest.fixture
