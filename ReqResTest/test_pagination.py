@@ -4,7 +4,7 @@ import requests
 from config import BASE_URL
 
 
-def test_pagina_1_trae_los_primeros_seis(headers):
+def test_pagina_1_trae_los_primeros_seis(headers: dict[str, str]) -> None:
     respuesta = requests.get(f"{BASE_URL}/api/users?page=1", headers=headers)
     assert respuesta.status_code == 200
     datos = respuesta.json()
@@ -16,7 +16,7 @@ def test_pagina_1_trae_los_primeros_seis(headers):
     assert [usuario["id"] for usuario in datos["data"]] == [1, 2, 3, 4, 5, 6]
 
 
-def test_pagina_2_no_repite_usuarios_de_la_1(headers):
+def test_pagina_2_no_repite_usuarios_de_la_1(headers: dict[str, str]) -> None:
     ids_pagina_1 = requests.get(f"{BASE_URL}/api/users?page=1", headers=headers).json()
     ids_pagina_1 = {usuario["id"] for usuario in ids_pagina_1["data"]}
 
@@ -31,7 +31,7 @@ def test_pagina_2_no_repite_usuarios_de_la_1(headers):
     assert ids_pagina_1 | ids_pagina_2 == set(range(1, datos["total"] + 1))
 
 
-def test_sin_parametro_page_devuelve_la_primera_pagina(headers):
+def test_sin_parametro_page_devuelve_la_primera_pagina(headers: dict[str, str]) -> None:
     # El endpoint no exige "page": sin él, se comporta igual que page=1.
     respuesta = requests.get(f"{BASE_URL}/api/users", headers=headers)
     assert respuesta.status_code == 200
@@ -41,7 +41,7 @@ def test_sin_parametro_page_devuelve_la_primera_pagina(headers):
     assert [usuario["id"] for usuario in datos["data"]] == [1, 2, 3, 4, 5, 6]
 
 
-def test_per_page_cambia_el_tamano_y_recalcula_total_pages(headers):
+def test_per_page_cambia_el_tamano_y_recalcula_total_pages(headers: dict[str, str]) -> None:
     respuesta = requests.get(f"{BASE_URL}/api/users?per_page=3", headers=headers)
     assert respuesta.status_code == 200
     datos = respuesta.json()
@@ -53,7 +53,7 @@ def test_per_page_cambia_el_tamano_y_recalcula_total_pages(headers):
     assert datos["total_pages"] == math.ceil(datos["total"] / datos["per_page"])
 
 
-def test_pagina_fuera_de_rango_devuelve_200_con_lista_vacia(headers):
+def test_pagina_fuera_de_rango_devuelve_200_con_lista_vacia(headers: dict[str, str]) -> None:
     # No es un 404: ReqRes responde 200 igual, con el número de página
     # que se pidió reflejado en el cuerpo aunque no exista, y "data"
     # vacío en vez de un error. Un test que solo mirara el status code

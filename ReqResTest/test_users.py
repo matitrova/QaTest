@@ -4,7 +4,7 @@ import requests
 import pytest
 from config import BASE_URL
 
-def test_obtener_token(headers: dict[str, str]):
+def test_obtener_token(headers: dict[str, str]) -> None:
     credenciales = {
         "email": "eve.holt@reqres.in",
         "password": "cityslicka"
@@ -19,12 +19,12 @@ def test_obtener_token(headers: dict[str, str]):
     assert "token" in datos
     print(f"Token recibido: {datos['token']}")
 
-def test_usar_token(obtener_token: Any):
+def test_usar_token(obtener_token: Any) -> None:
     assert isinstance(obtener_token, str)
     assert len(obtener_token) > 0
     print(f"Token recibido: {obtener_token}")
 
-def test_login_sin_email(headers):
+def test_login_sin_email(headers: dict[str, str]) -> None:
     credenciales = {
         "password": "cityslicka"}
     respuesta = requests.post(
@@ -34,7 +34,7 @@ def test_login_sin_email(headers):
     )
     assert respuesta.status_code == 400
 
-def test_login_sin_password(headers):
+def test_login_sin_password(headers: dict[str, str]) -> None:
     credenciales = {
         "email": "eve.holt@reqres.in"
     }
@@ -45,7 +45,7 @@ def test_login_sin_password(headers):
     )
     assert respuesta.status_code == 400
 
-def test_registro_exitoso(headers):
+def test_registro_exitoso(headers: dict[str, str]) -> None:
     nuevo_usuario = {
         "email": "charles.morris@reqres.in",
         "password": "pistol"
@@ -57,7 +57,7 @@ def test_registro_exitoso(headers):
     )
     assert respuesta.status_code == 200
 
-def test_registro_sin_email(headers):
+def test_registro_sin_email(headers: dict[str, str]) -> None:
     nuevo_usuario = {
         "password": "pistol"
     }
@@ -68,7 +68,7 @@ def test_registro_sin_email(headers):
     )
     assert respuesta.status_code == 400
 
-def test_registro_sin_password(headers):
+def test_registro_sin_password(headers: dict[str, str]) -> None:
     nuevo_usuario = {
         "email": "charles.morris@reqres.in"
     }
@@ -80,7 +80,7 @@ def test_registro_sin_password(headers):
     assert respuesta.status_code == 400     
     assert "error" in respuesta.json()
 
-def test_obtener_lista_usuarios(headers):
+def test_obtener_lista_usuarios(headers: dict[str, str]) -> None:
     respuesta = requests.get(f"{BASE_URL}/api/users?page=2", headers=headers)
     assert respuesta.status_code == 200
     datos = respuesta.json()
@@ -89,7 +89,7 @@ def test_obtener_lista_usuarios(headers):
     assert len(datos["data"]) > 0
 
 
-def test_usuario_especifico(headers):
+def test_usuario_especifico(headers: dict[str, str]) -> None:
     user_id = 2
     respuesta = requests.get(f"{BASE_URL}/api/users/{user_id}", headers=headers)
     assert respuesta.status_code == 200
@@ -98,12 +98,12 @@ def test_usuario_especifico(headers):
     assert isinstance(datos["data"], dict)
     assert datos["data"]["id"] == user_id
 
-def test_usuario_no_encontrado(headers):
+def test_usuario_no_encontrado(headers: dict[str, str]) -> None:
     user_id = 23
     respuesta = requests.get(f"{BASE_URL}/api/users/{user_id}", headers=headers)
     assert respuesta.status_code == 404
 
-def test_crear_usuario(headers):
+def test_crear_usuario(headers: dict[str, str]) -> None:
     nuevo_usuario = {
         "name": "morpheus",
         "job": "leader"
@@ -111,14 +111,14 @@ def test_crear_usuario(headers):
     respuesta = requests.post(f"{BASE_URL}/api/users", json=nuevo_usuario, headers=headers)
     assert respuesta.status_code == 201 
 
-def test_usuario_sin_nombre(headers):
+def test_usuario_sin_nombre(headers: dict[str, str]) -> None:
     nuevo_usuario = {
         "job": "leader"
     }
     respuesta = requests.post(f"{BASE_URL}/api/users", json=nuevo_usuario, headers=headers)
     assert respuesta.status_code == 201
 
-def test_put_exitoso(headers):
+def test_put_exitoso(headers: dict[str, str]) -> None:
     user_id = 2
     respuesta = requests.get(f"{BASE_URL}/api/users/{user_id}", headers=headers)
     assert respuesta.status_code == 200
@@ -143,7 +143,7 @@ def test_put_exitoso(headers):
     assert datos_nuevos["job"] == "zion resident"
     assert "updatedAt" in datos_nuevos
 
-def test_patch_trabajo(headers):
+def test_patch_trabajo(headers: dict[str, str]) -> None:
     user_id = 2
     respuesta = requests.get(f"{BASE_URL}/api/users/{user_id}", headers=headers)
     assert respuesta.status_code == 200
@@ -164,7 +164,7 @@ def test_patch_trabajo(headers):
     assert datos_nuevos["job"] == "zion resident"
     assert "updatedAt" in datos_nuevos
 
-def test_eliminar_usuario(headers):
+def test_eliminar_usuario(headers: dict[str, str]) -> None:
     user_id = 2
     respuesta = requests.get(f"{BASE_URL}/api/users/{user_id}", headers=headers)
     assert respuesta.status_code == 200

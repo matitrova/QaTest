@@ -58,13 +58,13 @@ def crear_reserva(totalprice: int | float, additionalneeds: str | None = None) -
     return respuesta
 
 
-def test_reserva_creada_cumple_el_contrato(reservas_creadas):
+def test_reserva_creada_cumple_el_contrato(reservas_creadas: list[int]) -> None:
     respuesta = crear_reserva(totalprice=150, additionalneeds="Breakfast")
     jsonschema.validate(respuesta.json(), SCHEMA_RESERVA_CREADA)
     reservas_creadas.append(respuesta.json()["bookingid"])
 
 
-def test_reserva_creada_sin_additionalneeds_tambien_cumple_el_contrato(reservas_creadas):
+def test_reserva_creada_sin_additionalneeds_tambien_cumple_el_contrato(reservas_creadas: list[int]) -> None:
     # additionalneeds no es obligatorio en el booking enviado, y la respuesta
     # lo omite directamente en vez de devolverlo como "" o null. El esquema
     # tiene que validar igual sin que el campo esté presente.
@@ -74,7 +74,7 @@ def test_reserva_creada_sin_additionalneeds_tambien_cumple_el_contrato(reservas_
     reservas_creadas.append(respuesta.json()["bookingid"])
 
 
-def test_reserva_individual_cumple_el_contrato(reservas_creadas):
+def test_reserva_individual_cumple_el_contrato(reservas_creadas: list[int]) -> None:
     respuesta_creacion = crear_reserva(totalprice=200)
     booking_id = respuesta_creacion.json()["bookingid"]
     reservas_creadas.append(booking_id)
@@ -84,7 +84,7 @@ def test_reserva_individual_cumple_el_contrato(reservas_creadas):
     jsonschema.validate(respuesta.json(), SCHEMA_RESERVA)
 
 
-def test_lista_de_reservas_cumple_el_contrato():
+def test_lista_de_reservas_cumple_el_contrato() -> None:
     respuesta = requests.get(f"{BASE_URL}/booking")
     assert respuesta.status_code == 200
     datos = respuesta.json()
@@ -93,7 +93,7 @@ def test_lista_de_reservas_cumple_el_contrato():
         jsonschema.validate(item, SCHEMA_ITEM_LISTA)
 
 
-def test_totalprice_enviado_como_float_se_trunca_a_entero_no_se_redondea(reservas_creadas):
+def test_totalprice_enviado_como_float_se_trunca_a_entero_no_se_redondea(reservas_creadas: list[int]) -> None:
     # El esquema exige "integer" para totalprice, y la API lo cumple incluso
     # mandando un float: pero no redondeando, sino truncando hacia abajo.
     # 111.9 vuelve como 111, no como 112 ni como el 111.9 original. Un test
@@ -106,7 +106,7 @@ def test_totalprice_enviado_como_float_se_trunca_a_entero_no_se_redondea(reserva
     reservas_creadas.append(datos["bookingid"])
 
 
-def test_el_esquema_de_reserva_rechaza_totalprice_como_string():
+def test_el_esquema_de_reserva_rechaza_totalprice_como_string() -> None:
     # Confirma que SCHEMA_RESERVA realmente exige "totalprice" entero: un
     # documento idéntico a una reserva real pero con el precio como string
     # tiene que fallar la validación, para no confiar en un esquema que por
@@ -122,7 +122,7 @@ def test_el_esquema_de_reserva_rechaza_totalprice_como_string():
         jsonschema.validate(reserva_con_precio_invalido, SCHEMA_RESERVA)
 
 
-def test_el_esquema_de_reserva_rechaza_bookingdates_sin_checkout():
+def test_el_esquema_de_reserva_rechaza_bookingdates_sin_checkout() -> None:
     reserva_sin_checkout = {
         "firstname": "Schema",
         "lastname": "Contract",

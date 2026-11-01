@@ -48,19 +48,19 @@ SCHEMA_USUARIO_CREADO = {
 }
 
 
-def test_usuario_individual_cumple_el_contrato(headers):
+def test_usuario_individual_cumple_el_contrato(headers: dict[str, str]) -> None:
     respuesta = requests.get(f"{BASE_URL}/api/users/2", headers=headers)
     assert respuesta.status_code == 200
     jsonschema.validate(respuesta.json(), SCHEMA_USUARIO_INDIVIDUAL)
 
 
-def test_lista_de_usuarios_cumple_el_contrato(headers):
+def test_lista_de_usuarios_cumple_el_contrato(headers: dict[str, str]) -> None:
     respuesta = requests.get(f"{BASE_URL}/api/users?page=1", headers=headers)
     assert respuesta.status_code == 200
     jsonschema.validate(respuesta.json(), SCHEMA_LISTA_USUARIOS)
 
 
-def test_usuario_creado_cumple_su_propio_contrato_no_el_del_get(headers):
+def test_usuario_creado_cumple_su_propio_contrato_no_el_del_get(headers: dict[str, str]) -> None:
     nuevo_usuario = {"name": "morpheus", "job": "leader"}
     respuesta = requests.post(f"{BASE_URL}/api/users", json=nuevo_usuario, headers=headers)
     assert respuesta.status_code == 201
@@ -72,7 +72,7 @@ def test_usuario_creado_cumple_su_propio_contrato_no_el_del_get(headers):
     assert isinstance(respuesta.json()["id"], str)
 
 
-def test_el_esquema_de_usuario_rechaza_un_id_como_string():
+def test_el_esquema_de_usuario_rechaza_un_id_como_string() -> None:
     # Confirma que SCHEMA_USUARIO realmente exige "id" entero: un documento
     # idéntico a un usuario real pero con "id" como string (el mismo tipo
     # que devuelve el POST de creación) tiene que fallar la validación. Sin
@@ -89,7 +89,7 @@ def test_el_esquema_de_usuario_rechaza_un_id_como_string():
         jsonschema.validate(usuario_con_id_invalido, SCHEMA_USUARIO)
 
 
-def test_el_esquema_de_usuario_rechaza_un_avatar_sin_url():
+def test_el_esquema_de_usuario_rechaza_un_avatar_sin_url() -> None:
     usuario_con_avatar_invalido = {
         "id": 2,
         "email": "janet.weaver@reqres.in",

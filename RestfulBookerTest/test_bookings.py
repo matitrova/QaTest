@@ -3,7 +3,7 @@ import pytest
 
 from config import BASE_URL
 
-def test_obtener_token():
+def test_obtener_token() -> None:
     credenciales = {
         "username": "admin",
         "password": "password123"
@@ -18,19 +18,19 @@ def test_obtener_token():
     assert isinstance(datos["token"], str)
     assert len(datos["token"]) > 0
 
-def test_usar_token(token):
+def test_usar_token(token: str) -> None:
     assert isinstance(token, str)
     assert len(token) > 0
     print(f"Token recibido: {token}")
 
-def test_obtener_reservas(token):
+def test_obtener_reservas(token: str) -> None:
     respuesta = requests.get(
         f"{BASE_URL}/booking")
     datos = respuesta.json()
     assert respuesta.status_code == 200
     assert isinstance(datos, list)
 
-def test_crear_reserva(token, reservas_creadas):
+def test_crear_reserva(token: str, reservas_creadas: list[int]) -> None:
     nueva_reserva = {
         "firstname": "John",
         "lastname": "Doe",
@@ -59,7 +59,7 @@ def test_crear_reserva(token, reservas_creadas):
     assert respuesta.status_code == 200
 
 
-def test_modificar_reserva(token, reservas_creadas):
+def test_modificar_reserva(token: str, reservas_creadas: list[int]) -> None:
     nueva_reserva = {
         "firstname": "Jane",
         "lastname": "Smith",
@@ -105,7 +105,7 @@ def test_modificar_reserva(token, reservas_creadas):
     assert datos["lastname"] == "Doe"
     assert datos["totalprice"] == 250
 
-def test_flujo_completo(token):
+def test_flujo_completo(token: str) -> None:
     nueva_reserva = {
         "firstname": "Alice",
         "lastname": "Johnson",
@@ -158,7 +158,7 @@ def test_flujo_completo(token):
         f"{BASE_URL}/booking/{booking_id}")
     assert respuesta.status_code == 404
 
-def test_patch_reserva(token, reservas_creadas):
+def test_patch_reserva(token: str, reservas_creadas: list[int]) -> None:
     nueva_reserva = {
         "firstname": "Bob",
         "lastname": "Brown",
@@ -203,7 +203,7 @@ def test_patch_reserva(token, reservas_creadas):
     datos = respuesta.json()
     assert datos["totalprice"] == 450
   
-def test_reserva_patch(token, reservas_creadas):
+def test_reserva_patch(token: str, reservas_creadas: list[int]) -> None:
     respuesta = requests.post(
         f"{BASE_URL}/booking",
         json={
@@ -235,19 +235,19 @@ def test_reserva_patch(token, reservas_creadas):
     )
     assert respuesta.status_code == 403
 
-def test_booking_inexists(token):
+def test_booking_inexists(token: str) -> None:
     respuesta = requests.get(
         f"{BASE_URL}/booking/999999")
     assert respuesta.status_code == 404
 
-def test_delete_booking_exists_sin_token():
+def test_delete_booking_exists_sin_token() -> None:
     respuesta = requests.delete(
         f"{BASE_URL}/booking/1",
 
     )
     assert respuesta.status_code == 403
 
-def test_borrado_con_cookie_de_token_elimina_la_reserva_de_verdad(token):
+def test_borrado_con_cookie_de_token_elimina_la_reserva_de_verdad(token: str) -> None:
     # El fixture reservas_creadas (conftest.py) limpia su teardown borrando
     # cada id con exactamente este mismo DELETE + header de Cookie. Este test
     # prueba que ese mecanismo elimina la reserva de verdad (y no solo que

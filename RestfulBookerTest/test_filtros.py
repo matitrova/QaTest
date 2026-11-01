@@ -36,7 +36,7 @@ def ids_filtrados(**params: str) -> set[int]:
     return {reserva["bookingid"] for reserva in datos}
 
 
-def test_filtrar_por_firstname_trae_todas_las_reservas_con_ese_nombre(token):
+def test_filtrar_por_firstname_trae_todas_las_reservas_con_ese_nombre(token: str) -> None:
     # Un mismo firstname con apellidos distintos: filtrar solo por firstname
     # tiene que traer las dos, no solo la primera que encuentre.
     nombre = f"Zzqatest{uuid.uuid4().hex[:8]}"
@@ -51,7 +51,7 @@ def test_filtrar_por_firstname_trae_todas_las_reservas_con_ese_nombre(token):
         eliminar_reserva(id_dos, token)
 
 
-def test_filtrar_por_firstname_y_lastname_juntos_acota_a_una_sola(token):
+def test_filtrar_por_firstname_y_lastname_juntos_acota_a_una_sola(token: str) -> None:
     nombre = f"Zzqatest{uuid.uuid4().hex[:8]}"
     id_uno = crear_reserva(nombre, "Uno", "2030-03-01", "2030-03-05")
     id_dos = crear_reserva(nombre, "Dos", "2030-04-01", "2030-04-05")
@@ -64,7 +64,7 @@ def test_filtrar_por_firstname_y_lastname_juntos_acota_a_una_sola(token):
         eliminar_reserva(id_dos, token)
 
 
-def test_firstname_no_es_case_insensitive_ni_busca_por_substring(token):
+def test_firstname_no_es_case_insensitive_ni_busca_por_substring(token: str) -> None:
     # El filtro exige coincidencia exacta, sensible a mayúsculas: ni una
     # variante en minúsculas ni un substring del nombre real encuentran la
     # reserva. Quien asuma un LIKE de SQL se lleva una sorpresa.
@@ -79,7 +79,7 @@ def test_firstname_no_es_case_insensitive_ni_busca_por_substring(token):
         eliminar_reserva(id_reserva, token)
 
 
-def test_filtrar_sin_coincidencias_devuelve_200_con_lista_vacia():
+def test_filtrar_sin_coincidencias_devuelve_200_con_lista_vacia() -> None:
     # No es un 404: como con la paginación de ReqRes, "no hay resultados"
     # sigue siendo una respuesta exitosa con una lista vacía en el cuerpo.
     respuesta = requests.get(
@@ -89,7 +89,7 @@ def test_filtrar_sin_coincidencias_devuelve_200_con_lista_vacia():
     assert respuesta.json() == []
 
 
-def test_filtrar_por_rango_de_fechas_incluye_solo_lo_que_cae_adentro(token):
+def test_filtrar_por_rango_de_fechas_incluye_solo_lo_que_cae_adentro(token: str) -> None:
     # checkin/checkout como filtro no buscan una fecha exacta: delimitan un
     # rango, y la reserva entra si sus fechas caen dentro de ese rango.
     nombre = f"Zzqatest{uuid.uuid4().hex[:8]}"

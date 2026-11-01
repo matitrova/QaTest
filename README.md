@@ -1146,6 +1146,18 @@ fixture y se envía en la cookie de las operaciones que lo requieren.
   `headers`, así que si la clave cambia algún día alcanza con editarla en un
   solo lugar. Verificado corriendo las dos suites completas (25 + 29 tests)
   dos veces seguidas antes de commitear.
+- El pool sigue agotado, así que el refactor del día continúa el anterior:
+  ese commit tipó los `conftest.py` y las funciones sueltas de ayuda de
+  `ReqResTest`/`RestfulBookerTest`, pero dejó sin tocar las firmas de las
+  propias funciones `test_*`, que seguían recibiendo sus fixtures
+  (`headers`, `token`, `reservas_creadas`, `obtener_token`) sin ninguna
+  anotación y sin declarar su retorno. Se tipan las 52 funciones de test que
+  faltaban en los 7 archivos de ambas suites (`test_users.py`,
+  `test_pagination.py` y `test_contrato_schema.py` de ReqRes;
+  `test_bookings.py`, `test_auth_errores.py`, `test_contrato_schema.py` y
+  `test_filtros.py` de Restful Booker), sin tocar ninguna aserción ni
+  ninguna lógica. Verificado corriendo las dos suites completas (25 + 29
+  tests) dos veces seguidas antes de commitear.
 
 ```bash
 cd ReqResTest && python3 -m pytest -v

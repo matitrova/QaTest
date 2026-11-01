@@ -19,7 +19,7 @@ def crear_reserva() -> int:
     return respuesta.json()["bookingid"]
 
 
-def test_auth_con_password_incorrecta_responde_200_sin_token():
+def test_auth_con_password_incorrecta_responde_200_sin_token() -> None:
     # Un 200 no significa éxito: con la contraseña mal, /auth sigue
     # respondiendo 200, y el único indicio del fallo está en el cuerpo
     # ("reason": "Bad credentials"), sin ningún "token". Un test que
@@ -34,7 +34,7 @@ def test_auth_con_password_incorrecta_responde_200_sin_token():
     assert datos["reason"] == "Bad credentials"
 
 
-def test_auth_con_username_incorrecto_responde_200_sin_token():
+def test_auth_con_username_incorrecto_responde_200_sin_token() -> None:
     respuesta = requests.post(
         f"{BASE_URL}/auth",
         json={"username": "usuario-que-no-existe", "password": "password123"},
@@ -45,7 +45,7 @@ def test_auth_con_username_incorrecto_responde_200_sin_token():
     assert datos["reason"] == "Bad credentials"
 
 
-def test_auth_sin_credenciales_responde_200_sin_token():
+def test_auth_sin_credenciales_responde_200_sin_token() -> None:
     # Ni siquiera un cuerpo vacío devuelve un 400: la API trata la
     # ausencia total de credenciales igual que una combinación
     # incorrecta, con la misma respuesta 200 + "reason".
@@ -56,7 +56,7 @@ def test_auth_sin_credenciales_responde_200_sin_token():
     assert datos["reason"] == "Bad credentials"
 
 
-def test_put_sin_token_responde_403():
+def test_put_sin_token_responde_403() -> None:
     booking_id = crear_reserva()
     respuesta = requests.put(
         f"{BASE_URL}/booking/{booking_id}",
@@ -72,7 +72,7 @@ def test_put_sin_token_responde_403():
     assert respuesta.status_code == 403
 
 
-def test_put_con_token_invalido_responde_403_igual_que_sin_token():
+def test_put_con_token_invalido_responde_403_igual_que_sin_token() -> None:
     # Mandar una cookie "token" con un valor cualquiera no es lo mismo
     # que no mandar ninguna: acá se confirma que la API de verdad valida
     # el contenido del token (no solo que la cookie exista), rechazando
@@ -93,7 +93,7 @@ def test_put_con_token_invalido_responde_403_igual_que_sin_token():
     assert respuesta.status_code == 403
 
 
-def test_obtener_reserva_con_id_no_numerico_responde_404():
+def test_obtener_reserva_con_id_no_numerico_responde_404() -> None:
     # El id de una reserva es siempre numérico; pedir uno que ni
     # siquiera tiene esa forma no distingue el caso con un 400 propio,
     # cae en el mismo 404 genérico que un id numérico inexistente.
