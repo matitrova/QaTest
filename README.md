@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **331 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **338 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 130 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 137 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 80 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, y un párrafo donde el sitio introduce un típo al azar en cada carga
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -166,6 +166,14 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   delay -- bloqueando un segundo click en vez de ignorarlo en silencio -- y
   que cada mensaje de resultado ("It's gone!", "It's back!", "It's
   enabled!", "It's disabled!") reemplaza al anterior en vez de acumularse
+- Típos (`/typos`): un párrafo cuyo texto incluye, al azar en cada carga,
+  un error de tipeo real (un apóstrofo reemplazado por una coma en
+  "won't" → "won,t"), verificando que el párrafo fijo de arriba y el
+  título nunca cambian, que el texto variable es siempre una de las dos
+  variantes conocidas, que ambas aparecen de verdad en varias recargas (no
+  solo que "no falla" con una sola), que ninguna otra variante aparece, y
+  que la diferencia entre las dos es exactamente un carácter en una
+  posición fija, no una palabra distinta
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -396,6 +404,22 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   tests (menos 4 que ya fallaban igual en el código sin tocar, por un
   cambio de comportamiento del sitio real) dos veces seguidas antes de
   commitear.
+- El pool original de the-internet.herokuapp.com que vengo siguiendo
+  quedó agotado hace unos días, pero el sitio real tiene más páginas de
+  las que ese pool listaba (51 contra las ~30 relevadas originalmente) --
+  releer el menú completo del sitio en vez de confiar en una lista vieja
+  encontró `/typos`, sin cubrir todavía. El HTML real de esa página nunca
+  cierra ninguno de sus dos `<p>` ("`<p>...carga.<p>\n  Sometimes...won't.\n</div>`"),
+  así que a primera vista el texto variable podría quedar como un nodo de
+  texto suelto fuera de cualquier párrafo -- el parser HTML5 del
+  navegador autocierra el primer `<p>` apenas encuentra el segundo, y
+  autocierra también a este con el `</div>` final, dejando dos párrafos
+  reales. El test lo confirma contando los `<p>` del DOM en vez de
+  confiar en cómo se ve el HTML fuente, y como la variante con error no
+  se puede pedir a demanda, se recolecta recargando en un loop (el mismo
+  patrón que `/notification_message`), confirmando ambas variantes por
+  separado para no asumir que una es "la normal" y la otra "la
+  excepción".
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
