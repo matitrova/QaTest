@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **338 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **365 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,10 +14,10 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 137 | UI |
-| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 80 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 145 | UI |
+| [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 93 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
-| [`ReqResTest`](ReqResTest) | API de ReqRes | 20 | API |
+| [`ReqResTest`](ReqResTest) | API de ReqRes | 25 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 29 | API |
 | [`ApiTest`](ApiTest) | API de JSONPlaceholder | 9 | API |
 | [`postman/`](postman) | API de Restful Booker, en Postman + Newman | 22 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, y un párrafo donde el sitio introduce un típo al azar en cada carga
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, y una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -174,6 +174,13 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   solo que "no falla" con una sola), que ninguna otra variante aparece, y
   que la diferencia entre las dos es exactamente un carácter en una
   posición fija, no una palabra distinta
+- Contenido dinámico (`/dynamic_content`): tres filas de imagen + texto que
+  se eligen al azar en cada carga, verificando que al menos una fila
+  cambia entre dos recargas consecutivas sin el parámetro `?with_content=static`,
+  que la página siempre muestra exactamente tres filas (con o sin ese
+  parámetro) y, agregando el parámetro, que las dos primeras filas quedan
+  fijas mientras la tercera sigue siendo aleatoria -- la propia página
+  promete hacer estático "some of the content", no todo
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -420,6 +427,16 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   patrón que `/notification_message`), confirmando ambas variantes por
   separado para no asumir que una es "la normal" y la otra "la
   excepción".
+- `/dynamic_content?with_content=static` no congela las tres filas por
+  igual: confirmado con varias recargas repetidas contra el sitio real,
+  las dos primeras filas (imagen y texto juntos) quedan exactamente
+  fijas, pero la tercera sigue devolviendo una combinación al azar en
+  cada carga -- el propio enunciado de la página ("make SOME of the
+  content static") ya avisa que no es todo, pero no dice cuántas filas
+  quedan afuera. Como esa tercera fila es aleatoria, una sola recarga no
+  alcanza para probarlo (podría repetirse por casualidad): se recarga en
+  un loop hasta encontrar dos valores distintos, el mismo patrón que ya
+  usa esta suite en `/shifting_content` para probar aleatoriedad real.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
