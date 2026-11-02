@@ -1,9 +1,12 @@
-from playwright.sync_api import expect
+from typing import Callable
+
+from playwright.sync_api import Page, expect
 
 from TestX.Inventory_Page import InventoryPage
+from TestX.LoginPage import LoginPage
 
 
-def test_logout_vuelve_a_la_pantalla_de_login(page, login_as):
+def test_logout_vuelve_a_la_pantalla_de_login(page: Page, login_as: Callable[..., LoginPage]) -> None:
     login = login_as("standard_user")
     page.wait_for_url("**/inventory.html")
 
@@ -15,7 +18,9 @@ def test_logout_vuelve_a_la_pantalla_de_login(page, login_as):
     expect(login.username_input).to_have_value("")
 
 
-def test_logout_protege_inventory_ante_navegacion_con_atras(page, inventory_as):
+def test_logout_protege_inventory_ante_navegacion_con_atras(
+    page: Page, inventory_as: Callable[..., InventoryPage]
+) -> None:
     inventory = inventory_as("standard_user")
     inventory.cerrar_sesion()
     expect(page).to_have_url("https://www.saucedemo.com/")
@@ -37,7 +42,7 @@ def test_logout_protege_inventory_ante_navegacion_con_atras(page, inventory_as):
     assert inventory.nombres.count() == 0
 
 
-def test_acceso_directo_a_inventory_sin_sesion_muestra_error(page):
+def test_acceso_directo_a_inventory_sin_sesion_muestra_error(page: Page) -> None:
     # Ni siquiera hace falta loguearse y desloguearse: entrar directo a
     # /inventory.html sin sesión previa cae en el mismo chequeo del lado
     # cliente que usa logout, y la app redirige la URL a "/" mostrando el

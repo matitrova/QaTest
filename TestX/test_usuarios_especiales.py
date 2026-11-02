@@ -1,8 +1,10 @@
 import time
+from typing import Callable
 
 import pytest
-from playwright.sync_api import expect
+from playwright.sync_api import Browser, Page, expect
 
+from TestX.Inventory_Page import InventoryPage
 from TestX.LoginPage import LoginPage
 
 PRODUCTOS_ROTOS_PARA_ERROR_USER = [
@@ -12,7 +14,7 @@ PRODUCTOS_ROTOS_PARA_ERROR_USER = [
 ]
 
 
-def test_problem_user_todas_las_imagenes_son_la_misma(inventory_as):
+def test_problem_user_todas_las_imagenes_son_la_misma(inventory_as: Callable[..., InventoryPage]) -> None:
     inventory = inventory_as("problem_user")
 
     # Igual que en el checkout (ver test_checkout_completo.py): la URL de
@@ -33,7 +35,7 @@ def test_problem_user_todas_las_imagenes_son_la_misma(inventory_as):
     assert len(set(srcs)) == 1
 
 
-def test_standard_user_cada_producto_tiene_su_propia_imagen(inventory_as):
+def test_standard_user_cada_producto_tiene_su_propia_imagen(inventory_as: Callable[..., InventoryPage]) -> None:
     inventory = inventory_as("standard_user")
 
     expect(inventory.imagenes.first).to_be_visible()
@@ -43,7 +45,7 @@ def test_standard_user_cada_producto_tiene_su_propia_imagen(inventory_as):
     assert len(set(srcs)) == 6
 
 
-def test_problem_user_el_orden_no_cambia_al_elegir_otro_criterio(inventory_as):
+def test_problem_user_el_orden_no_cambia_al_elegir_otro_criterio(inventory_as: Callable[..., InventoryPage]) -> None:
     inventory = inventory_as("problem_user")
 
     expect(inventory.nombres.first).to_be_visible()
@@ -56,7 +58,7 @@ def test_problem_user_el_orden_no_cambia_al_elegir_otro_criterio(inventory_as):
     assert inventory.nombres_productos() == orden_inicial
 
 
-def test_standard_user_el_orden_si_cambia_al_elegir_otro_criterio(inventory_as):
+def test_standard_user_el_orden_si_cambia_al_elegir_otro_criterio(inventory_as: Callable[..., InventoryPage]) -> None:
     inventory = inventory_as("standard_user")
 
     expect(inventory.nombres.first).to_be_visible()
@@ -68,7 +70,7 @@ def test_standard_user_el_orden_si_cambia_al_elegir_otro_criterio(inventory_as):
     assert orden_za == sorted(orden_inicial, reverse=True)
 
 
-def test_performance_glitch_user_el_delay_es_intermitente_no_constante(browser):
+def test_performance_glitch_user_el_delay_es_intermitente_no_constante(browser: Browser) -> None:
     # El delay no está en la navegación posterior al login, sino en la propia
     # respuesta al click: `locator.click()` de Playwright no retorna hasta
     # que termina de procesar el evento, así que el cronómetro tiene que
@@ -99,7 +101,9 @@ def test_performance_glitch_user_el_delay_es_intermitente_no_constante(browser):
     assert any(d > 2 for d in duraciones)
 
 
-def test_error_user_el_contador_del_carrito_no_refleja_los_seis_productos_agregados(inventory_as):
+def test_error_user_el_contador_del_carrito_no_refleja_los_seis_productos_agregados(
+    inventory_as: Callable[..., InventoryPage]
+) -> None:
     inventory = inventory_as("error_user")
 
     expect(inventory.nombres.first).to_be_visible()
@@ -124,7 +128,9 @@ def test_error_user_el_contador_del_carrito_no_refleja_los_seis_productos_agrega
 
 
 @pytest.mark.parametrize("producto", PRODUCTOS_ROTOS_PARA_ERROR_USER)
-def test_error_user_los_productos_rotos_no_cambian_su_boton_a_remove(inventory_as, producto):
+def test_error_user_los_productos_rotos_no_cambian_su_boton_a_remove(
+    inventory_as: Callable[..., InventoryPage], producto: str
+) -> None:
     inventory = inventory_as("error_user")
 
     expect(inventory.nombres.first).to_be_visible()
@@ -136,7 +142,7 @@ def test_error_user_los_productos_rotos_no_cambian_su_boton_a_remove(inventory_a
     expect(boton).to_have_text("Add to cart")
 
 
-def test_error_user_un_producto_sano_si_suma_al_contador(inventory_as):
+def test_error_user_un_producto_sano_si_suma_al_contador(inventory_as: Callable[..., InventoryPage]) -> None:
     inventory = inventory_as("error_user")
 
     expect(inventory.nombres.first).to_be_visible()
@@ -151,7 +157,7 @@ def test_error_user_un_producto_sano_si_suma_al_contador(inventory_as):
     assert inventory.obtener_cantidad_carrito() == "1"
 
 
-def test_standard_user_el_login_es_rapido(page):
+def test_standard_user_el_login_es_rapido(page: Page) -> None:
     login = LoginPage(page)
     login.navigate()
 

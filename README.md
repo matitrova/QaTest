@@ -1016,6 +1016,15 @@ checkout.
   `click()` del login entero, no solo el `wait_for_url()` posterior -- el delay ocurre
   durante la propia respuesta al click, así que medir después de que `login()` ya
   retornó siempre da un tiempo casi nulo, aunque el login en sí haya tardado 5 segundos.
+- Las 29 funciones `test_*` de esta suite no tenían tipado explícito, a pesar de que sus
+  propios Page Objects (`LoginPage`, `InventoryPage`, `CheckoutPage`) sí lo tenían desde
+  antes y de que ReqRes/Restful Booker ya habían sumado tipado a sus funciones `test_*`.
+  El tipo de cada parámetro depende de qué fixture lo provee: `page: Page` para el fixture
+  nativo de Playwright, y `Callable[..., InventoryPage]`/`Callable[..., LoginPage]` para
+  `inventory_as`/`login_as` de `conftest.py`, que no devuelven el Page Object directo sino
+  una función que lo construye con el usuario pedido. El único test que depende de varios
+  contextos de navegador en paralelo (`performance_glitch_user`) usa el fixture `browser`
+  en vez de `page`, así que ese quedó tipado como `Browser`, no como los demás.
 - Después de hacer logout, pulsar atrás en el navegador deja la barra de direcciones
   apuntando de nuevo a `/inventory.html`, pero eso no es que la sesión haya quedado
   "viva" en caché: la propia app detecta que no hay sesión y redirige sola a `/`, solo

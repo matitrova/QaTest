@@ -1,9 +1,14 @@
-from playwright.sync_api import expect
+from typing import Callable
+
+from playwright.sync_api import Page, expect
 
 from TestX.CheckoutPage import CheckoutPage
+from TestX.Inventory_Page import InventoryPage
 
 
-def test_checkout_completo_con_un_producto(page, inventory_as):
+def test_checkout_completo_con_un_producto(
+    page: Page, inventory_as: Callable[..., InventoryPage]
+) -> None:
     inventory = inventory_as("standard_user")
     inventory.agregar_al_carrito("sauce-labs-backpack")
 
@@ -42,7 +47,9 @@ def test_checkout_completo_con_un_producto(page, inventory_as):
     assert checkout.cart_badge.count() == 0
 
 
-def test_checkout_sin_completar_datos_muestra_error(page, inventory_as):
+def test_checkout_sin_completar_datos_muestra_error(
+    page: Page, inventory_as: Callable[..., InventoryPage]
+) -> None:
     inventory = inventory_as("standard_user")
     inventory.agregar_al_carrito("sauce-labs-backpack")
 

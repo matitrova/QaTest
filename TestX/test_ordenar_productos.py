@@ -1,7 +1,13 @@
+from typing import Callable
+
 from playwright.sync_api import expect
 
+from TestX.Inventory_Page import InventoryPage
 
-def test_standard_user_ordenar_por_precio_de_menor_a_mayor(inventory_as):
+
+def test_standard_user_ordenar_por_precio_de_menor_a_mayor(
+    inventory_as: Callable[..., InventoryPage]
+) -> None:
     inventory = inventory_as("standard_user")
     expect(inventory.nombres.first).to_be_visible()
     precios_inicial = inventory.precios_productos()
@@ -11,7 +17,9 @@ def test_standard_user_ordenar_por_precio_de_menor_a_mayor(inventory_as):
     assert precios_lohi == sorted(precios_inicial)
 
 
-def test_standard_user_ordenar_por_precio_de_mayor_a_menor(inventory_as):
+def test_standard_user_ordenar_por_precio_de_mayor_a_menor(
+    inventory_as: Callable[..., InventoryPage]
+) -> None:
     inventory = inventory_as("standard_user")
     expect(inventory.nombres.first).to_be_visible()
     precios_inicial = inventory.precios_productos()
@@ -21,7 +29,9 @@ def test_standard_user_ordenar_por_precio_de_mayor_a_menor(inventory_as):
     assert precios_hilo == sorted(precios_inicial, reverse=True)
 
 
-def test_standard_user_el_empate_de_precio_mantiene_el_orden_original(inventory_as):
+def test_standard_user_el_empate_de_precio_mantiene_el_orden_original(
+    inventory_as: Callable[..., InventoryPage]
+) -> None:
     # El catálogo tiene dos productos al mismo precio ($15.99): "Sauce Labs
     # Bolt T-Shirt" y "Test.allTheThings() T-Shirt (Red)", en ese orden en
     # el catálogo original. Un sort inestable podría invertirlos entre
@@ -50,7 +60,9 @@ def test_standard_user_el_empate_de_precio_mantiene_el_orden_original(inventory_
         assert orden_resultante == empatados
 
 
-def test_problem_user_el_orden_no_cambia_con_ningun_criterio(inventory_as):
+def test_problem_user_el_orden_no_cambia_con_ningun_criterio(
+    inventory_as: Callable[..., InventoryPage]
+) -> None:
     # test_usuarios_especiales.py ya prueba que a problem_user elegir "Name
     # (Z to A)" no le reordena la lista. Pero el bug real no es específico
     # de ese criterio: el <select> de orden no dispara ningún reordenamiento
