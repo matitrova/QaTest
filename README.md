@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **365 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **369 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 145 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 149 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 93 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 25 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, y una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -181,6 +181,12 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   parámetro) y, agregando el parámetro, que las dos primeras filas quedan
   fijas mientras la tercera sigue siendo aleatoria -- la propia página
   promete hacer estático "some of the content", no todo
+- Geolocalización (`/geolocation`): un botón dispara
+  `navigator.geolocation.getCurrentPosition()` y la página muestra la
+  latitud, la longitud y un link a Google Maps con esas mismas
+  coordenadas, probado con dos ubicaciones simuladas distintas
+  (parametrizado) para confirmar que lo que se muestra es la posición que
+  el contexto del navegador entrega, no un valor fijo
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -437,6 +443,7 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   alcanza para probarlo (podría repetirse por casualidad): se recarga en
   un loop hasta encontrar dos valores distintos, el mismo patrón que ya
   usa esta suite en `/shifting_content` para probar aleatoriedad real.
+- `navigator.geolocation.getCurrentPosition()` depende de un permiso del navegador y, sin mockearlo, de la ubicación real de la máquina que corre el test -- en headless, sin ese permiso otorgado de antemano, la llamada se queda esperando una respuesta que nunca llega. Extendiendo el fixture `browser_context_args` con `geolocation` y `permissions: ["geolocation"]` **antes** de crear el contexto (el mismo patrón que ya usa esta suite para `http_credentials` en Basic Auth), el resultado queda determinístico: el test corre parametrizado con dos coordenadas distintas para confirmar que la página refleja la posición simulada, no que "da algún número" por casualidad.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
