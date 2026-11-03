@@ -1,10 +1,10 @@
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from EntryAdPage import EntryAdPage
 
 
-def test_anuncio_aparece_al_cargar(page):
+def test_anuncio_aparece_al_cargar(page: Page) -> None:
     entry_ad_page = EntryAdPage(page)
     page.goto(f"{BASE_URL}/entry_ad")
 
@@ -22,7 +22,7 @@ def test_anuncio_aparece_al_cargar(page):
 # probara "cerrar funciona" no distinguiría un cierre intencional de un
 # cierre accidental por tocar el contenido.
 
-def test_clic_dentro_del_modal_no_lo_cierra(page):
+def test_clic_dentro_del_modal_no_lo_cierra(page: Page) -> None:
     entry_ad_page = EntryAdPage(page)
     page.goto(f"{BASE_URL}/entry_ad")
     expect(entry_ad_page.modal).to_be_visible(timeout=5000)
@@ -33,7 +33,7 @@ def test_clic_dentro_del_modal_no_lo_cierra(page):
     assert entry_ad_page.anuncio_visible() is True
 
 
-def test_cerrar_anuncio_lo_oculta_y_no_reaparece_al_recargar(page):
+def test_cerrar_anuncio_lo_oculta_y_no_reaparece_al_recargar(page: Page) -> None:
     entry_ad_page = EntryAdPage(page)
     page.goto(f"{BASE_URL}/entry_ad")
     expect(entry_ad_page.modal).to_be_visible(timeout=5000)
@@ -63,7 +63,7 @@ def test_cerrar_anuncio_lo_oculta_y_no_reaparece_al_recargar(page):
 # cancelar ese POST antes de que termine -- probar el endpoint directo es
 # lo único que da un resultado determinístico.
 
-def test_reiniciar_pega_a_un_endpoint_que_no_existe(page):
+def test_reiniciar_pega_a_un_endpoint_que_no_existe(page: Page) -> None:
     respuesta = page.request.post(f"{BASE_URL}/entry-ad")
     assert respuesta.status == 404
 
@@ -73,7 +73,7 @@ def test_reiniciar_pega_a_un_endpoint_que_no_existe(page):
 # cerrarlo y clickear ese link, una visita aparte a la página sigue sin
 # mostrar el anuncio.
 
-def test_reiniciar_nunca_reactiva_el_anuncio(page):
+def test_reiniciar_nunca_reactiva_el_anuncio(page: Page) -> None:
     entry_ad_page = EntryAdPage(page)
     page.goto(f"{BASE_URL}/entry_ad")
     expect(entry_ad_page.modal).to_be_visible(timeout=5000)

@@ -1,10 +1,10 @@
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from DropdownPage import DropdownPage
 
 
-def test_estado_inicial_es_el_placeholder(page):
+def test_estado_inicial_es_el_placeholder(page: Page) -> None:
     # La opción inicial ("Please select an option") está disabled en el
     # HTML -- no es una opción real, es un placeholder. Confirmar esto
     # evita que un cambio futuro la convierta en seleccionable sin que
@@ -15,7 +15,7 @@ def test_estado_inicial_es_el_placeholder(page):
     expect(dropdown_page.dropdown).to_have_value("")
 
 
-def test_seleccionar_opcion_1(page):
+def test_seleccionar_opcion_1(page: Page) -> None:
     dropdown_page = DropdownPage(page)
     page.goto(f"{BASE_URL}/dropdown")
 
@@ -24,7 +24,7 @@ def test_seleccionar_opcion_1(page):
     expect(dropdown_page.dropdown).to_have_value("1")
 
 
-def test_cambiar_de_una_opcion_a_otra(page):
+def test_cambiar_de_una_opcion_a_otra(page: Page) -> None:
     # No alcanza con probar "seleccionar una opción" una sola vez --
     # también hay que confirmar que cambiar de una opción real a otra
     # (no desde el placeholder) deja el valor correcto, no el anterior.

@@ -1,12 +1,12 @@
 import pytest
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from StatusCodesPage import StatusCodesPage
 
 
 @pytest.mark.parametrize("codigo", [200, 301, 404, 500])
-def test_status_code_en_body_y_en_response(page, codigo):
+def test_status_code_en_body_y_en_response(page: Page, codigo: int) -> None:
     # El código HTTP real de la respuesta y el texto que el propio
     # sitio imprime en el body son dos fuentes independientes --
     # las dos tienen que coincidir con lo que el sitio promete.
@@ -19,7 +19,7 @@ def test_status_code_en_body_y_en_response(page, codigo):
     )
 
 
-def test_301_no_redirige_a_ningun_lado(page):
+def test_301_no_redirige_a_ningun_lado(page: Page) -> None:
     # Un 301 real trae un header Location y el navegador termina en
     # otra URL. Este "301" del sitio no trae Location -- Playwright
     # no tiene a dónde redirigir, así que la página se queda en la
@@ -31,7 +31,7 @@ def test_301_no_redirige_a_ningun_lado(page):
     assert page.url == f"{BASE_URL}/status_codes/301"
 
 
-def test_pagina_principal_linkea_los_cuatro_codigos(page):
+def test_pagina_principal_linkea_los_cuatro_codigos(page: Page) -> None:
     page.goto(f"{BASE_URL}/status_codes")
 
     for codigo in (200, 301, 404, 500):

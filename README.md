@@ -444,6 +444,16 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   un loop hasta encontrar dos valores distintos, el mismo patrón que ya
   usa esta suite en `/shifting_content` para probar aleatoriedad real.
 - `navigator.geolocation.getCurrentPosition()` depende de un permiso del navegador y, sin mockearlo, de la ubicación real de la máquina que corre el test -- en headless, sin ese permiso otorgado de antemano, la llamada se queda esperando una respuesta que nunca llega. Extendiendo el fixture `browser_context_args` con `geolocation` y `permissions: ["geolocation"]` **antes** de crear el contexto (el mismo patrón que ya usa esta suite para `http_credentials` en Basic Auth), el resultado queda determinístico: el test corre parametrizado con dos coordenadas distintas para confirmar que la página refleja la posición simulada, no que "da algún número" por casualidad.
+- El pool de casos nuevos (the-internet, UI Testing Playground, SauceDemo, ReqRes/Restful
+  Booker) ya está cubierto en su totalidad. Los 32 Page Objects de esta suite ya tenían
+  tipado explícito desde antes, pero sus ~150 funciones `test_*` seguían sin anotar --a
+  diferencia de TestX, ReqResTest y RestfulBookerTest, que ya lo tenían. El tipo depende
+  de qué fixture provee cada parámetro: `page: Page` para el nativo de Playwright,
+  `DynamicControlsPage`/`LargeDomPage` para los fixtures propios de esos dos archivos que
+  devuelven el Page Object ya navegado, `tuple[float, float]` para `coordenadas_simuladas`
+  en Geolocation, y `str`/`int` para los parámetros de `pytest.mark.parametrize` en Key
+  Presses y Status Codes. El `conftest.py` de la suite también quedó tipado, incluyendo el
+  `Iterator[None]` del único fixture con `yield`.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v

@@ -1,17 +1,19 @@
 import pytest
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from LargeDomPage import LargeDomPage
 
 
 @pytest.fixture
-def large_dom_page(page):
+def large_dom_page(page: Page) -> LargeDomPage:
     page.goto(f"{BASE_URL}/large")
     return LargeDomPage(page)
 
 
-def test_no_siblings_anidado_50_divs_adentro_se_ubica_directo_por_id(large_dom_page):
+def test_no_siblings_anidado_50_divs_adentro_se_ubica_directo_por_id(
+    large_dom_page: LargeDomPage,
+) -> None:
     # El elemento no tiene hermanos: está envuelto en 50 <div> sin class ni
     # id, uno dentro del otro, antes de llegar al div.parent que los
     # contiene a todos. Ubicarlo por id no requiere bajar esa cadena a
@@ -27,7 +29,9 @@ def test_no_siblings_anidado_50_divs_adentro_se_ubica_directo_por_id(large_dom_p
     assert profundidad == 50
 
 
-def test_sibling_1_2_y_sibling_1_3_si_son_hermanos_reales_en_su_tier(large_dom_page):
+def test_sibling_1_2_y_sibling_1_3_si_son_hermanos_reales_en_su_tier(
+    large_dom_page: LargeDomPage,
+) -> None:
     # En cada tier, item-2 e item-3 sí son hermanos reales: ambos cuelgan
     # directo de item-1, que es su padre, no un tercer hermano.
     item_2 = large_dom_page.hermano(1, 2)
@@ -41,8 +45,8 @@ def test_sibling_1_2_y_sibling_1_3_si_son_hermanos_reales_en_su_tier(large_dom_p
 
 
 def test_sibling_1_1_es_padre_de_sibling_1_2_y_ancestro_de_todo_el_resto_de_tiers(
-    large_dom_page,
-):
+    large_dom_page: LargeDomPage,
+) -> None:
     # La sección se llama "Siblings", pero item-1 de cada tier no es
     # hermano de item-2/item-3: es su padre. Y ese mismo <div> tampoco
     # cierra hasta después de contener completo al tier siguiente -- item-1
@@ -66,7 +70,9 @@ def test_sibling_1_1_es_padre_de_sibling_1_2_y_ancestro_de_todo_el_resto_de_tier
     assert es_ancestro_del_ultimo_tier is True
 
 
-def test_tabla_es_una_grilla_completa_de_50_por_50_no_una_muestra_recortada(large_dom_page):
+def test_tabla_es_una_grilla_completa_de_50_por_50_no_una_muestra_recortada(
+    large_dom_page: LargeDomPage,
+) -> None:
     # El nombre "Table" no aclara el tamaño real: son 50 filas de datos por
     # 50 columnas (2500 celdas), no las 6 columnas que se ven en pantalla
     # sin hacer scroll horizontal. La tabla además tiene un <thead> con una

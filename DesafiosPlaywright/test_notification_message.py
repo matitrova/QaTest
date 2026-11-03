@@ -1,5 +1,5 @@
 import pytest
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from NotificationMessagePage import NotificationMessagePage
@@ -15,7 +15,7 @@ MENSAJES_CONOCIDOS = {
 # mensaje de éxito" puntualmente, así que el test solo puede afirmar que el
 # mensaje que aparece es uno de los dos conocidos, no cuál de los dos.
 
-def test_mensaje_es_uno_de_los_dos_conocidos(page):
+def test_mensaje_es_uno_de_los_dos_conocidos(page: Page) -> None:
     notification_page = NotificationMessagePage(page)
     page.goto(f"{BASE_URL}/notification_message")
 
@@ -26,7 +26,7 @@ def test_mensaje_es_uno_de_los_dos_conocidos(page):
 # segunda "s" de "success") -- se prueba tal cual está publicado, no la
 # ortografía correcta, porque es lo que un usuario real ve.
 
-def test_mensaje_de_error_tiene_el_typo_del_sitio(page):
+def test_mensaje_de_error_tiene_el_typo_del_sitio(page: Page) -> None:
     notification_page = NotificationMessagePage(page)
 
     for _ in range(15):
@@ -46,7 +46,7 @@ def test_mensaje_de_error_tiene_el_typo_del_sitio(page):
 # mensaje real. Se recolectan ambas variantes visitando la página varias
 # veces y se confirma que las dos comparten clase.
 
-def test_clase_no_distingue_exito_de_error(page):
+def test_clase_no_distingue_exito_de_error(page: Page) -> None:
     notification_page = NotificationMessagePage(page)
     clases_por_mensaje = {}
 
@@ -60,7 +60,7 @@ def test_clase_no_distingue_exito_de_error(page):
     assert len(set(clases_por_mensaje.values())) == 1
 
 
-def test_cerrar_mensaje_lo_oculta(page):
+def test_cerrar_mensaje_lo_oculta(page: Page) -> None:
     notification_page = NotificationMessagePage(page)
     page.goto(f"{BASE_URL}/notification_message")
 

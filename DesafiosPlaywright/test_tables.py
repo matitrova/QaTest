@@ -1,12 +1,12 @@
 import re
 
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from TablesPage import TablesPage
 
 
-def test_tabla_sin_class_arranca_en_el_orden_original(page):
+def test_tabla_sin_class_arranca_en_el_orden_original(page: Page) -> None:
     tables_page = TablesPage(page)
     page.goto(f"{BASE_URL}/tables", wait_until="networkidle")
 
@@ -15,7 +15,7 @@ def test_tabla_sin_class_arranca_en_el_orden_original(page):
     expect(tables_page.apellidos_tabla1).to_have_text(["Smith", "Bach", "Doe", "Conway"])
 
 
-def test_ordenar_por_apellido_ascendente(page):
+def test_ordenar_por_apellido_ascendente(page: Page) -> None:
     tables_page = TablesPage(page)
     page.goto(f"{BASE_URL}/tables", wait_until="networkidle")
     tables_page.esperar_que_tablesorter_este_listo()
@@ -34,7 +34,7 @@ def test_ordenar_por_apellido_ascendente(page):
     expect(tables_page.apellidos_tabla2).to_have_text(["Bach", "Conway", "Doe", "Smith"])
 
 
-def test_ordenar_por_apellido_descendente(page):
+def test_ordenar_por_apellido_descendente(page: Page) -> None:
     tables_page = TablesPage(page)
     page.goto(f"{BASE_URL}/tables", wait_until="networkidle")
     tables_page.esperar_que_tablesorter_este_listo()
@@ -48,7 +48,7 @@ def test_ordenar_por_apellido_descendente(page):
     expect(tables_page.apellidos_tabla2).to_have_text(["Smith", "Doe", "Conway", "Bach"])
 
 
-def test_ordenar_por_monto_es_numerico_no_alfabetico(page):
+def test_ordenar_por_monto_es_numerico_no_alfabetico(page: Page) -> None:
     tables_page = TablesPage(page)
     page.goto(f"{BASE_URL}/tables", wait_until="networkidle")
     tables_page.esperar_que_tablesorter_este_listo()
@@ -66,7 +66,7 @@ def test_ordenar_por_monto_es_numerico_no_alfabetico(page):
     assert montos[-1] == 100.0
 
 
-def test_ordenar_por_monto_descendente(page):
+def test_ordenar_por_monto_descendente(page: Page) -> None:
     tables_page = TablesPage(page)
     page.goto(f"{BASE_URL}/tables", wait_until="networkidle")
     tables_page.esperar_que_tablesorter_este_listo()

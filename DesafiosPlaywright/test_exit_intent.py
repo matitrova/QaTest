@@ -1,17 +1,17 @@
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from ExitIntentPage import ExitIntentPage
 
 
-def test_modal_no_aparece_al_cargar(page):
+def test_modal_no_aparece_al_cargar(page: Page) -> None:
     exit_intent_page = ExitIntentPage(page)
     page.goto(f"{BASE_URL}/exit_intent")
 
     expect(exit_intent_page.modal).to_be_hidden()
 
 
-def test_salir_por_arriba_del_viewport_muestra_el_modal(page):
+def test_salir_por_arriba_del_viewport_muestra_el_modal(page: Page) -> None:
     exit_intent_page = ExitIntentPage(page)
     page.goto(f"{BASE_URL}/exit_intent")
 
@@ -26,7 +26,9 @@ def test_salir_por_arriba_del_viewport_muestra_el_modal(page):
 # página -- incluso hasta abajo del todo -- no dispara ningún mouseleave del
 # documentElement, así que el modal no debería aparecer por eso.
 
-def test_moverse_dentro_de_la_pagina_sin_salir_por_arriba_no_muestra_el_modal(page):
+def test_moverse_dentro_de_la_pagina_sin_salir_por_arriba_no_muestra_el_modal(
+    page: Page,
+) -> None:
     exit_intent_page = ExitIntentPage(page)
     page.goto(f"{BASE_URL}/exit_intent")
 
@@ -42,7 +44,7 @@ def test_moverse_dentro_de_la_pagina_sin_salir_por_arriba_no_muestra_el_modal(pa
 # solo probara "cerrar funciona" no distinguiría un cierre intencional de
 # uno accidental por tocar el propio contenido del modal.
 
-def test_clic_dentro_del_modal_no_lo_cierra(page):
+def test_clic_dentro_del_modal_no_lo_cierra(page: Page) -> None:
     exit_intent_page = ExitIntentPage(page)
     page.goto(f"{BASE_URL}/exit_intent")
     exit_intent_page.simular_salida_del_mouse_por_arriba()
@@ -54,7 +56,7 @@ def test_clic_dentro_del_modal_no_lo_cierra(page):
     assert exit_intent_page.modal_visible() is True
 
 
-def test_cerrar_modal_con_el_footer_lo_oculta(page):
+def test_cerrar_modal_con_el_footer_lo_oculta(page: Page) -> None:
     exit_intent_page = ExitIntentPage(page)
     page.goto(f"{BASE_URL}/exit_intent")
     exit_intent_page.simular_salida_del_mouse_por_arriba()
@@ -76,7 +78,9 @@ def test_cerrar_modal_con_el_footer_lo_oculta(page):
 # el primer intento de este test, y falló: una segunda salida por arriba en
 # la misma carga de página no reabre nada.
 
-def test_una_vez_que_se_muestra_no_vuelve_a_dispararse_en_la_misma_carga(page):
+def test_una_vez_que_se_muestra_no_vuelve_a_dispararse_en_la_misma_carga(
+    page: Page,
+) -> None:
     exit_intent_page = ExitIntentPage(page)
     page.goto(f"{BASE_URL}/exit_intent")
     exit_intent_page.simular_salida_del_mouse_por_arriba()

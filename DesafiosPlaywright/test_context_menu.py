@@ -1,3 +1,4 @@
+from playwright.sync_api import Page
 
 from config import BASE_URL
 from ContextMenuPage import ContextMenuPage
@@ -7,7 +8,7 @@ from ContextMenuPage import ContextMenuPage
 # javascript_alerts: si el diálogo aparece sin un handler enganchado,
 # Playwright lo descarta solo.
 
-def test_clic_derecho_dispara_alert(page):
+def test_clic_derecho_dispara_alert(page: Page) -> None:
     context_menu_page = ContextMenuPage(page)
     page.goto(f"{BASE_URL}/context_menu")
 
@@ -24,7 +25,7 @@ def test_clic_derecho_dispara_alert(page):
 # caso, un test que solo probara el clic derecho no distinguiría "cualquier
 # clic abre el diálogo" de "específicamente el clic derecho lo abre".
 
-def test_clic_izquierdo_no_dispara_alert(page):
+def test_clic_izquierdo_no_dispara_alert(page: Page) -> None:
     context_menu_page = ContextMenuPage(page)
     page.goto(f"{BASE_URL}/context_menu")
 

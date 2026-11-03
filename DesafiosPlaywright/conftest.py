@@ -1,8 +1,11 @@
+from typing import Iterator
+
 import pytest
+from playwright.sync_api import Page
 
 
 @pytest.fixture(autouse=True)
-def bloquear_analitica_externa(page):
+def bloquear_analitica_externa(page: Page) -> Iterator[None]:
     # El layout de the-internet.herokuapp.com carga un script de Optimizely
     # (dominio externo, ajeno a lo que se está probando). Si esa red está
     # lenta o inaccesible, el evento "load" puede colgarse esperándolo y

@@ -1,4 +1,4 @@
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from DynamicLoadingPage import DynamicLoadingPage
@@ -11,7 +11,7 @@ from DynamicLoadingPage import DynamicLoadingPage
 TIMEOUT_CARGA_MS = 10_000
 
 
-def test_elemento_oculto_que_se_muestra(page):
+def test_elemento_oculto_que_se_muestra(page: Page) -> None:
     # Ejemplo 1: el "Hello World!" ya está en el DOM desde el principio,
     # solo que oculto con display:none hasta que termina la carga.
     dynamic_page = DynamicLoadingPage(page)
@@ -23,7 +23,7 @@ def test_elemento_oculto_que_se_muestra(page):
     assert "Hello World!" in dynamic_page.finish_text.inner_text()
 
 
-def test_elemento_que_se_agrega_al_dom(page):
+def test_elemento_que_se_agrega_al_dom(page: Page) -> None:
     # Ejemplo 2: acá el elemento no existe en el DOM hasta que termina
     # la carga -- esperar por "visible" no alcanza si el locator todavía
     # no encontró nada; expect().to_be_visible() reintenta hasta que el

@@ -1,12 +1,13 @@
 import pytest
 import requests
+from playwright.sync_api import Page
 
 from config import BASE_URL
 from BasicAuthPage import BasicAuthPage
 
 
 @pytest.fixture(scope="function")
-def browser_context_args(browser_context_args):
+def browser_context_args(browser_context_args: dict) -> dict:
     # HTTP Basic Auth es un diálogo nativo del navegador, no un dialog de JS:
     # no hay ningún "accept()" posible una vez que page.goto() ya disparó el
     # pedido, se queda esperando una interacción que Playwright no puede dar.
@@ -19,14 +20,14 @@ def browser_context_args(browser_context_args):
     }
 
 
-def test_credenciales_correctas_muestran_felicitacion(page):
+def test_credenciales_correctas_muestran_felicitacion(page: Page) -> None:
     basic_auth_page = BasicAuthPage(page)
     page.goto(f"{BASE_URL}/basic_auth")
 
     assert "Congratulations" in basic_auth_page.mensaje_exito.inner_text()
 
 
-def test_sin_credenciales_devuelve_401():
+def test_sin_credenciales_devuelve_401() -> None:
     # Se prueba con requests, no con el navegador: sin credenciales en el
     # contexto, el propio Chromium abriría su diálogo nativo de usuario y
     # contraseña y colgaría el test esperando una respuesta que nunca llega.
@@ -35,13 +36,13 @@ def test_sin_credenciales_devuelve_401():
     assert respuesta.status_code == 401
 
 
-def test_credenciales_incorrectas_devuelven_401():
+def test_credenciales_incorrectas_devuelven_401() -> None:
     respuesta = requests.get(f"{BASE_URL}/basic_auth", auth=("admin", "incorrecta"))
 
     assert respuesta.status_code == 401
 
 
-def test_credenciales_correctas_devuelven_200():
+def test_credenciales_correctas_devuelven_200() -> None:
     respuesta = requests.get(f"{BASE_URL}/basic_auth", auth=("admin", "admin"))
 
     assert respuesta.status_code == 200

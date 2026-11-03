@@ -1,10 +1,10 @@
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from FormAuthenticationPage import FormAuthenticationPage
 
 
-def test_login_con_credenciales_correctas_entra_a_la_secure_area(page):
+def test_login_con_credenciales_correctas_entra_a_la_secure_area(page: Page) -> None:
     form_authentication_page = FormAuthenticationPage(page)
     page.goto(f"{BASE_URL}/login")
 
@@ -17,7 +17,7 @@ def test_login_con_credenciales_correctas_entra_a_la_secure_area(page):
     expect(form_authentication_page.logout).to_be_visible()
 
 
-def test_login_con_usuario_invalido_muestra_error_y_no_entra(page):
+def test_login_con_usuario_invalido_muestra_error_y_no_entra(page: Page) -> None:
     form_authentication_page = FormAuthenticationPage(page)
     page.goto(f"{BASE_URL}/login")
 
@@ -29,7 +29,7 @@ def test_login_con_usuario_invalido_muestra_error_y_no_entra(page):
     )
 
 
-def test_login_con_password_invalido_muestra_error_y_no_entra(page):
+def test_login_con_password_invalido_muestra_error_y_no_entra(page: Page) -> None:
     form_authentication_page = FormAuthenticationPage(page)
     page.goto(f"{BASE_URL}/login")
 
@@ -46,7 +46,9 @@ def test_login_con_password_invalido_muestra_error_y_no_entra(page):
 # contraseña: el mensaje es el mismo que con usuario inválido solo, no uno
 # genérico de "credenciales incorrectas" ni los dos mensajes juntos.
 
-def test_login_con_usuario_y_password_invalidos_prioriza_el_error_de_usuario(page):
+def test_login_con_usuario_y_password_invalidos_prioriza_el_error_de_usuario(
+    page: Page,
+) -> None:
     form_authentication_page = FormAuthenticationPage(page)
     page.goto(f"{BASE_URL}/login")
 
@@ -57,7 +59,7 @@ def test_login_con_usuario_y_password_invalidos_prioriza_el_error_de_usuario(pag
     )
 
 
-def test_logout_termina_la_sesion_y_vuelve_al_login(page):
+def test_logout_termina_la_sesion_y_vuelve_al_login(page: Page) -> None:
     form_authentication_page = FormAuthenticationPage(page)
     page.goto(f"{BASE_URL}/login")
     form_authentication_page.login("tomsmith", "SuperSecretPassword!")
@@ -76,7 +78,7 @@ def test_logout_termina_la_sesion_y_vuelve_al_login(page):
 # context (sin cookie de sesión), redirige a /login en vez de mostrar la
 # página o un 403/404.
 
-def test_acceso_directo_a_secure_sin_sesion_redirige_a_login(page):
+def test_acceso_directo_a_secure_sin_sesion_redirige_a_login(page: Page) -> None:
     page.goto(f"{BASE_URL}/secure")
 
     expect(page).to_have_url(f"{BASE_URL}/login")

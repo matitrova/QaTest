@@ -1,17 +1,17 @@
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from InputsPage import InputsPage
 
 
-def test_arranca_vacio(page):
+def test_arranca_vacio(page: Page) -> None:
     inputs_page = InputsPage(page)
     page.goto(f"{BASE_URL}/inputs")
 
     expect(inputs_page.input_numero).to_have_value("")
 
 
-def test_acepta_digitos(page):
+def test_acepta_digitos(page: Page) -> None:
     inputs_page = InputsPage(page)
     page.goto(f"{BASE_URL}/inputs")
 
@@ -20,7 +20,7 @@ def test_acepta_digitos(page):
     expect(inputs_page.input_numero).to_have_value("1234")
 
 
-def test_rechaza_letras(page):
+def test_rechaza_letras(page: Page) -> None:
     # No hay ningún atributo `pattern` ni JS de validación en este input: es
     # el propio navegador el que, por ser type="number", descarta cada tecla
     # que no sea un carácter numérico válido antes de que llegue al valor.
@@ -32,7 +32,7 @@ def test_rechaza_letras(page):
     expect(inputs_page.input_numero).to_have_value("")
 
 
-def test_acepta_negativos_y_decimales(page):
+def test_acepta_negativos_y_decimales(page: Page) -> None:
     inputs_page = InputsPage(page)
     page.goto(f"{BASE_URL}/inputs")
 
@@ -43,7 +43,7 @@ def test_acepta_negativos_y_decimales(page):
     expect(inputs_page.input_numero).to_have_value("3.14")
 
 
-def test_descarta_un_segundo_punto_decimal(page):
+def test_descarta_un_segundo_punto_decimal(page: Page) -> None:
     # El navegador permite un solo punto decimal por valor: al escribir
     # "5.5.5" el segundo punto se descarta solo, pero el resto de los
     # caracteres sigue entrando -- el resultado es "5.55", no un valor vacío
@@ -56,7 +56,7 @@ def test_descarta_un_segundo_punto_decimal(page):
     expect(inputs_page.input_numero).to_have_value("5.55")
 
 
-def test_descarta_el_signo_mas_suelto(page):
+def test_descarta_el_signo_mas_suelto(page: Page) -> None:
     # Un "+" sin exponente (`e`/`E`) de por medio no es un carácter válido en
     # este input: se descarta igual que una letra, y solo queda el dígito
     # que le sigue.
@@ -68,7 +68,7 @@ def test_descarta_el_signo_mas_suelto(page):
     expect(inputs_page.input_numero).to_have_value("5")
 
 
-def test_mantiene_notacion_cientifica_como_texto(page):
+def test_mantiene_notacion_cientifica_como_texto(page: Page) -> None:
     # "1e3" es notación científica válida para un number input, pero el
     # navegador no la normaliza mientras se escribe: input_value() devuelve
     # el texto tal cual se tipeó, no el 1000 que representa.
@@ -80,7 +80,7 @@ def test_mantiene_notacion_cientifica_como_texto(page):
     expect(inputs_page.input_numero).to_have_value("1e3")
 
 
-def test_mantiene_ceros_a_la_izquierda(page):
+def test_mantiene_ceros_a_la_izquierda(page: Page) -> None:
     # Sin ningún atributo min/max/step que fuerce una normalización, el
     # valor se guarda como el string que se tipeó: "007" no se convierte en
     # "7" hasta que algo (un submit, por ejemplo) lo interprete como número.
@@ -92,7 +92,7 @@ def test_mantiene_ceros_a_la_izquierda(page):
     expect(inputs_page.input_numero).to_have_value("007")
 
 
-def test_flecha_arriba_incrementa_de_a_uno(page):
+def test_flecha_arriba_incrementa_de_a_uno(page: Page) -> None:
     inputs_page = InputsPage(page)
     page.goto(f"{BASE_URL}/inputs")
 
@@ -102,7 +102,7 @@ def test_flecha_arriba_incrementa_de_a_uno(page):
     expect(inputs_page.input_numero).to_have_value("2")
 
 
-def test_flecha_abajo_no_tiene_piso_sin_atributo_min(page):
+def test_flecha_abajo_no_tiene_piso_sin_atributo_min(page: Page) -> None:
     # Este input no tiene atributo `min`: bajar con la flecha por debajo de
     # cero no lo frena en 0, sigue restando y entra en negativos.
     inputs_page = InputsPage(page)

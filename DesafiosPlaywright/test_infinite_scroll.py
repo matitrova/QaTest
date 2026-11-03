@@ -1,9 +1,12 @@
+from playwright.sync_api import Page
 
 from config import BASE_URL
 from InfiniteScrollPage import InfiniteScrollPage
 
 
-def test_la_pagina_carga_al_menos_un_parrafo_sin_necesidad_de_scrollear(page):
+def test_la_pagina_carga_al_menos_un_parrafo_sin_necesidad_de_scrollear(
+    page: Page,
+) -> None:
     infinite_scroll_page = InfiniteScrollPage(page)
     page.goto(f"{BASE_URL}/infinite_scroll")
 
@@ -16,7 +19,7 @@ def test_la_pagina_carga_al_menos_un_parrafo_sin_necesidad_de_scrollear(page):
 # agregar contenido nuevo -- a diferencia del scroll hasta el fondo del
 # siguiente test.
 
-def test_scrollear_sin_llegar_al_fondo_no_agrega_parrafos(page):
+def test_scrollear_sin_llegar_al_fondo_no_agrega_parrafos(page: Page) -> None:
     infinite_scroll_page = InfiniteScrollPage(page)
     page.goto(f"{BASE_URL}/infinite_scroll")
     page.wait_for_timeout(500)
@@ -28,7 +31,7 @@ def test_scrollear_sin_llegar_al_fondo_no_agrega_parrafos(page):
     assert infinite_scroll_page.cantidad_de_parrafos() == cantidad_antes
 
 
-def test_cada_scroll_hasta_el_fondo_agrega_un_parrafo_mas(page):
+def test_cada_scroll_hasta_el_fondo_agrega_un_parrafo_mas(page: Page) -> None:
     infinite_scroll_page = InfiniteScrollPage(page)
     page.goto(f"{BASE_URL}/infinite_scroll")
     page.wait_for_timeout(500)

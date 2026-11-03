@@ -1,10 +1,10 @@
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from CheckboxesPage import CheckboxesPage
 
 
-def test_estado_inicial(page):
+def test_estado_inicial(page: Page) -> None:
     # La página arranca con el checkbox 1 destildado y el 2 tildado --
     # no es un detalle menor: si algún día alguien invierte el HTML,
     # este test lo detecta antes que los de toggle de abajo.
@@ -15,7 +15,7 @@ def test_estado_inicial(page):
     expect(checkboxes_page.checkbox_2).to_be_checked()
 
 
-def test_tildar_checkbox_destildado(page):
+def test_tildar_checkbox_destildado(page: Page) -> None:
     checkboxes_page = CheckboxesPage(page)
     page.goto(f"{BASE_URL}/checkboxes")
 
@@ -26,7 +26,7 @@ def test_tildar_checkbox_destildado(page):
     expect(checkboxes_page.checkbox_2).to_be_checked()
 
 
-def test_destildar_checkbox_tildado(page):
+def test_destildar_checkbox_tildado(page: Page) -> None:
     checkboxes_page = CheckboxesPage(page)
     page.goto(f"{BASE_URL}/checkboxes")
 

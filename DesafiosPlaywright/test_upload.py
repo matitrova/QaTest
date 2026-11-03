@@ -1,12 +1,14 @@
 from pathlib import Path
 
+from playwright.sync_api import Page
+
 from config import BASE_URL
 from UploadPage import UploadPage
 
 ARCHIVO_DE_PRUEBA = Path(__file__).parent / "archivo_prueba.txt"
 
 
-def test_subir_archivo(page):
+def test_subir_archivo(page: Page) -> None:
     upload_page = UploadPage(page)
     page.goto(f"{BASE_URL}/upload")
 

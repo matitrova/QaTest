@@ -1,4 +1,5 @@
 import pytest
+from playwright.sync_api import Page
 
 from config import BASE_URL
 from TyposPage import TyposPage
@@ -8,7 +9,7 @@ TEXTO_CON_TYPO = "Sometimes you'll see a typo, other times you won,t."
 VARIANTES_CONOCIDAS = {TEXTO_SIN_TYPO, TEXTO_CON_TYPO}
 
 
-def test_titulo_y_parrafo_introductorio_son_fijos(page):
+def test_titulo_y_parrafo_introductorio_son_fijos(page: Page) -> None:
     typos_page = TyposPage(page)
     page.goto(f"{BASE_URL}/typos")
 
@@ -28,14 +29,14 @@ def test_titulo_y_parrafo_introductorio_son_fijos(page):
 # autocierra también al segundo -- confirmado contando los <p> reales del
 # DOM en vez de confiar en cómo se ve el HTML fuente.
 
-def test_el_html_roto_resuelve_en_dos_parrafos_reales(page):
+def test_el_html_roto_resuelve_en_dos_parrafos_reales(page: Page) -> None:
     typos_page = TyposPage(page)
     page.goto(f"{BASE_URL}/typos")
 
     assert typos_page.cantidad_de_parrafos() == 2
 
 
-def test_el_parrafo_variable_es_uno_de_los_dos_textos_conocidos(page):
+def test_el_parrafo_variable_es_uno_de_los_dos_textos_conocidos(page: Page) -> None:
     typos_page = TyposPage(page)
     page.goto(f"{BASE_URL}/typos")
 
@@ -48,7 +49,7 @@ def test_el_parrafo_variable_es_uno_de_los_dos_textos_conocidos(page):
 # el test lo confirma carácter por carácter en vez de solo comparar los dos
 # strings completos, para dejar documentada la naturaleza exacta del bug.
 
-def test_la_variante_con_typo_difiere_solo_en_el_apostrofo():
+def test_la_variante_con_typo_difiere_solo_en_el_apostrofo() -> None:
     assert len(TEXTO_CON_TYPO) == len(TEXTO_SIN_TYPO)
 
     diferencias = [
@@ -69,7 +70,7 @@ def test_la_variante_con_typo_difiere_solo_en_el_apostrofo():
 # vez de asumir que aparece a la primera (el mismo patrón que
 # /notification_message y /disappearing_elements en esta suite).
 
-def test_el_typo_aparece_al_azar_en_recargas(page):
+def test_el_typo_aparece_al_azar_en_recargas(page: Page) -> None:
     typos_page = TyposPage(page)
 
     for _ in range(30):
@@ -84,7 +85,7 @@ def test_el_typo_aparece_al_azar_en_recargas(page):
 # aparece, para no asumir que "a veces ves un typo" implica que el typo es
 # la opción por default y lo demás es la excepción.
 
-def test_la_variante_sin_typo_tambien_aparece_al_azar(page):
+def test_la_variante_sin_typo_tambien_aparece_al_azar(page: Page) -> None:
     typos_page = TyposPage(page)
 
     for _ in range(30):
@@ -101,7 +102,7 @@ def test_la_variante_sin_typo_tambien_aparece_al_azar(page):
 # y se confirma que el conjunto de textos vistos es subconjunto de las dos
 # variantes conocidas.
 
-def test_no_aparecen_variantes_desconocidas_en_varias_recargas(page):
+def test_no_aparecen_variantes_desconocidas_en_varias_recargas(page: Page) -> None:
     typos_page = TyposPage(page)
     vistas = set()
 

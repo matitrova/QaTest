@@ -1,4 +1,4 @@
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from JavascriptAlertsPage import JavascriptAlertsPage
@@ -11,7 +11,7 @@ from JavascriptAlertsPage import JavascriptAlertsPage
 # abre el diálogo, y se usa "once" (no "on") para no dejar el handler
 # pegado y afectar al resto de los tests.
 
-def test_alert_simple(page):
+def test_alert_simple(page: Page) -> None:
     alerts_page = JavascriptAlertsPage(page)
     page.goto(f"{BASE_URL}/javascript_alerts")
 
@@ -21,7 +21,7 @@ def test_alert_simple(page):
     expect(alerts_page.result_text).to_have_text("You successfully clicked an alert")
 
 
-def test_confirm_aceptado(page):
+def test_confirm_aceptado(page: Page) -> None:
     alerts_page = JavascriptAlertsPage(page)
     page.goto(f"{BASE_URL}/javascript_alerts")
 
@@ -31,7 +31,7 @@ def test_confirm_aceptado(page):
     expect(alerts_page.result_text).to_have_text("You clicked: Ok")
 
 
-def test_confirm_cancelado(page):
+def test_confirm_cancelado(page: Page) -> None:
     alerts_page = JavascriptAlertsPage(page)
     page.goto(f"{BASE_URL}/javascript_alerts")
 
@@ -41,7 +41,7 @@ def test_confirm_cancelado(page):
     expect(alerts_page.result_text).to_have_text("You clicked: Cancel")
 
 
-def test_prompt_con_texto(page):
+def test_prompt_con_texto(page: Page) -> None:
     alerts_page = JavascriptAlertsPage(page)
     page.goto(f"{BASE_URL}/javascript_alerts")
 
@@ -52,7 +52,7 @@ def test_prompt_con_texto(page):
     expect(alerts_page.result_text).to_have_text(f"You entered: {texto_ingresado}")
 
 
-def test_prompt_cancelado(page):
+def test_prompt_cancelado(page: Page) -> None:
     alerts_page = JavascriptAlertsPage(page)
     page.goto(f"{BASE_URL}/javascript_alerts")
 

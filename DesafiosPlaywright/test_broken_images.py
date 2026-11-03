@@ -1,15 +1,17 @@
+from playwright.sync_api import Page
+
 from config import BASE_URL
 from BrokenImagesPage import BrokenImagesPage
 
 
-def test_la_pagina_tiene_tres_imagenes(page):
+def test_la_pagina_tiene_tres_imagenes(page: Page) -> None:
     broken_images_page = BrokenImagesPage(page)
     page.goto(f"{BASE_URL}/broken_images")
 
     assert broken_images_page.imagenes.count() == 3
 
 
-def test_el_src_de_cada_imagen_determina_si_responde_200_o_404(page):
+def test_el_src_de_cada_imagen_determina_si_responde_200_o_404(page: Page) -> None:
     broken_images_page = BrokenImagesPage(page)
     respuestas = {}
 
@@ -26,7 +28,7 @@ def test_el_src_de_cada_imagen_determina_si_responde_200_o_404(page):
     assert respuestas[f"{BASE_URL}/img/avatar-blank.jpg"] == 200
 
 
-def test_dos_imagenes_rotas_y_una_que_carga_bien(page):
+def test_dos_imagenes_rotas_y_una_que_carga_bien(page: Page) -> None:
     # El propio sitio apunta dos de las tres imágenes a rutas que no
     # existen (asdf.jpg, hjkl.jpg) y deja la tercera (avatar-blank.jpg)
     # apuntando a un archivo real -- las tres conviven en la misma

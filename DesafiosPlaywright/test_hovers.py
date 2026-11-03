@@ -1,10 +1,10 @@
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from HoversPage import HoversPage
 
 
-def test_captions_ocultas_antes_de_pasar_el_mouse(page):
+def test_captions_ocultas_antes_de_pasar_el_mouse(page: Page) -> None:
     # El CSS de la página es .figcaption { display: none } y
     # .figure:hover .figcaption { display: block } -- no es opacidad,
     # es display, así que to_be_visible() lo detecta bien sin trucos.
@@ -15,7 +15,7 @@ def test_captions_ocultas_antes_de_pasar_el_mouse(page):
         expect(hovers_page.caption_de(i)).not_to_be_visible()
 
 
-def test_hover_muestra_solo_la_caption_correspondiente(page):
+def test_hover_muestra_solo_la_caption_correspondiente(page: Page) -> None:
     hovers_page = HoversPage(page)
     page.goto(f"{BASE_URL}/hovers")
 
@@ -28,7 +28,7 @@ def test_hover_muestra_solo_la_caption_correspondiente(page):
     expect(hovers_page.caption_de(2)).not_to_be_visible()
 
 
-def test_cada_figura_muestra_su_propio_nombre_y_link(page):
+def test_cada_figura_muestra_su_propio_nombre_y_link(page: Page) -> None:
     hovers_page = HoversPage(page)
     page.goto(f"{BASE_URL}/hovers")
 

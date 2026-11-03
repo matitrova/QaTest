@@ -1,8 +1,10 @@
+from playwright.sync_api import Page
+
 from config import BASE_URL
 from DynamicContentPage import DynamicContentPage
 
 
-def test_en_modo_dinamico_el_contenido_cambia_entre_recargas(page):
+def test_en_modo_dinamico_el_contenido_cambia_entre_recargas(page: Page) -> None:
     dynamic_content_page = DynamicContentPage(page)
 
     page.goto(f"{BASE_URL}/dynamic_content")
@@ -19,7 +21,7 @@ def test_en_modo_dinamico_el_contenido_cambia_entre_recargas(page):
 # Verificado contra el sitio real con varias recargas: las primeras dos filas
 # (imagen + texto juntos) quedan exactamente fijas con ese parámetro.
 
-def test_en_modo_estatico_las_primeras_dos_filas_quedan_fijas(page):
+def test_en_modo_estatico_las_primeras_dos_filas_quedan_fijas(page: Page) -> None:
     dynamic_content_page = DynamicContentPage(page)
     url = f"{BASE_URL}/dynamic_content?with_content=static"
 
@@ -40,7 +42,7 @@ def test_en_modo_estatico_las_primeras_dos_filas_quedan_fijas(page):
 # encontrar dos valores distintos, el mismo patrón que ya usa este repo en
 # test_shifting_content.py para probar aleatoriedad real.
 
-def test_en_modo_estatico_la_tercera_fila_sigue_siendo_aleatoria(page):
+def test_en_modo_estatico_la_tercera_fila_sigue_siendo_aleatoria(page: Page) -> None:
     dynamic_content_page = DynamicContentPage(page)
     url = f"{BASE_URL}/dynamic_content?with_content=static"
     terceras_filas = set()
@@ -54,7 +56,7 @@ def test_en_modo_estatico_la_tercera_fila_sigue_siendo_aleatoria(page):
     assert len(terceras_filas) > 1
 
 
-def test_el_sitio_siempre_muestra_exactamente_tres_filas(page):
+def test_el_sitio_siempre_muestra_exactamente_tres_filas(page: Page) -> None:
     dynamic_content_page = DynamicContentPage(page)
 
     page.goto(f"{BASE_URL}/dynamic_content")

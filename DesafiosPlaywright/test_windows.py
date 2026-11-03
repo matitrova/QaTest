@@ -1,10 +1,10 @@
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from WindowsPage import WindowsPage
 
 
-def test_abrir_nueva_ventana(page):
+def test_abrir_nueva_ventana(page: Page) -> None:
     windows_page = WindowsPage(page)
     page.goto(f"{BASE_URL}/windows")
 
@@ -17,7 +17,7 @@ def test_abrir_nueva_ventana(page):
     nueva_pagina.close()
 
 
-def test_ventana_original_no_se_modifica(page):
+def test_ventana_original_no_se_modifica(page: Page) -> None:
     windows_page = WindowsPage(page)
     page.goto(f"{BASE_URL}/windows")
 
@@ -32,7 +32,7 @@ def test_ventana_original_no_se_modifica(page):
     nueva_pagina.close()
 
 
-def test_cerrar_nueva_ventana_no_afecta_original(page):
+def test_cerrar_nueva_ventana_no_afecta_original(page: Page) -> None:
     windows_page = WindowsPage(page)
     page.goto(f"{BASE_URL}/windows")
 

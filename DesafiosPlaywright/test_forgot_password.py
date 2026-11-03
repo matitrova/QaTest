@@ -1,4 +1,4 @@
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from ForgotPasswordPage import ForgotPasswordPage
@@ -10,7 +10,7 @@ from ForgotPasswordPage import ForgotPasswordPage
 # no se puede distinguir de uno válido en el cliente -- hay que mandarlo y ver
 # qué devuelve el servidor en los dos casos.
 
-def test_el_campo_email_no_tiene_validacion_de_formato_html(page):
+def test_el_campo_email_no_tiene_validacion_de_formato_html(page: Page) -> None:
     page.goto(f"{BASE_URL}/forgot_password")
 
     assert page.locator("#email").get_attribute("type") == "text"
@@ -20,7 +20,7 @@ def test_el_campo_email_no_tiene_validacion_de_formato_html(page):
 # tenga forma de email, sin importar que sea uno real. No hay ningún mensaje
 # de "te enviamos un correo" que esta página pueda mostrar en los hechos.
 
-def test_envio_con_email_valido_responde_500(page):
+def test_envio_con_email_valido_responde_500(page: Page) -> None:
     forgot_password_page = ForgotPasswordPage(page)
     page.goto(f"{BASE_URL}/forgot_password")
 
@@ -38,7 +38,7 @@ def test_envio_con_email_valido_responde_500(page):
 # con "@" -- en cambio, el resultado es idéntico en los dos casos, lo que
 # descarta que sea un problema de parseo del valor ingresado.
 
-def test_envio_con_email_vacio_tambien_responde_500(page):
+def test_envio_con_email_vacio_tambien_responde_500(page: Page) -> None:
     forgot_password_page = ForgotPasswordPage(page)
     page.goto(f"{BASE_URL}/forgot_password")
 
@@ -55,7 +55,7 @@ def test_envio_con_email_vacio_tambien_responde_500(page):
 # mismo 500, lo que confirma que el formulario está roto en el servidor para
 # cualquier input, no solo para casos límite de validación.
 
-def test_envio_con_texto_sin_forma_de_email_tambien_responde_500(page):
+def test_envio_con_texto_sin_forma_de_email_tambien_responde_500(page: Page) -> None:
     forgot_password_page = ForgotPasswordPage(page)
     page.goto(f"{BASE_URL}/forgot_password")
 

@@ -1,5 +1,5 @@
 import pytest
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from KeyPressesPage import KeyPressesPage
@@ -17,7 +17,9 @@ from KeyPressesPage import KeyPressesPage
     ],
     ids=["letra", "digito", "espacio", "escape", "backspace", "flecha"],
 )
-def test_tecla_muestra_el_nombre_esperado(page, tecla, texto_esperado):
+def test_tecla_muestra_el_nombre_esperado(
+    page: Page, tecla: str, texto_esperado: str
+) -> None:
     # Cada tecla pasa por el mismo mapeo de KeyboardEvent.code a texto --
     # son seis variantes del mismo comportamiento, no seis comportamientos
     # distintos, así que un solo test parametrizado cubre los mismos casos
@@ -30,7 +32,7 @@ def test_tecla_muestra_el_nombre_esperado(page, tecla, texto_esperado):
     expect(key_presses_page.resultado).to_have_text(texto_esperado)
 
 
-def test_cada_tecla_pisa_el_resultado_anterior(page):
+def test_cada_tecla_pisa_el_resultado_anterior(page: Page) -> None:
     # El handler reasigna innerHTML entero en cada keydown -- no acumula
     # texto de teclas anteriores, así que solo debe quedar la última.
     key_presses_page = KeyPressesPage(page)
@@ -43,7 +45,7 @@ def test_cada_tecla_pisa_el_resultado_anterior(page):
     expect(key_presses_page.resultado).to_have_text("You entered: B")
 
 
-def test_enter_no_muestra_enter_sino_que_recarga_la_pagina(page):
+def test_enter_no_muestra_enter_sino_que_recarga_la_pagina(page: Page) -> None:
     # A diferencia de cualquier otra tecla, Enter nunca llega a mostrarse:
     # el <input> vive solo dentro de un <form> sin ningún botón de submit,
     # y ese es justamente el caso en el que el propio navegador dispara el

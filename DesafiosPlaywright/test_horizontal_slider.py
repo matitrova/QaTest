@@ -1,10 +1,10 @@
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from HorizontalSliderPage import HorizontalSliderPage
 
 
-def test_valor_inicial_es_cero(page):
+def test_valor_inicial_es_cero(page: Page) -> None:
     slider_page = HorizontalSliderPage(page)
     page.goto(f"{BASE_URL}/horizontal_slider")
 
@@ -12,7 +12,7 @@ def test_valor_inicial_es_cero(page):
     assert slider_page.slider.input_value() == "0"
 
 
-def test_una_flecha_derecha_mueve_un_step(page):
+def test_una_flecha_derecha_mueve_un_step(page: Page) -> None:
     slider_page = HorizontalSliderPage(page)
     page.goto(f"{BASE_URL}/horizontal_slider")
 
@@ -22,7 +22,7 @@ def test_una_flecha_derecha_mueve_un_step(page):
     expect(slider_page.valor_mostrado).to_have_text("0.5")
 
 
-def test_varias_flechas_derecha_acumulan_y_una_izquierda_resta(page):
+def test_varias_flechas_derecha_acumulan_y_una_izquierda_resta(page: Page) -> None:
     slider_page = HorizontalSliderPage(page)
     page.goto(f"{BASE_URL}/horizontal_slider")
 
@@ -34,7 +34,7 @@ def test_varias_flechas_derecha_acumulan_y_una_izquierda_resta(page):
     expect(slider_page.valor_mostrado).to_have_text("1")
 
 
-def test_no_supera_el_maximo_ni_baja_del_minimo(page):
+def test_no_supera_el_maximo_ni_baja_del_minimo(page: Page) -> None:
     # min=0, max=5, step=0.5 -- el input debe frenar en los bordes, no
     # desbordar ni dar la vuelta.
     slider_page = HorizontalSliderPage(page)
@@ -48,7 +48,7 @@ def test_no_supera_el_maximo_ni_baja_del_minimo(page):
     expect(slider_page.valor_mostrado).to_have_text("0")
 
 
-def test_click_en_el_extremo_salta_directo_al_valor_mas_cercano(page):
+def test_click_en_el_extremo_salta_directo_al_valor_mas_cercano(page: Page) -> None:
     # A diferencia de las flechas, clickear el slider no lo mueve de a un
     # step: salta directo al valor que corresponde a esa posición del
     # click. Clickear cerca del borde derecho debería ir directo al máximo.

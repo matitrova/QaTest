@@ -1,4 +1,5 @@
 import pytest
+from playwright.sync_api import Page
 
 from config import BASE_URL
 from DisappearingElementsPage import DisappearingElementsPage
@@ -7,7 +8,7 @@ ITEMS_BASE = ["Home", "About", "Contact Us", "Portfolio"]
 ITEM_EXTRA = "Gallery"
 
 
-def test_los_cuatro_items_base_siempre_aparecen_en_el_mismo_orden(page):
+def test_los_cuatro_items_base_siempre_aparecen_en_el_mismo_orden(page: Page) -> None:
     disappearing_elements_page = DisappearingElementsPage(page)
 
     for _ in range(5):
@@ -15,7 +16,7 @@ def test_los_cuatro_items_base_siempre_aparecen_en_el_mismo_orden(page):
         assert disappearing_elements_page.textos()[:4] == ITEMS_BASE
 
 
-def test_la_cantidad_de_items_es_cuatro_o_cinco(page):
+def test_la_cantidad_de_items_es_cuatro_o_cinco(page: Page) -> None:
     disappearing_elements_page = DisappearingElementsPage(page)
 
     for _ in range(5):
@@ -29,7 +30,7 @@ def test_la_cantidad_de_items_es_cuatro_o_cinco(page):
 # recargar hasta ver los dos estados en vez de buscarlo con un selector que
 # ignore visibilidad.
 
-def test_gallery_aparece_en_algunas_cargas_y_no_en_otras(page):
+def test_gallery_aparece_en_algunas_cargas_y_no_en_otras(page: Page) -> None:
     disappearing_elements_page = DisappearingElementsPage(page)
     vistos = set()
 
@@ -45,7 +46,7 @@ def test_gallery_aparece_en_algunas_cargas_y_no_en_otras(page):
     assert vistos == {True, False}
 
 
-def test_gallery_cuando_aparece_es_el_ultimo_item(page):
+def test_gallery_cuando_aparece_es_el_ultimo_item(page: Page) -> None:
     disappearing_elements_page = DisappearingElementsPage(page)
 
     for _ in range(20):

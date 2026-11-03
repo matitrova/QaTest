@@ -1,17 +1,17 @@
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from AddRemoveElementsPage import AddRemoveElementsPage
 
 
-def test_arranca_sin_elementos(page):
+def test_arranca_sin_elementos(page: Page) -> None:
     add_remove_page = AddRemoveElementsPage(page)
     page.goto(f"{BASE_URL}/add_remove_elements/")
 
     expect(add_remove_page.botones_eliminar).to_have_count(0)
 
 
-def test_agregar_un_elemento_lo_muestra(page):
+def test_agregar_un_elemento_lo_muestra(page: Page) -> None:
     add_remove_page = AddRemoveElementsPage(page)
     page.goto(f"{BASE_URL}/add_remove_elements/")
 
@@ -20,7 +20,7 @@ def test_agregar_un_elemento_lo_muestra(page):
     expect(add_remove_page.botones_eliminar).to_have_count(1)
 
 
-def test_agregar_varios_elementos_acumula(page):
+def test_agregar_varios_elementos_acumula(page: Page) -> None:
     add_remove_page = AddRemoveElementsPage(page)
     page.goto(f"{BASE_URL}/add_remove_elements/")
 
@@ -29,7 +29,7 @@ def test_agregar_varios_elementos_acumula(page):
     expect(add_remove_page.botones_eliminar).to_have_count(5)
 
 
-def test_eliminar_uno_baja_el_contador(page):
+def test_eliminar_uno_baja_el_contador(page: Page) -> None:
     add_remove_page = AddRemoveElementsPage(page)
     page.goto(f"{BASE_URL}/add_remove_elements/")
 
@@ -39,7 +39,7 @@ def test_eliminar_uno_baja_el_contador(page):
     expect(add_remove_page.botones_eliminar).to_have_count(2)
 
 
-def test_eliminar_todos_deja_la_lista_vacia(page):
+def test_eliminar_todos_deja_la_lista_vacia(page: Page) -> None:
     add_remove_page = AddRemoveElementsPage(page)
     page.goto(f"{BASE_URL}/add_remove_elements/")
 

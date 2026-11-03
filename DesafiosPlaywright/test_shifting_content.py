@@ -1,9 +1,12 @@
+from playwright.sync_api import Page
 
 from config import BASE_URL
 from ShiftingContentPage import KNOWN_LINES, TARGET_TEXT, ShiftingContentListPage
 
 
-def test_las_mismas_cinco_lineas_aparecen_siempre_aunque_cambien_de_orden(page):
+def test_las_mismas_cinco_lineas_aparecen_siempre_aunque_cambien_de_orden(
+    page: Page,
+) -> None:
     shifting_content_page = ShiftingContentListPage(page)
 
     for _ in range(5):
@@ -19,7 +22,7 @@ def test_las_mismas_cinco_lineas_aparecen_siempre_aunque_cambien_de_orden(page):
 # y la reusara después encontraría el dato equivocado ni bien recargara la
 # página, porque no hay ninguna que se mantenga estable entre pedidos.
 
-def test_la_posicion_del_registro_fijo_varia_entre_recargas(page):
+def test_la_posicion_del_registro_fijo_varia_entre_recargas(page: Page) -> None:
     shifting_content_page = ShiftingContentListPage(page)
     posiciones = set()
 
@@ -41,7 +44,9 @@ def test_la_posicion_del_registro_fijo_varia_entre_recargas(page):
 # única forma de ubicar la línea es parsear el texto completo del contenedor y
 # partirlo, que es justo lo que hace lineas().
 
-def test_no_existe_un_elemento_propio_para_ubicar_la_linea_por_texto(page):
+def test_no_existe_un_elemento_propio_para_ubicar_la_linea_por_texto(
+    page: Page,
+) -> None:
     shifting_content_page = ShiftingContentListPage(page)
     page.goto(f"{BASE_URL}/shifting_content/list")
 

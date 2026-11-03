@@ -1,10 +1,10 @@
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from FloatingMenuPage import FloatingMenuPage
 
 
-def test_menu_arranca_en_su_posicion_original(page):
+def test_menu_arranca_en_su_posicion_original(page: Page) -> None:
     floating_menu_page = FloatingMenuPage(page)
     page.goto(f"{BASE_URL}/floating_menu")
 
@@ -20,7 +20,7 @@ def test_menu_arranca_en_su_posicion_original(page):
 # sobre la posición resultante en pantalla (bounding_box), que es la que
 # demuestra el efecto "floating".
 
-def test_menu_permanece_cerca_del_borde_superior_al_scrollear(page):
+def test_menu_permanece_cerca_del_borde_superior_al_scrollear(page: Page) -> None:
     floating_menu_page = FloatingMenuPage(page)
     page.goto(f"{BASE_URL}/floating_menu")
     posicion_inicial = floating_menu_page.posicion_del_menu()
@@ -36,7 +36,7 @@ def test_menu_permanece_cerca_del_borde_superior_al_scrollear(page):
     assert posicion_tras_scroll["y"] < 50
 
 
-def test_menu_vuelve_a_su_posicion_original_al_scrollear_arriba(page):
+def test_menu_vuelve_a_su_posicion_original_al_scrollear_arriba(page: Page) -> None:
     floating_menu_page = FloatingMenuPage(page)
     page.goto(f"{BASE_URL}/floating_menu")
     posicion_inicial = floating_menu_page.posicion_del_menu()
@@ -57,7 +57,9 @@ def test_menu_vuelve_a_su_posicion_original_al_scrollear_arriba(page):
 # está flotando a mitad de un scroll largo, y que el navegador actualiza el
 # hash de la URL como corresponde a un link ancla normal.
 
-def test_los_links_del_menu_siguen_siendo_clickeables_mientras_flota(page):
+def test_los_links_del_menu_siguen_siendo_clickeables_mientras_flota(
+    page: Page,
+) -> None:
     floating_menu_page = FloatingMenuPage(page)
     page.goto(f"{BASE_URL}/floating_menu")
     floating_menu_page.hacer_scroll(2000)
