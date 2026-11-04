@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **369 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **375 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 149 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 155 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 93 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 25 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -187,6 +187,14 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   coordenadas, probado con dos ubicaciones simuladas distintas
   (parametrizado) para confirmar que lo que se muestra es la posición que
   el contexto del navegador entrega, no un valor fijo
+- Inputs de solo lectura (`/readonly`): un campo editable por default, uno
+  siempre de solo lectura (`readonly`) y uno deshabilitado (`disabled`) --
+  el propio label de la página aclara que no son lo mismo --, verificando
+  que ninguno de los dos últimos acepta texto pero que solo el `disabled`
+  queda además inhabilitado para recibir foco. Un checkbox agrega y quita
+  el atributo `readonly` del primer campo de forma dinámica, pisando su
+  valor con un texto fijo cada vez que lo vuelve de solo lectura, sin
+  afectar a los otros dos
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -444,8 +452,21 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   un loop hasta encontrar dos valores distintos, el mismo patrón que ya
   usa esta suite en `/shifting_content` para probar aleatoriedad real.
 - `navigator.geolocation.getCurrentPosition()` depende de un permiso del navegador y, sin mockearlo, de la ubicación real de la máquina que corre el test -- en headless, sin ese permiso otorgado de antemano, la llamada se queda esperando una respuesta que nunca llega. Extendiendo el fixture `browser_context_args` con `geolocation` y `permissions: ["geolocation"]` **antes** de crear el contexto (el mismo patrón que ya usa esta suite para `http_credentials` en Basic Auth), el resultado queda determinístico: el test corre parametrizado con dos coordenadas distintas para confirmar que la página refleja la posición simulada, no que "da algún número" por casualidad.
-- El pool de casos nuevos (the-internet, UI Testing Playground, SauceDemo, ReqRes/Restful
-  Booker) ya está cubierto en su totalidad. Los 32 Page Objects de esta suite ya tenían
+- `expect(locator).to_be_editable()` resultó la forma correcta de verificar `/readonly`:
+  Playwright considera "editable" solo a un input sin `readonly` ni `disabled`, así que
+  intentar `fill()` sobre cualquiera de los otros dos directamente tira timeout de
+  actionability en vez de completarse en silencio -- el mismo patrón de "la excepción
+  es la prueba" que ya usa esta suite para el botón bloqueado de `/dynamic_controls`. El
+  campo `readonly` sí queda habilitado y seleccionable (`to_be_enabled()` pasa igual),
+  a diferencia del `disabled`, que además rechaza el foco -- la distinción que el
+  propio label de la página adelanta ("not the same as read-only") es real y medible,
+  no solo un matiz de redacción.
+- El pool original (the-internet, UI Testing Playground, SauceDemo, ReqRes/Restful
+  Booker) seguía dando casos nuevos: la lista que vengo siguiendo hace meses no incluía
+  todas las páginas reales de the-internet.herokuapp.com (`/readonly` entre ellas, además
+  de otras como `/radio_buttons`, `/large_form` o `/subdirectories`) -- recorrer el menú
+  de la página en vivo en vez de confiar solo en la lista guardada encontró más terreno
+  del que parecía quedar. Los 32 Page Objects de esta suite ya tenían
   tipado explícito desde antes, pero sus ~150 funciones `test_*` seguían sin anotar --a
   diferencia de TestX, ReqResTest y RestfulBookerTest, que ya lo tenían. El tipo depende
   de qué fixture provee cada parámetro: `page: Page` para el nativo de Playwright,
