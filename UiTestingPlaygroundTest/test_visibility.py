@@ -1,6 +1,8 @@
 import pytest
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
+from VisibilityPage import VisibilityPage
+
 
 BOTONES_QUE_SE_OCULTAN = [
     "boton_zero_width",
@@ -12,13 +14,13 @@ BOTONES_QUE_SE_OCULTAN = [
 ]
 
 
-def test_todos_los_botones_arrancan_visibles(visibility_page):
+def test_todos_los_botones_arrancan_visibles(visibility_page: VisibilityPage) -> None:
     assert visibility_page.boton_removed.is_visible()
     for nombre in BOTONES_QUE_SE_OCULTAN:
         assert getattr(visibility_page, nombre).is_visible()
 
 
-def test_removido_desaparece_del_dom(visibility_page):
+def test_removido_desaparece_del_dom(visibility_page: VisibilityPage) -> None:
     visibility_page.ocultar()
 
     # A diferencia de los demás, este botón no queda oculto por CSS: el
@@ -27,7 +29,7 @@ def test_removido_desaparece_del_dom(visibility_page):
     assert visibility_page.boton_removed.count() == 0
 
 
-def test_ancho_cero_no_es_visible(visibility_page):
+def test_ancho_cero_no_es_visible(visibility_page: VisibilityPage) -> None:
     visibility_page.ocultar()
 
     # El JS le agrega la clase "zerowidth" (width: 0, min-width: 0). Sigue
@@ -37,7 +39,7 @@ def test_ancho_cero_no_es_visible(visibility_page):
     assert visibility_page.boton_zero_width.bounding_box()["width"] == 0
 
 
-def test_opacity_cero_playwright_lo_sigue_viendo_visible(visibility_page):
+def test_opacity_cero_playwright_lo_sigue_viendo_visible(visibility_page: VisibilityPage) -> None:
     visibility_page.ocultar()
 
     # `opacity: 0` lo hace invisible a simple vista, pero Playwright no mira
@@ -52,13 +54,13 @@ def test_opacity_cero_playwright_lo_sigue_viendo_visible(visibility_page):
     ) == "0"
 
 
-def test_visibility_hidden_no_es_visible(visibility_page):
+def test_visibility_hidden_no_es_visible(visibility_page: VisibilityPage) -> None:
     visibility_page.ocultar()
 
     assert not visibility_page.boton_invisible.is_visible()
 
 
-def test_display_none_no_es_visible_y_no_tiene_bounding_box(visibility_page):
+def test_display_none_no_es_visible_y_no_tiene_bounding_box(visibility_page: VisibilityPage) -> None:
     visibility_page.ocultar()
 
     # `display: none` sí saca al elemento del flujo de layout -- a
@@ -68,7 +70,7 @@ def test_display_none_no_es_visible_y_no_tiene_bounding_box(visibility_page):
     assert visibility_page.boton_not_displayed.bounding_box() is None
 
 
-def test_offscreen_playwright_lo_sigue_viendo_visible(visibility_page):
+def test_offscreen_playwright_lo_sigue_viendo_visible(visibility_page: VisibilityPage) -> None:
     visibility_page.ocultar()
 
     # El JS lo manda a position: absolute; top/left: -9999px -- fuera del
@@ -80,7 +82,7 @@ def test_offscreen_playwright_lo_sigue_viendo_visible(visibility_page):
     assert visibility_page.boton_offscreen.bounding_box()["x"] < 0
 
 
-def test_overlapped_es_visible_pero_el_click_no_llega(visibility_page):
+def test_overlapped_es_visible_pero_el_click_no_llega(visibility_page: VisibilityPage) -> None:
     visibility_page.ocultar()
 
     # El JS no toca ningún estilo del propio botón: superpone un `<div>`

@@ -1,13 +1,15 @@
+from playwright.sync_api import Page
+
 from config import BASE_URL
 from ClientDelayPage import ClientDelayPage
 
 
-def test_no_hay_contenido_cargado_antes_de_hacer_click(client_delay_page):
+def test_no_hay_contenido_cargado_antes_de_hacer_click(client_delay_page: ClientDelayPage) -> None:
     assert client_delay_page.contenido.inner_text() == ""
     assert not client_delay_page.spinner.is_visible()
 
 
-def test_al_hacer_click_el_spinner_aparece_de_inmediato(client_delay_page):
+def test_al_hacer_click_el_spinner_aparece_de_inmediato(client_delay_page: ClientDelayPage) -> None:
     client_delay_page.disparar_calculo()
 
     # El propio CreateLabel() muestra el spinner con $('#spinner').show()
@@ -17,7 +19,7 @@ def test_al_hacer_click_el_spinner_aparece_de_inmediato(client_delay_page):
     assert client_delay_page.contenido.inner_text() == ""
 
 
-def test_despues_de_esperar_aparece_el_texto_calculado(client_delay_page):
+def test_despues_de_esperar_aparece_el_texto_calculado(client_delay_page: ClientDelayPage) -> None:
     client_delay_page.disparar_calculo()
     client_delay_page.esperar_etiqueta()
 
@@ -28,7 +30,7 @@ def test_despues_de_esperar_aparece_el_texto_calculado(client_delay_page):
     assert not client_delay_page.spinner.is_visible()
 
 
-def test_la_espera_no_dispara_ningun_pedido_de_red(page):
+def test_la_espera_no_dispara_ningun_pedido_de_red(page: Page) -> None:
     # A diferencia de /ajax (AjaxDataPage), donde el botón dispara un
     # $.get("/ajaxdata") real contra el servidor, el de esta página solo
     # programa un setTimeout en el propio navegador: los 15 segundos no

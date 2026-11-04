@@ -1,4 +1,11 @@
-def test_el_id_literal_del_html_no_existe_apenas_carga_la_pagina(page, sample_app_page):
+from playwright.sync_api import Page
+
+from SampleAppPage import SampleAppPage
+
+
+def test_el_id_literal_del_html_no_existe_apenas_carga_la_pagina(
+    page: Page, sample_app_page: SampleAppPage
+) -> None:
     # El HTML servido por el backend trae id="username" tal cual -- se puede
     # confirmar pidiéndolo crudo con requests, sin ejecutar ningún JS -- pero
     # un script inline lo reemplaza por un GUID al terminar de parsear el
@@ -11,7 +18,9 @@ def test_el_id_literal_del_html_no_existe_apenas_carga_la_pagina(page, sample_ap
     assert sample_app_page.clave.count() == 1
 
 
-def test_el_id_de_los_campos_cambia_en_cada_recarga_pero_el_name_no(page, sample_app_page):
+def test_el_id_de_los_campos_cambia_en_cada_recarga_pero_el_name_no(
+    page: Page, sample_app_page: SampleAppPage
+) -> None:
     id_primera_carga = sample_app_page.id_usuario()
     assert id_primera_carga != "username"
 
@@ -28,7 +37,9 @@ def test_el_id_de_los_campos_cambia_en_cada_recarga_pero_el_name_no(page, sample
     assert sample_app_page.usuario.count() == 1
 
 
-def test_login_con_password_incorrecta_es_invalido_y_limpia_los_campos(sample_app_page):
+def test_login_con_password_incorrecta_es_invalido_y_limpia_los_campos(
+    sample_app_page: SampleAppPage,
+) -> None:
     sample_app_page.login("matias", "password_incorrecta")
 
     assert sample_app_page.texto_estado() == "Invalid username/password"
@@ -39,7 +50,9 @@ def test_login_con_password_incorrecta_es_invalido_y_limpia_los_campos(sample_ap
     assert sample_app_page.clave.input_value() == ""
 
 
-def test_login_sin_usuario_tambien_es_invalido_aunque_la_password_sea_correcta(sample_app_page):
+def test_login_sin_usuario_tambien_es_invalido_aunque_la_password_sea_correcta(
+    sample_app_page: SampleAppPage,
+) -> None:
     # El enunciado de la página pide "any non-empty user name" -- un usuario
     # vacío con la password correcta ("pwd") tiene que fallar igual que una
     # password incorrecta, no alcanza con que uno de los dos campos esté bien.
@@ -49,7 +62,9 @@ def test_login_sin_usuario_tambien_es_invalido_aunque_la_password_sea_correcta(s
     assert sample_app_page.clase_estado() == "text-danger"
 
 
-def test_login_exitoso_muestra_bienvenida_y_cambia_el_boton_a_log_out(sample_app_page):
+def test_login_exitoso_muestra_bienvenida_y_cambia_el_boton_a_log_out(
+    sample_app_page: SampleAppPage,
+) -> None:
     sample_app_page.login("matias", "pwd")
 
     assert sample_app_page.texto_estado() == "Welcome, matias!"
@@ -59,7 +74,7 @@ def test_login_exitoso_muestra_bienvenida_y_cambia_el_boton_a_log_out(sample_app
     assert sample_app_page.texto_boton() == "Log Out"
 
 
-def test_logout_revierte_el_estado_y_limpia_los_campos(sample_app_page):
+def test_logout_revierte_el_estado_y_limpia_los_campos(sample_app_page: SampleAppPage) -> None:
     sample_app_page.login("matias", "pwd")
     assert sample_app_page.texto_boton() == "Log Out"
 

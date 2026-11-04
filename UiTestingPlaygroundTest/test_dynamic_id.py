@@ -1,11 +1,13 @@
-from DynamicIdPage import ID_DINAMICO
+from playwright.sync_api import Page
+
+from DynamicIdPage import ID_DINAMICO, DynamicIdPage
 
 
-def test_el_id_del_boton_tiene_formato_de_id_dinamico(dynamic_id_page):
+def test_el_id_del_boton_tiene_formato_de_id_dinamico(dynamic_id_page: DynamicIdPage) -> None:
     assert ID_DINAMICO.match(dynamic_id_page.id_actual())
 
 
-def test_el_id_del_boton_cambia_entre_recargas(page, dynamic_id_page):
+def test_el_id_del_boton_cambia_entre_recargas(page: Page, dynamic_id_page: DynamicIdPage) -> None:
     ids = {dynamic_id_page.id_actual()}
     for _ in range(4):
         page.reload()
@@ -17,7 +19,9 @@ def test_el_id_del_boton_cambia_entre_recargas(page, dynamic_id_page):
     assert len(ids) > 1
 
 
-def test_el_id_de_una_carga_anterior_deja_de_existir_tras_recargar(page, dynamic_id_page):
+def test_el_id_de_una_carga_anterior_deja_de_existir_tras_recargar(
+    page: Page, dynamic_id_page: DynamicIdPage
+) -> None:
     id_anterior = dynamic_id_page.id_actual()
 
     page.reload()
@@ -29,7 +33,9 @@ def test_el_id_de_una_carga_anterior_deja_de_existir_tras_recargar(page, dynamic
     assert dynamic_id_page.id_actual() != id_anterior
 
 
-def test_el_boton_se_puede_clickear_por_rol_y_texto_sin_depender_del_id(page, dynamic_id_page):
+def test_el_boton_se_puede_clickear_por_rol_y_texto_sin_depender_del_id(
+    page: Page, dynamic_id_page: DynamicIdPage
+) -> None:
     # El locator por rol y texto visible nunca cambia, aunque el id sí lo
     # haga en cada recarga -- por eso el click funciona igual las tres veces
     # sin que el test necesite leer ni recordar ningún id.

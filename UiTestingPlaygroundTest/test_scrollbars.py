@@ -1,4 +1,9 @@
-def test_el_boton_queda_fuera_del_area_visible_pero_is_visible_da_true(scrollbars_page):
+from ScrollbarsPage import ScrollbarsPage
+
+
+def test_el_boton_queda_fuera_del_area_visible_pero_is_visible_da_true(
+    scrollbars_page: ScrollbarsPage,
+) -> None:
     cont_box = scrollbars_page.box_contenedor()
     boton_box = scrollbars_page.box_boton()
 
@@ -20,7 +25,9 @@ def test_el_boton_queda_fuera_del_area_visible_pero_is_visible_da_true(scrollbar
     assert scrollbars_page.boton.is_visible()
 
 
-def test_click_sin_scroll_manual_escrollea_el_contenedor_en_ambos_ejes(scrollbars_page):
+def test_click_sin_scroll_manual_escrollea_el_contenedor_en_ambos_ejes(
+    scrollbars_page: ScrollbarsPage,
+) -> None:
     scroll_izq_antes, scroll_arriba_antes = scrollbars_page.scroll_actual()
     assert scroll_izq_antes == 0
     assert scroll_arriba_antes == 0
@@ -43,7 +50,7 @@ def test_click_sin_scroll_manual_escrollea_el_contenedor_en_ambos_ejes(scrollbar
     assert scroll_arriba_despues > 0
 
 
-def test_click_con_force_tambien_escrollea_el_contenedor(scrollbars_page):
+def test_click_con_force_tambien_escrollea_el_contenedor(scrollbars_page: ScrollbarsPage) -> None:
     scroll_antes = scrollbars_page.scroll_actual()
     assert scroll_antes == [0, 0]
 

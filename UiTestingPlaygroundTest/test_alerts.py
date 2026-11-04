@@ -1,5 +1,9 @@
 import time
 
+from playwright.sync_api import Page
+
+from AlertsPage import AlertsPage
+
 
 # A diferencia de /javascript_alerts (DesafiosPlaywright/JavascriptAlertsPage.py),
 # acá Confirm y Prompt no escriben ningún resultado en el DOM: lo único que
@@ -10,7 +14,7 @@ import time
 # cada test para no dejarlo pegado.
 
 
-def test_alert_simple(page, alerts_page):
+def test_alert_simple(page: Page, alerts_page: AlertsPage) -> None:
     dialogos = []
 
     def manejar(dialog):
@@ -23,7 +27,9 @@ def test_alert_simple(page, alerts_page):
     assert dialogos == [("alert", "Today is a working day.\nOr less likely a holiday.")]
 
 
-def test_confirm_aceptado_dispara_un_segundo_alert_con_yes_despues_de_un_segundo(page, alerts_page):
+def test_confirm_aceptado_dispara_un_segundo_alert_con_yes_despues_de_un_segundo(
+    page: Page, alerts_page: AlertsPage
+) -> None:
     dialogos = []
     tiempos = []
 
@@ -47,7 +53,7 @@ def test_confirm_aceptado_dispara_un_segundo_alert_con_yes_despues_de_un_segundo
     assert tiempos[1] - tiempos[0] >= 0.9
 
 
-def test_confirm_cancelado_dispara_un_segundo_alert_con_no(page, alerts_page):
+def test_confirm_cancelado_dispara_un_segundo_alert_con_no(page: Page, alerts_page: AlertsPage) -> None:
     dialogos = []
 
     def manejar(dialog):
@@ -65,7 +71,9 @@ def test_confirm_cancelado_dispara_un_segundo_alert_con_no(page, alerts_page):
     ]
 
 
-def test_prompt_con_texto_dispara_un_segundo_alert_con_el_valor_ingresado(page, alerts_page):
+def test_prompt_con_texto_dispara_un_segundo_alert_con_el_valor_ingresado(
+    page: Page, alerts_page: AlertsPage
+) -> None:
     texto_ingresado = "perros"
     dialogos = []
 
@@ -84,7 +92,7 @@ def test_prompt_con_texto_dispara_un_segundo_alert_con_el_valor_ingresado(page, 
     ]
 
 
-def test_prompt_cancelado_el_segundo_alert_muestra_no_answer(page, alerts_page):
+def test_prompt_cancelado_el_segundo_alert_muestra_no_answer(page: Page, alerts_page: AlertsPage) -> None:
     dialogos = []
 
     def manejar(dialog):

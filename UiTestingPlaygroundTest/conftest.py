@@ -1,4 +1,5 @@
 import pytest
+from playwright.sync_api import Page
 
 from config import BASE_URL
 from AjaxDataPage import AjaxDataPage
@@ -30,120 +31,120 @@ from VisibilityPage import VisibilityPage
 
 
 @pytest.fixture
-def ajax_data_page(page):
+def ajax_data_page(page: Page) -> AjaxDataPage:
     page.goto(f"{BASE_URL}/ajax")
     return AjaxDataPage(page)
 
 
 @pytest.fixture
-def alerts_page(page):
+def alerts_page(page: Page) -> AlertsPage:
     page.goto(f"{BASE_URL}/alerts")
     return AlertsPage(page)
 
 
 @pytest.fixture
-def class_page(page):
+def class_page(page: Page) -> ClassAttributePage:
     page.goto(f"{BASE_URL}/classattr")
     return ClassAttributePage(page)
 
 
 @pytest.fixture
-def clear_input_page(page):
+def clear_input_page(page: Page) -> ClearInputPage:
     page.goto(f"{BASE_URL}/clearinput")
     return ClearInputPage(page)
 
 
 @pytest.fixture
-def click_page(page):
+def click_page(page: Page) -> ClickPage:
     page.goto(f"{BASE_URL}/click")
     return ClickPage(page)
 
 
 @pytest.fixture
-def client_delay_page(page):
+def client_delay_page(page: Page) -> ClientDelayPage:
     page.goto(f"{BASE_URL}/clientDelay")
     return ClientDelayPage(page)
 
 
 @pytest.fixture
-def dynamic_id_page(page):
+def dynamic_id_page(page: Page) -> DynamicIdPage:
     page.goto(f"{BASE_URL}/dynamicid")
     return DynamicIdPage(page)
 
 
 @pytest.fixture
-def dynamic_table_page(page):
+def dynamic_table_page(page: Page) -> DynamicTablePage:
     page.goto(f"{BASE_URL}/dynamictable")
     return DynamicTablePage(page)
 
 
 @pytest.fixture
-def hidden_layers_page(page):
+def hidden_layers_page(page: Page) -> HiddenLayersPage:
     page.goto(f"{BASE_URL}/hiddenlayers")
     return HiddenLayersPage(page)
 
 
 @pytest.fixture
-def load_delay_page(page):
+def load_delay_page(page: Page) -> LoadDelayPage:
     page.goto(f"{BASE_URL}/loaddelay")
     return LoadDelayPage(page)
 
 
 @pytest.fixture
-def mouse_over_page(page):
+def mouse_over_page(page: Page) -> MouseOverPage:
     page.goto(f"{BASE_URL}/mouseover")
     return MouseOverPage(page)
 
 
 @pytest.fixture
-def nbsp_page(page):
+def nbsp_page(page: Page) -> NbspPage:
     page.goto(f"{BASE_URL}/nbsp")
     return NbspPage(page)
 
 
 @pytest.fixture
-def overlapped_page(page):
+def overlapped_page(page: Page) -> OverlappedPage:
     page.goto(f"{BASE_URL}/overlapped")
     return OverlappedPage(page)
 
 
 @pytest.fixture
-def progress_bar_page(page):
+def progress_bar_page(page: Page) -> ProgressBarPage:
     page.goto(f"{BASE_URL}/progressbar")
     return ProgressBarPage(page)
 
 
 @pytest.fixture
-def sample_app_page(page):
+def sample_app_page(page: Page) -> SampleAppPage:
     page.goto(f"{BASE_URL}/sampleapp")
     return SampleAppPage(page)
 
 
 @pytest.fixture
-def scrollbars_page(page):
+def scrollbars_page(page: Page) -> ScrollbarsPage:
     page.goto(f"{BASE_URL}/scrollbars")
     return ScrollbarsPage(page)
 
 
 @pytest.fixture
-def shadow_dom_page(page):
+def shadow_dom_page(page: Page) -> ShadowDomPage:
     page.goto(f"{BASE_URL}/shadowdom")
     return ShadowDomPage(page)
 
 
 @pytest.fixture
-def text_input_page(page):
+def text_input_page(page: Page) -> TextInputPage:
     page.goto(f"{BASE_URL}/textinput")
     return TextInputPage(page)
 
 
 @pytest.fixture
-def verify_text_page(page):
+def verify_text_page(page: Page) -> VerifyTextPage:
     page.goto(f"{BASE_URL}/verifytext")
     return VerifyTextPage(page)
 
 
 @pytest.fixture
-def visibility_page(page):
+def visibility_page(page: Page) -> VisibilityPage:
     page.goto(f"{BASE_URL}/visibility")
     return VisibilityPage(page)

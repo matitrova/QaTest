@@ -1,3 +1,5 @@
+from playwright.sync_api import Page
+
 from config import BASE_URL
 from ShadowDomPage import PATRON_GUID, ShadowDomPage
 
@@ -14,12 +16,14 @@ from ShadowDomPage import PATRON_GUID, ShadowDomPage
 # shadow roots abiertos de forma transparente.
 
 
-def test_el_campo_vive_en_un_shadow_root_pero_no_es_visible_para_el_document_global(shadow_dom_page):
+def test_el_campo_vive_en_un_shadow_root_pero_no_es_visible_para_el_document_global(
+    shadow_dom_page: ShadowDomPage,
+) -> None:
     assert shadow_dom_page.esta_dentro_de_un_shadow_root() is True
     assert shadow_dom_page.encontrable_desde_el_document_global() is False
 
 
-def test_generar_guid_carga_un_valor_con_formato_de_guid_en_el_input(shadow_dom_page):
+def test_generar_guid_carga_un_valor_con_formato_de_guid_en_el_input(shadow_dom_page: ShadowDomPage) -> None:
     assert shadow_dom_page.valor_actual() == ""
 
     shadow_dom_page.generar_guid()
@@ -27,7 +31,7 @@ def test_generar_guid_carga_un_valor_con_formato_de_guid_en_el_input(shadow_dom_
     assert PATRON_GUID.match(shadow_dom_page.valor_actual())
 
 
-def test_dos_clicks_en_generar_dan_dos_guids_distintos(page, shadow_dom_page):
+def test_dos_clicks_en_generar_dan_dos_guids_distintos(page: Page, shadow_dom_page: ShadowDomPage) -> None:
     shadow_dom_page.generar_guid()
     primer_guid = shadow_dom_page.valor_actual()
 
@@ -49,7 +53,9 @@ def test_dos_clicks_en_generar_dan_dos_guids_distintos(page, shadow_dom_page):
 # el click no "falla silenciosamente": dispara un error real de la página
 # (page.on("pageerror")), y el valor del input queda intacto porque la
 # asignación a editField.value ocurre en el botón de generar, no en este.
-def test_copiar_al_clipboard_dispara_un_error_real_porque_el_sitio_no_es_un_contexto_seguro(page):
+def test_copiar_al_clipboard_dispara_un_error_real_porque_el_sitio_no_es_un_contexto_seguro(
+    page: Page,
+) -> None:
     shadow_dom_page = ShadowDomPage(page)
 
     errores = []

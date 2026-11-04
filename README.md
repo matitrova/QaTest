@@ -963,6 +963,16 @@ no el sitio completo).
   pasaron a usar la fixture; los otros 7 quedaron como estaban.
   Verificado corriendo los 80 tests de la suite dos veces seguidas antes de
   commitear.
+- El pool de casos nuevos (the-internet, UI Testing Playground, SauceDemo, ReqRes/Restful
+  Booker) ya está cubierto en su totalidad. Los 18 Page Objects de esta suite ya tenían
+  tipado explícito desde antes (ver el ítem anterior), pero el `conftest.py` con las 20
+  fixtures que entregan cada Page Object ya navegado, y las ~75 funciones `test_*` de los
+  19 archivos de test, seguían sin anotar -- mismo refactor ya aplicado en DesafiosPlaywright,
+  TestX, ReqResTest y RestfulBookerTest. El tipo de cada parámetro depende de qué fixture lo
+  provee: `page: Page` para el nativo de Playwright, el Page Object correspondiente
+  (`AjaxDataPage`, `AlertsPage`, etc.) para las fixtures propias de la suite, y `str` para
+  `id_campo` en el único test parametrizado (Clear Input). Verificado corriendo los 93 tests
+  de la suite dos veces seguidas sin ningún fallo.
 
 ```bash
 cd UiTestingPlaygroundTest && python3 -m pytest -v

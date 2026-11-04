@@ -1,9 +1,12 @@
 import time
 
+from playwright.sync_api import Page
+
 from config import BASE_URL
+from LoadDelayPage import LoadDelayPage
 
 
-def test_la_navegacion_tarda_al_menos_lo_que_demora_el_servidor(page):
+def test_la_navegacion_tarda_al_menos_lo_que_demora_el_servidor(page: Page) -> None:
     # A diferencia de /clientDelay (ClientDelayPage), donde el retraso es un
     # setTimeout en el navegador después de que la página ya terminó de
     # cargar, acá es el servidor el que tarda en mandar la respuesta: el
@@ -15,14 +18,14 @@ def test_la_navegacion_tarda_al_menos_lo_que_demora_el_servidor(page):
     assert duracion >= 4
 
 
-def test_el_boton_ya_esta_visible_apenas_termina_la_navegacion(load_delay_page):
+def test_el_boton_ya_esta_visible_apenas_termina_la_navegacion(load_delay_page: LoadDelayPage) -> None:
     # goto() ya esperó el evento load del navegador: a diferencia de
     # ClientDelayPage, no hace falta ningún wait_for adicional después para
     # ver el botón -- si la navegación terminó, el botón ya está.
     assert load_delay_page.boton_visible()
 
 
-def test_la_demora_no_dispara_ningun_pedido_xhr_o_fetch(page):
+def test_la_demora_no_dispara_ningun_pedido_xhr_o_fetch(page: Page) -> None:
     # Confirma que los ~5 segundos de espera son el propio documento HTML
     # tardando en llegar, no una página que carga rápido y después dispara
     # una llamada async en segundo plano (el caso de /ajax, por ejemplo).
