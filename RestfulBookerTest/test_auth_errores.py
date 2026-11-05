@@ -56,8 +56,9 @@ def test_auth_sin_credenciales_responde_200_sin_token() -> None:
     assert datos["reason"] == "Bad credentials"
 
 
-def test_put_sin_token_responde_403() -> None:
+def test_put_sin_token_responde_403(reservas_creadas: list[int]) -> None:
     booking_id = crear_reserva()
+    reservas_creadas.append(booking_id)
     respuesta = requests.put(
         f"{BASE_URL}/booking/{booking_id}",
         json={
@@ -72,12 +73,13 @@ def test_put_sin_token_responde_403() -> None:
     assert respuesta.status_code == 403
 
 
-def test_put_con_token_invalido_responde_403_igual_que_sin_token() -> None:
+def test_put_con_token_invalido_responde_403_igual_que_sin_token(reservas_creadas: list[int]) -> None:
     # Mandar una cookie "token" con un valor cualquiera no es lo mismo
     # que no mandar ninguna: acá se confirma que la API de verdad valida
     # el contenido del token (no solo que la cookie exista), rechazando
     # un valor inventado con el mismo 403 que la ausencia total.
     booking_id = crear_reserva()
+    reservas_creadas.append(booking_id)
     respuesta = requests.put(
         f"{BASE_URL}/booking/{booking_id}",
         json={

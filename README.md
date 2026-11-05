@@ -1256,6 +1256,21 @@ fixture y se envía en la cookie de las operaciones que lo requieren.
   `test_filtros.py` de Restful Booker), sin tocar ninguna aserción ni
   ninguna lógica. Verificado corriendo las dos suites completas (25 + 29
   tests) dos veces seguidas antes de commitear.
+- El pool sigue agotado, así que el refactor del día encontró un leak real
+  que los anteriores no tocaron: cuando se agregó el fixture
+  `reservas_creadas` para que `test_bookings.py` dejara de acumular reservas
+  en la API pública (ver más arriba), `test_auth_errores.py` quedó afuera.
+  Sus dos tests de `PUT` (`test_put_sin_token_responde_403` y
+  `test_put_con_token_invalido_responde_403_igual_que_sin_token`) también
+  llaman a su propio `crear_reserva()` para tener un booking contra el que
+  mandar el `PUT`, pero nunca registraban ese id para borrarlo: cada corrida
+  de la suite — local o en CI, en cada push — dejaba dos reservas más
+  acumulándose para siempre en `restful-booker.herokuapp.com`, el mismo
+  problema que ya se había resuelto en el otro archivo. Se agregó el
+  parámetro `reservas_creadas: list[int]` a esos dos tests y el
+  `reservas_creadas.append(booking_id)` que faltaba, mismo patrón que ya
+  usan `test_bookings.py` y `test_contrato_schema.py`. Verificado corriendo
+  la suite completa (29 tests) dos veces seguidas antes de commitear.
 
 ```bash
 cd ReqResTest && python3 -m pytest -v
