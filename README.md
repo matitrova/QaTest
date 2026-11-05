@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -475,6 +475,19 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   en Geolocation, y `str`/`int` para los parámetros de `pytest.mark.parametrize` en Key
   Presses y Status Codes. El `conftest.py` de la suite también quedó tipado, incluyendo el
   `Iterator[None]` del único fixture con `yield`.
+- File Download (`/download`): otra página real que la lista vieja del pool tampoco
+  tenía anotada. Su particularidad es que la lista de archivos no la controla el sitio
+  sino quien lo visita -- cada link viene de un archivo que algún usuario subió antes por
+  `/upload`, así que es contenido compartido que cambia con el tiempo. Ningún test de
+  `test_file_download.py` asume un nombre de archivo puntual por eso: toma el primer
+  link que encuentre, dispara la descarga con `page.expect_download()` y verifica tres
+  cosas que no dependen de qué archivo sea -- que el nombre sugerido por la descarga
+  coincide con el texto del link, que el archivo guardado pesa más de cero bytes, y que
+  el click no navega a la URL del archivo (clickear un link que descarga no es lo mismo
+  que clickear uno que navega, aunque las acciones de Playwright para ambos se vean
+  idénticas). Un cuarto test descarga dos links distintos en la misma sesión y confirma
+  que traen contenido distinto entre sí, para no validar sin querer siempre el mismo
+  archivo cacheado.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
