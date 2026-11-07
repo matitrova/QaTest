@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **389 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **396 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 169 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 176 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 93 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 25 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no, y una página con dos grupos de radio buttons donde uno arranca con una opción ya marcada por el propio servidor, una opción del segundo grupo viene deshabilitada de antemano y un script sincroniza a mano el atributo HTML `checked` de todo el grupo cada vez que se tilda una opción distinta
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -195,6 +195,18 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   el atributo `readonly` del primer campo de forma dinámica, pisando su
   valor con un texto fijo cada vez que lo vuelve de solo lectura, sin
   afectar a los otros dos
+- Radio Buttons (`/radio_buttons`): dos grupos de radio buttons (color y
+  deporte) donde, a diferencia de la mayoría de los ejemplos del género, el
+  color "Blue" ya viene marcado desde el HTML que sirve el backend y el
+  párrafo de resultado lo refleja desde la primera carga -- nada arranca
+  "sin nada seleccionado". El deporte "Hockey" trae el atributo `disabled`
+  de antemano, y "Tennis" es el único radio del grupo sin `id` propio ni
+  `<label>` que lo envuelva, así que se ubica por su atributo `value`. El
+  test verifica el estado inicial exacto, que tildar un color nuevo
+  desmarca al anterior (y viceversa para deporte, de forma independiente),
+  que un click sobre Hockey falla con timeout de actionability en vez de
+  no hacer nada en silencio, y que ese click fallido no altera ningún otro
+  estado ya elegido.
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -512,6 +524,18 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   necesita que el elemento esté visible y estable en la página. Un Locator sobre el mismo
   `<li>`, en cambio, nunca se rompe: se vuelve a resolver solo contra el DOM actual, así
   que sigue funcionando después de reconstruir la lista las veces que sea.
+- El navegador desmarca solo al resto del grupo cuando se tilda un radio
+  nuevo, pero eso solo actualiza la propiedad `checked` en memoria -- el
+  atributo HTML `checked` de un radio tildado por el usuario normalmente
+  nunca se vuelve a tocar y queda pegado al elemento que lo tenía al
+  cargar la página. `/radio_buttons` es la excepción: un handler de
+  `onchange` reescribe a mano (`setAttribute`/`removeAttribute`) el
+  atributo `checked` de todo el grupo cada vez que cambia la selección,
+  para que quede sincronizado con el estado real y no solo la propiedad.
+  El test lo confirma leyendo `get_attribute("checked")` antes y después
+  de tildar un radio distinto, no solo `is_checked()`, que es la señal
+  nativa de Playwright y no distingue si la página además actualizó el
+  atributo o no.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
