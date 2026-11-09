@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **415 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **422 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 195 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 202 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 93 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 25 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no, y una página con dos grupos de radio buttons donde uno arranca con una opción ya marcada por el propio servidor, una opción del segundo grupo viene deshabilitada de antemano y un script sincroniza a mano el atributo HTML `checked` de todo el grupo cada vez que se tilda una opción distinta, y un login en dos pasos donde el segundo paso pide un código de un solo uso que el propio sitio expone en el HTML en vez de mandarlo por SMS, y un dropdown que no es un `<select>` sino `div`s con roles ARIA, con una opción marcada `aria-disabled` que Playwright respeta igual que a un control disabled nativo
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no, y una página con dos grupos de radio buttons donde uno arranca con una opción ya marcada por el propio servidor, una opción del segundo grupo viene deshabilitada de antemano y un script sincroniza a mano el atributo HTML `checked` de todo el grupo cada vez que se tilda una opción distinta, y un login en dos pasos donde el segundo paso pide un código de un solo uso que el propio sitio expone en el HTML en vez de mandarlo por SMS, y un dropdown que no es un `<select>` sino `div`s con roles ARIA, con una opción marcada `aria-disabled` que Playwright respeta igual que a un control disabled nativo, y un menú de jQuery UI con un item marcado como deshabilitado cuyo submenú nunca se abre al pasarle el mouse, a diferencia de su gemelo habilitado, que además anida un tercer nivel con links reales a archivos para descargar
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -207,6 +207,20 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   que un click sobre Hockey falla con timeout de actionability en vez de
   no hacer nada en silencio, y que ese click fallido no altera ningún otro
   estado ya elegido.
+- Menú de jQuery UI (`/jqueryui/menu`): un widget con dos items de primer
+  nivel, "Disabled" y "Enabled", visualmente parecidos pero con
+  comportamiento opuesto al pasar el mouse — el primero tiene
+  `aria-disabled="true"` y su submenú nunca se abre, mientras que el
+  segundo sí revela el suyo, que a su vez contiene un tercer nivel
+  anidado ("Downloads") que se abre sin cerrar a su padre. Dentro de
+  "Downloads" hay tres links a archivos reales en formatos distintos
+  (PDF, CSV, Excel), verificados tanto por su `Content-Type` y
+  `Content-Disposition: attachment` reales vía API como con una descarga
+  de verdad disparada desde el navegador. El otro item del mismo nivel,
+  "Back to JQuery UI", no abre nada: es un link real que navega a
+  `/jqueryui`, a diferencia de "Downloads" que solo despliega un submenú
+  — el test distingue ambos comportamientos en vez de asumir que todo
+  item de ese nivel se comporta igual.
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -559,6 +573,22 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   al recorrer las opciones, confirmado leyendo `aria-activedescendant` del combo, el
   único lugar donde el script registra cuál opción quedó resaltada sin estar todavía
   seleccionada.
+- `/jqueryui/menu` tiene dos items de primer nivel con el mismo marcado HTML
+  (mismo `role="menuitem"`, mismo `aria-haspopup`, cada uno con su propio
+  `<ul>` anidado) y solo se diferencian por una clase/atributo:
+  `ui-state-disabled` y `aria-disabled="true"` en "Disabled". El widget de
+  jQuery UI usa esa marca para no enganchar el handler de hover en ese item
+  puntual, así que pasar el mouse por encima no dispara nada -- ni siquiera
+  un intento fallido, directamente ningún evento. El test no se conforma con
+  que el submenú esté cerrado al principio (eso también sería cierto si el
+  hover tardara en surtir efecto): hace `hover()` sobre el link, espera
+  explícitamente y confirma que sigue cerrado, usando como control el mismo
+  hover sobre "Enabled" sí lo abre. Los locators del Page Object no usan los
+  `id` que jQuery UI autogenera (`ui-id-1`, `ui-id-2`, ...) porque son un
+  detalle de implementación del widget, no algo que identifique a un item
+  por su rol -- se navega por posición y por combinadores CSS (`> li`,
+  `> ul`, `> a`) relativos a cada contenedor, igual que el resto de la
+  suite evita depender de atributos que no pertenecen al propio sitio.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
