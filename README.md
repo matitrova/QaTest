@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **422 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **431 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 202 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 211 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 93 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 25 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no, y una página con dos grupos de radio buttons donde uno arranca con una opción ya marcada por el propio servidor, una opción del segundo grupo viene deshabilitada de antemano y un script sincroniza a mano el atributo HTML `checked` de todo el grupo cada vez que se tilda una opción distinta, y un login en dos pasos donde el segundo paso pide un código de un solo uso que el propio sitio expone en el HTML en vez de mandarlo por SMS, y un dropdown que no es un `<select>` sino `div`s con roles ARIA, con una opción marcada `aria-disabled` que Playwright respeta igual que a un control disabled nativo, y un menú de jQuery UI con un item marcado como deshabilitado cuyo submenú nunca se abre al pasarle el mouse, a diferencia de su gemelo habilitado, que además anida un tercer nivel con links reales a archivos para descargar
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no, y una página con dos grupos de radio buttons donde uno arranca con una opción ya marcada por el propio servidor, una opción del segundo grupo viene deshabilitada de antemano y un script sincroniza a mano el atributo HTML `checked` de todo el grupo cada vez que se tilda una opción distinta, y un login en dos pasos donde el segundo paso pide un código de un solo uso que el propio sitio expone en el HTML en vez de mandarlo por SMS, y un dropdown que no es un `<select>` sino `div`s con roles ARIA, con una opción marcada `aria-disabled` que Playwright respeta igual que a un control disabled nativo, y un menú de jQuery UI con un item marcado como deshabilitado cuyo submenú nunca se abre al pasarle el mouse, a diferencia de su gemelo habilitado, que además anida un tercer nivel con links reales a archivos para descargar, y un diálogo nativo `<dialog>` con una versión modal que deja inerte al resto de la página y otra no modal que no
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -221,6 +221,17 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   `/jqueryui`, a diferencia de "Downloads" que solo despliega un submenú
   — el test distingue ambos comportamientos en vez de asumir que todo
   item de ese nivel se comporta igual.
+- Diálogo nativo (`/dialog`): un `<dialog>` abierto con `showModal()` deja
+  inerte al resto del documento mientras está abierto -- un click real sobre
+  un campo de la página de atrás (`#page-input`) choca con un timeout de
+  actionability en vez de llegar a destino -- mientras que el mismo diálogo
+  abierto con `show()` (no modal) deja ese campo perfectamente usable. Dentro
+  del modal, confirmar o cancelar vía `<form method="dialog">` cierra el
+  diálogo con el valor del botón que se clickeó (`modal.returnValue`) más el
+  nombre tipeado si lo hay, mientras que Escape lo cierra con un resultado
+  fijo que pisa a los dos, sin importar qué se haya escrito antes. Ese mismo
+  Escape no tiene ningún efecto sobre el diálogo no modal: solo cierra el que
+  se abrió con `showModal()`.
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -589,6 +600,37 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   por su rol -- se navega por posición y por combinadores CSS (`> li`,
   `> ul`, `> a`) relativos a cada contenedor, igual que el resto de la
   suite evita depender de atributos que no pertenecen al propio sitio.
+- `/dialog` es la primera página de esta suite con el elemento HTML
+  `<dialog>` nativo, y el test confirma en código una distinción de la spec
+  fácil de pasar por alto: `showModal()` y `show()` no son dos formas de
+  abrir lo mismo. El modal deja inerte al resto del documento -- confirmado
+  con `click()` sobre `#page-input`, que tira timeout de actionability
+  porque el punto no recibe eventos de puntero, el mismo síntoma que el
+  botón tapado de `/hiddenlayers` ya documentado en esta suite. Pero
+  `fill()` no hace ese mismo chequeo de hit-test: pasa sin ninguna
+  excepción, y sin embargo tampoco escribe nada, porque internamente
+  necesita enfocar el input antes de tipear y un elemento inerte no puede
+  recibir foco, ni con un click real ni con el `focus()` interno de
+  Playwright. El resultado es un no-op completamente silencioso, confirmado
+  leyendo `input_value()` después: sigue vacío. Un test que solo verificara
+  "`fill()` no lanzó excepción" daría este caso por bueno sin haber escrito
+  nada de verdad, así que el test afirma el valor resultante, no la ausencia
+  de error. Los botones de "Confirm"/"Cancel" viven dentro de un
+  `<form method="dialog">`: clickearlos dispara el cierre nativo del
+  diálogo con el valor del botón en `dialog.returnValue`, pero ese cierre --
+  y la actualización del párrafo de resultado que depende del evento
+  `close` -- no termina antes de que `click()` retorne. Leer el resultado
+  inmediatamente después del click todavía mostraba el texto de "abierto" en
+  varias corridas; la solución es `expect(locator).to_have_text(...)`, que
+  reintenta solo hasta que el valor cambia, en vez de un `wait_for_timeout()`
+  a ciegas con un número fijo que podría quedar corto en una corrida más
+  lenta. Por último, Escape solo cierra el diálogo abierto con
+  `showModal()` -- dispara el evento `cancel` antes que `close`, y el propio
+  handler de la página usa esa secuencia para pisar cualquier otro resultado
+  con un mensaje fijo, sin importar el nombre tipeado o qué botón se hubiera
+  clickeado antes -- pero no tiene ningún efecto sobre el diálogo abierto
+  con `show()`, confirmado presionando Escape sobre el no-modal y
+  verificando que ni su atributo `open` ni el párrafo de resultado cambian.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
