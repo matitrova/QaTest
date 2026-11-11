@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **440 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **448 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 220 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 228 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 93 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 25 | API |
@@ -663,6 +663,26 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   del test, así que se abandonó por un caso del pool sin esa dependencia de
   red en vez de forzar un `sleep` o un timeout gigante para tapar la
   flakiness.
+- `/cookie_consent` decide del lado del servidor, no con CSS, si manda el
+  banner: con la cookie `cookie_consent` todavía sin definir, el HTML trae
+  el `<div id="cookie-banner">` completo; apenas esa cookie queda en `all` o
+  `necessary`, una recarga ya ni siquiera lo incluye en la respuesta -- el
+  test lo prueba contando el locator (`.count() == 0`), no con
+  `to_be_hidden()`, que hubiera pasado igual aunque el elemento siguiera
+  presente oculto por estilos. El panel con los checkboxes de "Necessary"
+  (tildado y disabled de fábrica, no se puede destildar) y "Analytics"
+  arranca oculto con el atributo HTML `hidden`, y "Customize" lo alterna a
+  mano junto con el `aria-expanded` del propio botón, sin transición de por
+  medio. El botón "Save my choice" no manda un valor fijo: lee en el
+  momento del click si el checkbox de Analytics está tildado y recién ahí
+  arma "all" o "necessary" -- el test confirma las dos ramas, tildando el
+  checkbox primero en una y dejándolo como arranca en la otra, en vez de
+  asumir que ese botón siempre guarda lo mismo que "Accept all". Por
+  último, "Forget my choice" no es un botón sino un link GET a
+  `/cookie_consent/reset` que expira la cookie del lado del servidor y
+  redirige de vuelta: el test navega ahí con `.click()` y confirma que el
+  banner reaparece, en vez de borrar la cookie a mano desde el contexto de
+  Playwright.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
