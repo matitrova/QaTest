@@ -24,26 +24,24 @@ def test_usar_token(obtener_token: Any) -> None:
     assert len(obtener_token) > 0
     print(f"Token recibido: {obtener_token}")
 
-def test_login_sin_email(headers: dict[str, str]) -> None:
-    credenciales = {
-        "password": "cityslicka"}
+@pytest.mark.parametrize(
+    "credenciales",
+    [
+        {"password": "cityslicka"},
+        {"email": "eve.holt@reqres.in"},
+    ],
+    ids=["sin_email", "sin_password"],
+)
+def test_login_con_campo_faltante_devuelve_400(
+    credenciales: dict[str, str], headers: dict[str, str]
+) -> None:
     respuesta = requests.post(
         f"{BASE_URL}/api/login",
         json=credenciales,
         headers=headers
     )
     assert respuesta.status_code == 400
-
-def test_login_sin_password(headers: dict[str, str]) -> None:
-    credenciales = {
-        "email": "eve.holt@reqres.in"
-    }
-    respuesta = requests.post(
-        f"{BASE_URL}/api/login",
-        json=credenciales,
-        headers=headers
-    )
-    assert respuesta.status_code == 400
+    assert "error" in respuesta.json()
 
 def test_registro_exitoso(headers: dict[str, str]) -> None:
     nuevo_usuario = {
@@ -57,27 +55,23 @@ def test_registro_exitoso(headers: dict[str, str]) -> None:
     )
     assert respuesta.status_code == 200
 
-def test_registro_sin_email(headers: dict[str, str]) -> None:
-    nuevo_usuario = {
-        "password": "pistol"
-    }
+@pytest.mark.parametrize(
+    "nuevo_usuario",
+    [
+        {"password": "pistol"},
+        {"email": "charles.morris@reqres.in"},
+    ],
+    ids=["sin_email", "sin_password"],
+)
+def test_registro_con_campo_faltante_devuelve_400(
+    nuevo_usuario: dict[str, str], headers: dict[str, str]
+) -> None:
     respuesta = requests.post(
         f"{BASE_URL}/api/register",
         json=nuevo_usuario,
         headers=headers
     )
     assert respuesta.status_code == 400
-
-def test_registro_sin_password(headers: dict[str, str]) -> None:
-    nuevo_usuario = {
-        "email": "charles.morris@reqres.in"
-    }
-    respuesta = requests.post(
-        f"{BASE_URL}/api/register",
-        json=nuevo_usuario,
-        headers=headers
-    )
-    assert respuesta.status_code == 400     
     assert "error" in respuesta.json()
 
 def test_obtener_lista_usuarios(headers: dict[str, str]) -> None:

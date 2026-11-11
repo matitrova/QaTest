@@ -1610,6 +1610,19 @@ formulario) quedaron igual. Se corrieron los 8 tests del archivo dos veces segui
 antes de commitear: mismos 8 casos, mismos resultados, con una sexta parte del código
 de antes.
 
+**Cuatro tests que probaban la misma validación en `ReqResTest/test_users.py`.**
+`test_login_sin_email`, `test_login_sin_password`, `test_registro_sin_email` y
+`test_registro_sin_password` repetían la misma secuencia -- armar un payload con un
+campo faltante, pegarle al endpoint, esperar 400 -- cambiando solo el campo omitido y
+el endpoint. Se reemplazaron por `test_login_con_campo_faltante_devuelve_400` y
+`test_registro_con_campo_faltante_devuelve_400`, cada uno parametrizado con los dos
+casos (`sin_email`, `sin_password`) y con `ids` explícitos para que el reporte de CI
+siga distinguiéndolos. De paso se confirmó contra la API real que las cuatro
+respuestas devuelven `"error"` en el body -- algo que antes solo uno de los cuatro
+tests originales chequeaba -- y esa aserción se agregó a los dos tests nuevos. Se
+corrió la suite completa de ReqRes (25 tests) dos veces seguidas antes de commitear:
+mismos resultados, dos tests menos y una aserción más estricta en los que quedaron.
+
 ## Instalación
 
 ```bash
