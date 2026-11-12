@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **448 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **454 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 228 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 234 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 93 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 25 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no, y una página con dos grupos de radio buttons donde uno arranca con una opción ya marcada por el propio servidor, una opción del segundo grupo viene deshabilitada de antemano y un script sincroniza a mano el atributo HTML `checked` de todo el grupo cada vez que se tilda una opción distinta, y un login en dos pasos donde el segundo paso pide un código de un solo uso que el propio sitio expone en el HTML en vez de mandarlo por SMS, y un dropdown que no es un `<select>` sino `div`s con roles ARIA, con una opción marcada `aria-disabled` que Playwright respeta igual que a un control disabled nativo, y un menú de jQuery UI con un item marcado como deshabilitado cuyo submenú nunca se abre al pasarle el mouse, a diferencia de su gemelo habilitado, que además anida un tercer nivel con links reales a archivos para descargar, y un diálogo nativo `<dialog>` con una versión modal que deja inerte al resto de la página y otra no modal que no, y una página de A/B testing que depende de un experimento de Optimizely discontinuado hace años pero cuyo script sigue corriendo y dividiendo visitantes de verdad, y un `<select multiple>` cuyo atributo HTML `selected` no se actualiza solo: lo sincroniza a mano el propio listener de "change" de la página, un paso por detrás de la propiedad real del DOM
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no, y una página con dos grupos de radio buttons donde uno arranca con una opción ya marcada por el propio servidor, una opción del segundo grupo viene deshabilitada de antemano y un script sincroniza a mano el atributo HTML `checked` de todo el grupo cada vez que se tilda una opción distinta, y un login en dos pasos donde el segundo paso pide un código de un solo uso que el propio sitio expone en el HTML en vez de mandarlo por SMS, y un dropdown que no es un `<select>` sino `div`s con roles ARIA, con una opción marcada `aria-disabled` que Playwright respeta igual que a un control disabled nativo, y un menú de jQuery UI con un item marcado como deshabilitado cuyo submenú nunca se abre al pasarle el mouse, a diferencia de su gemelo habilitado, que además anida un tercer nivel con links reales a archivos para descargar, y un diálogo nativo `<dialog>` con una versión modal que deja inerte al resto de la página y otra no modal que no, y una página de A/B testing que depende de un experimento de Optimizely discontinuado hace años pero cuyo script sigue corriendo y dividiendo visitantes de verdad, y un `<select multiple>` cuyo atributo HTML `selected` no se actualiza solo: lo sincroniza a mano el propio listener de "change" de la página, un paso por detrás de la propiedad real del DOM, y un gráfico SVG con barras y un círculo clickeables donde seleccionar una barra desmarca a las otras y el círculo alterna de color de forma independiente
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -683,6 +683,22 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   redirige de vuelta: el test navega ahí con `.click()` y confirma que el
   banner reaparece, en vez de borrar la cookie a mano desde el contexto de
   Playwright.
+- `/svg` tiene tres `<rect>` y un `<circle>` dentro de un `<svg>`, y el propio
+  enunciado de la página avisa que XPath necesita
+  `*[local-name()='rect']` por el namespace de SVG -- un detalle real de
+  XPath que no aplica a los selectores CSS por `id` que usa toda esta suite:
+  Playwright los encuentra igual que a cualquier `<div>`, sin tratamiento
+  especial. El verdadero problema de namespace apareció en otro lado:
+  `inner_text()` asume un `HTMLElement` y tira `Node is not an HTMLElement`
+  contra el `<text>` del círculo, que es un `SVGElement` -- la solución es
+  `text_content()`, que lee el nodo de texto crudo sin pasar por el layout
+  box que `inner_text()` necesita (el `<p id="result">` de la misma página,
+  por ser HTML, sigue leyéndose con `inner_text()` sin problema). El handler
+  de click de las barras primero pisa el `fill` de las tres a su color base
+  y recién después pinta la clickeada, así que seleccionar una desmarca a
+  las otras dos; el círculo usa su propio `<p>` de resultado compartido con
+  las barras pero ningún otro estado en común, y el test lo confirma
+  clickeando ambos y verificando que ninguno pisa el color del otro.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
