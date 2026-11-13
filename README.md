@@ -1659,6 +1659,19 @@ tests originales chequeaba -- y esa aserción se agregó a los dos tests nuevos.
 corrió la suite completa de ReqRes (25 tests) dos veces seguidas antes de commitear:
 mismos resultados, dos tests menos y una aserción más estricta en los que quedaron.
 
+**Tres archivos de `DesafiosPlaywright` que todavía repetían `goto()` +
+Page Object en cada test.** La mayoría de los archivos de esta suite (`test_radio_buttons.py`,
+`test_nested_frames.py`, etc.) ya usan una fixture local por página que navega una sola vez y
+entrega el Page Object listo. `test_checkboxes.py`, `test_context_menu.py` y
+`test_drag_and_drop.py` habían quedado con el patrón viejo: cada uno de sus 7 tests repetía
+`page.goto(...)` seguido de instanciar el mismo Page Object, con la misma URL en todos los
+tests del archivo. Se sumó una fixture (`checkboxes_page`, `context_menu_page`, `drag_page`)
+a cada uno y los tests pasaron a recibirla como parámetro en vez de repetir las dos líneas,
+igual que el resto de la suite. Ningún locator ni ninguna aserción cambió. Se corrieron los
+7 tests de los tres archivos dos veces seguidas antes de commitear: mismos resultados, con
+la suite completa (`DesafiosPlaywright`) corrida una vez más al final para confirmar que no
+quedó nada roto en los otros 232 tests de la carpeta.
+
 ## Instalación
 
 ```bash

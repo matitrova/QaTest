@@ -1,13 +1,19 @@
+import pytest
 from playwright.sync_api import Page
 
 from config import BASE_URL
 from DragAndDropPage import DragAndDropPage
 
 
-def test_arrastrar_columna_a_intercambia_contenido_con_b(page: Page) -> None:
-    drag_page = DragAndDropPage(page)
+@pytest.fixture
+def drag_page(page: Page) -> DragAndDropPage:
     page.goto(f"{BASE_URL}/drag_and_drop")
+    return DragAndDropPage(page)
 
+
+def test_arrastrar_columna_a_intercambia_contenido_con_b(
+    drag_page: DragAndDropPage,
+) -> None:
     assert drag_page.texto_de(drag_page.columna_a) == "A"
     assert drag_page.texto_de(drag_page.columna_b) == "B"
 
@@ -19,10 +25,9 @@ def test_arrastrar_columna_a_intercambia_contenido_con_b(page: Page) -> None:
     assert drag_page.texto_de(drag_page.columna_b) == "A"
 
 
-def test_arrastrar_dos_veces_vuelve_al_estado_original(page: Page) -> None:
-    drag_page = DragAndDropPage(page)
-    page.goto(f"{BASE_URL}/drag_and_drop")
-
+def test_arrastrar_dos_veces_vuelve_al_estado_original(
+    drag_page: DragAndDropPage,
+) -> None:
     drag_page.arrastrar_a_hacia_b()
     drag_page.arrastrar_a_hacia_b()
 

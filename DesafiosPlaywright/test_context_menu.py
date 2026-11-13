@@ -1,21 +1,27 @@
+import pytest
 from playwright.sync_api import Page
 
 from config import BASE_URL
 from ContextMenuPage import ContextMenuPage
 
 
+@pytest.fixture
+def context_menu_page(page: Page) -> ContextMenuPage:
+    page.goto(f"{BASE_URL}/context_menu")
+    return ContextMenuPage(page)
+
+
 # El listener de "dialog" se registra ANTES del clic derecho, igual que en
 # javascript_alerts: si el diálogo aparece sin un handler enganchado,
 # Playwright lo descarta solo.
 
-def test_clic_derecho_dispara_alert(page: Page) -> None:
-    context_menu_page = ContextMenuPage(page)
-    page.goto(f"{BASE_URL}/context_menu")
-
+def test_clic_derecho_dispara_alert(context_menu_page: ContextMenuPage) -> None:
     mensajes = []
-    page.once("dialog", lambda dialog: (mensajes.append(dialog.message), dialog.accept()))
+    context_menu_page.page.once(
+        "dialog", lambda dialog: (mensajes.append(dialog.message), dialog.accept())
+    )
     context_menu_page.hacer_clic_derecho_en_hot_spot()
-    page.wait_for_timeout(200)
+    context_menu_page.page.wait_for_timeout(200)
 
     assert mensajes == ["You selected a context menu"]
 
@@ -25,13 +31,12 @@ def test_clic_derecho_dispara_alert(page: Page) -> None:
 # caso, un test que solo probara el clic derecho no distinguiría "cualquier
 # clic abre el diálogo" de "específicamente el clic derecho lo abre".
 
-def test_clic_izquierdo_no_dispara_alert(page: Page) -> None:
-    context_menu_page = ContextMenuPage(page)
-    page.goto(f"{BASE_URL}/context_menu")
-
+def test_clic_izquierdo_no_dispara_alert(context_menu_page: ContextMenuPage) -> None:
     mensajes = []
-    page.on("dialog", lambda dialog: (mensajes.append(dialog.message), dialog.accept()))
+    context_menu_page.page.on(
+        "dialog", lambda dialog: (mensajes.append(dialog.message), dialog.accept())
+    )
     context_menu_page.hacer_clic_izquierdo_en_hot_spot()
-    page.wait_for_timeout(200)
+    context_menu_page.page.wait_for_timeout(200)
 
     assert mensajes == []
