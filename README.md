@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **462 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **475 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 247 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 260 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 93 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 25 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no, y una página con dos grupos de radio buttons donde uno arranca con una opción ya marcada por el propio servidor, una opción del segundo grupo viene deshabilitada de antemano y un script sincroniza a mano el atributo HTML `checked` de todo el grupo cada vez que se tilda una opción distinta, y un login en dos pasos donde el segundo paso pide un código de un solo uso que el propio sitio expone en el HTML en vez de mandarlo por SMS, y un dropdown que no es un `<select>` sino `div`s con roles ARIA, con una opción marcada `aria-disabled` que Playwright respeta igual que a un control disabled nativo, y un menú de jQuery UI con un item marcado como deshabilitado cuyo submenú nunca se abre al pasarle el mouse, a diferencia de su gemelo habilitado, que además anida un tercer nivel con links reales a archivos para descargar, y un diálogo nativo `<dialog>` con una versión modal que deja inerte al resto de la página y otra no modal que no, y una página de A/B testing que depende de un experimento de Optimizely discontinuado hace años pero cuyo script sigue corriendo y dividiendo visitantes de verdad, y un `<select multiple>` cuyo atributo HTML `selected` no se actualiza solo: lo sincroniza a mano el propio listener de "change" de la página, un paso por detrás de la propiedad real del DOM, un gráfico SVG con barras y un círculo clickeables donde seleccionar una barra desmarca a las otras y el círculo alterna de color de forma independiente, y dos custom elements con shadow root abierto donde el `<p>` que envuelve el `<slot>` no contiene, en el árbol liviano, el texto que el navegador termina pintando ahí, y una página de autenticación HTTP Digest que muestra el mismo mensaje y usa las mismas credenciales que la de Basic Auth pero falla de dos formas distintas según falte la credencial o esté mal
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no, y una página con dos grupos de radio buttons donde uno arranca con una opción ya marcada por el propio servidor, una opción del segundo grupo viene deshabilitada de antemano y un script sincroniza a mano el atributo HTML `checked` de todo el grupo cada vez que se tilda una opción distinta, y un login en dos pasos donde el segundo paso pide un código de un solo uso que el propio sitio expone en el HTML en vez de mandarlo por SMS, y un dropdown que no es un `<select>` sino `div`s con roles ARIA, con una opción marcada `aria-disabled` que Playwright respeta igual que a un control disabled nativo, y un menú de jQuery UI con un item marcado como deshabilitado cuyo submenú nunca se abre al pasarle el mouse, a diferencia de su gemelo habilitado, que además anida un tercer nivel con links reales a archivos para descargar, y un diálogo nativo `<dialog>` con una versión modal que deja inerte al resto de la página y otra no modal que no, y una página de A/B testing que depende de un experimento de Optimizely discontinuado hace años pero cuyo script sigue corriendo y dividiendo visitantes de verdad, y un `<select multiple>` cuyo atributo HTML `selected` no se actualiza solo: lo sincroniza a mano el propio listener de "change" de la página, un paso por detrás de la propiedad real del DOM, un gráfico SVG con barras y un círculo clickeables donde seleccionar una barra desmarca a las otras y el círculo alterna de color de forma independiente, y dos custom elements con shadow root abierto donde el `<p>` que envuelve el `<slot>` no contiene, en el árbol liviano, el texto que el navegador termina pintando ahí, y una página de autenticación HTTP Digest que muestra el mismo mensaje y usa las mismas credenciales que la de Basic Auth pero falla de dos formas distintas según falte la credencial o esté mal, y un campo de autocompletado que espera 300ms después de que el usuario deja de tipear antes de pedirle sugerencias a un servidor que además se toma su propio tiempo en responder, y cuya función de resaltado por teclado da la vuelta distinto según la dirección en la que se la recorra
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -232,6 +232,17 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   fijo que pisa a los dos, sin importar qué se haya escrito antes. Ese mismo
   Escape no tiene ningún efecto sobre el diálogo no modal: solo cierra el que
   se abrió con `showModal()`.
+- Autocomplete (`/autocomplete`): un `<input role="combobox">` que dispara una
+  búsqueda al servidor 300ms después de dejar de tipear, que a su vez tarda
+  otro medio segundo (configurable por URL) en responder, verificando que las
+  sugerencias respetan prefijo sin importar mayúsculas o minúsculas, que
+  vaciar el campo cierra la lista en el mismo tick sin pasar por ninguna de
+  las dos esperas, que click, flechas y Enter seleccionan igual, que Escape
+  cierra sin tocar ni el texto ni la selección previa, y un caso de la
+  función de resaltado por teclado que da la vuelta distinto según la
+  dirección: flecha abajo desde la última opción vuelve limpio a la primera,
+  pero flecha arriba sin ninguna selección previa salta a la anteúltima, no a
+  la última.
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -738,6 +749,26 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   la respuesta es un 400, no un 401; hay que usar
   `requests.auth.HTTPDigestAuth` explícitamente para que la biblioteca
   negocie el nonce y responda en el esquema correcto.
+- `/autocomplete` arma cada sugerencia con un `addEventListener('mousedown', ...)`
+  que llama a `event.preventDefault()`, no con un `click` -- si no cancelara el
+  `mousedown`, el `blur` del input (que cierra la lista) dispararía antes de que
+  el click llegue a completarse, y la opción se cerraría sola sin seleccionar
+  nada. El índice resaltado por teclado es también más sutil de lo que
+  parece: arranca en `-1` ("nada todavía") y la función de resaltado lo
+  recalcula como `(index + cantidad) % cantidad` cada vez. Una flecha abajo
+  pide `index = activo + 1`; desde la última opción eso da `cantidad`, y
+  `cantidad % cantidad` vuelve limpio a `0` (la primera). Pero una flecha
+  arriba pide `index = activo - 1`; sin ninguna selección previa (`activo =
+  -1`) eso pide el índice `-2`, no `-1`, así que `(-2 + cantidad) % cantidad`
+  cae en la anteúltima opción, no en la última como esperaría la intuición de
+  "dar la vuelta hacia atrás" -- confirmado contra el sitio real con 8
+  sugerencias antes de escribirlo en una aserción, no asumido por el nombre
+  de la función. El test de la pérdida de sincronía entre debounce y
+  servidor usa `?delay=` en la URL para acortar la espera simulada en casi
+  todos los casos (de 500ms a 50ms), salvo uno que navega sin ese parámetro
+  para probar el delay real de producción y capturar el estado intermedio
+  "Loading..." con `expect()`, que sondea hasta encontrarlo en vez de
+  depender de un `sleep` calculado a mano.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
