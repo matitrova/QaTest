@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **475 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **490 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 260 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 275 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 93 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 25 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no, y una página con dos grupos de radio buttons donde uno arranca con una opción ya marcada por el propio servidor, una opción del segundo grupo viene deshabilitada de antemano y un script sincroniza a mano el atributo HTML `checked` de todo el grupo cada vez que se tilda una opción distinta, y un login en dos pasos donde el segundo paso pide un código de un solo uso que el propio sitio expone en el HTML en vez de mandarlo por SMS, y un dropdown que no es un `<select>` sino `div`s con roles ARIA, con una opción marcada `aria-disabled` que Playwright respeta igual que a un control disabled nativo, y un menú de jQuery UI con un item marcado como deshabilitado cuyo submenú nunca se abre al pasarle el mouse, a diferencia de su gemelo habilitado, que además anida un tercer nivel con links reales a archivos para descargar, y un diálogo nativo `<dialog>` con una versión modal que deja inerte al resto de la página y otra no modal que no, y una página de A/B testing que depende de un experimento de Optimizely discontinuado hace años pero cuyo script sigue corriendo y dividiendo visitantes de verdad, y un `<select multiple>` cuyo atributo HTML `selected` no se actualiza solo: lo sincroniza a mano el propio listener de "change" de la página, un paso por detrás de la propiedad real del DOM, un gráfico SVG con barras y un círculo clickeables donde seleccionar una barra desmarca a las otras y el círculo alterna de color de forma independiente, y dos custom elements con shadow root abierto donde el `<p>` que envuelve el `<slot>` no contiene, en el árbol liviano, el texto que el navegador termina pintando ahí, y una página de autenticación HTTP Digest que muestra el mismo mensaje y usa las mismas credenciales que la de Basic Auth pero falla de dos formas distintas según falte la credencial o esté mal, y un campo de autocompletado que espera 300ms después de que el usuario deja de tipear antes de pedirle sugerencias a un servidor que además se toma su propio tiempo en responder, y cuya función de resaltado por teclado da la vuelta distinto según la dirección en la que se la recorra
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no, y una página con dos grupos de radio buttons donde uno arranca con una opción ya marcada por el propio servidor, una opción del segundo grupo viene deshabilitada de antemano y un script sincroniza a mano el atributo HTML `checked` de todo el grupo cada vez que se tilda una opción distinta, y un login en dos pasos donde el segundo paso pide un código de un solo uso que el propio sitio expone en el HTML en vez de mandarlo por SMS, y un dropdown que no es un `<select>` sino `div`s con roles ARIA, con una opción marcada `aria-disabled` que Playwright respeta igual que a un control disabled nativo, y un menú de jQuery UI con un item marcado como deshabilitado cuyo submenú nunca se abre al pasarle el mouse, a diferencia de su gemelo habilitado, que además anida un tercer nivel con links reales a archivos para descargar, y un diálogo nativo `<dialog>` con una versión modal que deja inerte al resto de la página y otra no modal que no, y una página de A/B testing que depende de un experimento de Optimizely discontinuado hace años pero cuyo script sigue corriendo y dividiendo visitantes de verdad, y un `<select multiple>` cuyo atributo HTML `selected` no se actualiza solo: lo sincroniza a mano el propio listener de "change" de la página, un paso por detrás de la propiedad real del DOM, un gráfico SVG con barras y un círculo clickeables donde seleccionar una barra desmarca a las otras y el círculo alterna de color de forma independiente, y dos custom elements con shadow root abierto donde el `<p>` que envuelve el `<slot>` no contiene, en el árbol liviano, el texto que el navegador termina pintando ahí, y una página de autenticación HTTP Digest que muestra el mismo mensaje y usa las mismas credenciales que la de Basic Auth pero falla de dos formas distintas según falte la credencial o esté mal, y un campo de autocompletado que espera 300ms después de que el usuario deja de tipear antes de pedirle sugerencias a un servidor que además se toma su propio tiempo en responder, y cuya función de resaltado por teclado da la vuelta distinto según la dirección en la que se la recorra, y un formulario de alta de cuenta donde el navegador aplica sus propias reglas de validación antes de mandar nada y el servidor repite solo una parte de ellas, con un único usuario ya tomado que el backend rechaza sin importar mayúsculas aunque el propio formulario nunca deje probarlo con una variante real
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -243,6 +243,24 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   dirección: flecha abajo desde la última opción vuelve limpio a la primera,
   pero flecha arriba sin ninguna selección previa salta a la anteúltima, no a
   la última.
+- Form Validation (`/form_validation`): un formulario de alta de cuenta donde
+  el navegador corre su propia validación HTML5 (`required`, `minlength`,
+  `pattern`, `type=email`, `type=url`, `min`/`max`) antes de disparar el
+  evento de envío, y recién si todo eso pasa manda un `fetch()` a un
+  servidor que repite solo una parte de esas reglas. Se verifica que un
+  campo inválido (username con mayúsculas o muy corto, email sin forma de
+  tal, contraseña corta, URL sin forma de tal, edad fuera de rango, el
+  checkbox de términos sin tildar) bloquea el envío por completo -- ningún
+  pedido sale hacia el servidor --, y por contraste, que pegándole directo
+  al endpoint sin pasar por el formulario, el servidor acepta sin problema
+  un username con mayúsculas y de dos caracteres, una edad fuera de rango y
+  una URL sin forma de tal, porque nunca las revisa. Los únicos dos
+  usuarios que el backend rechaza por "ya tomado" (`tomsmith` y `admin`) lo
+  hacen sin importar mayúsculas, un chequeo que el propio formulario nunca
+  deja probar con una variante real porque el `pattern` del campo ya la
+  bloquea antes de llegar a intentarlo. Mientras la respuesta está en
+  vuelo, el botón de envío queda deshabilitado y el resultado muestra
+  "Checking...".
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -769,6 +787,32 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   para probar el delay real de producción y capturar el estado intermedio
   "Loading..." con `expect()`, que sondea hasta encontrarlo en vez de
   depender de un `sleep` calculado a mano.
+- `/form_validation` responde 422, no 200, cuando el body trae algún
+  `errors` -- confirmado contra la API real antes de escribir el test de
+  contraste, porque el propio `fetch()` de la página decide qué rama
+  mostrar (`"Please fix..."` o el mensaje de éxito) mirando `res.ok`, que en
+  `fetch` es `true` solo para códigos 2xx: un test que solo mirara el JSON
+  del body sin el status code habría pasado igual aunque el servidor
+  devolviera 200 con errores adentro, un contrato distinto al real. El
+  backend valida cuatro cosas nada más -- username y email no vacíos,
+  password de 8 caracteres o más, terms tildado, y si el username ya está
+  tomado -- y no toca ninguna otra regla del HTML (`pattern`, `minlength`
+  del username, rango de `age`, formato de `website`), confirmado pegándole
+  directo al endpoint con payloads que el navegador real jamás deja salir
+  del formulario. El chequeo de "usuario ya tomado" es case-insensitive en
+  el servidor (compara en minúsculas antes de buscar en su lista), pero
+  **el propio formulario nunca permite probarlo con un usuario real**: el
+  `pattern="[a-z0-9]+"` del campo rechaza cualquier mayúscula antes de que
+  el evento de envío llegue a dispararse, así que `ADMIN` o `TomSmith`
+  jamás salen del navegador como un intento de login -- la única forma de
+  confirmar que el servidor no distingue mayúsculas es pegarle directo,
+  sin pasar por el form que se supone que lo protege. Por último, el
+  estado "Checking..." con el botón deshabilitado dura demasiado poco
+  contra el servidor real para capturarlo con un `expect()` sin que fuera
+  flaky -- se interceptó la ruta del propio POST con `page.route()` para
+  demorar la respuesta a propósito un segundo, el mismo patrón que ya usa
+  esta suite para separar el estado intermedio del final en vez de
+  arriesgar una carrera contra el tiempo real del sitio.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
