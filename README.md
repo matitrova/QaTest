@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **490 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **501 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 275 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 286 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 93 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 25 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no, y una página con dos grupos de radio buttons donde uno arranca con una opción ya marcada por el propio servidor, una opción del segundo grupo viene deshabilitada de antemano y un script sincroniza a mano el atributo HTML `checked` de todo el grupo cada vez que se tilda una opción distinta, y un login en dos pasos donde el segundo paso pide un código de un solo uso que el propio sitio expone en el HTML en vez de mandarlo por SMS, y un dropdown que no es un `<select>` sino `div`s con roles ARIA, con una opción marcada `aria-disabled` que Playwright respeta igual que a un control disabled nativo, y un menú de jQuery UI con un item marcado como deshabilitado cuyo submenú nunca se abre al pasarle el mouse, a diferencia de su gemelo habilitado, que además anida un tercer nivel con links reales a archivos para descargar, y un diálogo nativo `<dialog>` con una versión modal que deja inerte al resto de la página y otra no modal que no, y una página de A/B testing que depende de un experimento de Optimizely discontinuado hace años pero cuyo script sigue corriendo y dividiendo visitantes de verdad, y un `<select multiple>` cuyo atributo HTML `selected` no se actualiza solo: lo sincroniza a mano el propio listener de "change" de la página, un paso por detrás de la propiedad real del DOM, un gráfico SVG con barras y un círculo clickeables donde seleccionar una barra desmarca a las otras y el círculo alterna de color de forma independiente, y dos custom elements con shadow root abierto donde el `<p>` que envuelve el `<slot>` no contiene, en el árbol liviano, el texto que el navegador termina pintando ahí, y una página de autenticación HTTP Digest que muestra el mismo mensaje y usa las mismas credenciales que la de Basic Auth pero falla de dos formas distintas según falte la credencial o esté mal, y un campo de autocompletado que espera 300ms después de que el usuario deja de tipear antes de pedirle sugerencias a un servidor que además se toma su propio tiempo en responder, y cuya función de resaltado por teclado da la vuelta distinto según la dirección en la que se la recorra, y un formulario de alta de cuenta donde el navegador aplica sus propias reglas de validación antes de mandar nada y el servidor repite solo una parte de ellas, con un único usuario ya tomado que el backend rechaza sin importar mayúsculas aunque el propio formulario nunca deje probarlo con una variante real
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no, y una página con dos grupos de radio buttons donde uno arranca con una opción ya marcada por el propio servidor, una opción del segundo grupo viene deshabilitada de antemano y un script sincroniza a mano el atributo HTML `checked` de todo el grupo cada vez que se tilda una opción distinta, y un login en dos pasos donde el segundo paso pide un código de un solo uso que el propio sitio expone en el HTML en vez de mandarlo por SMS, y un dropdown que no es un `<select>` sino `div`s con roles ARIA, con una opción marcada `aria-disabled` que Playwright respeta igual que a un control disabled nativo, y un menú de jQuery UI con un item marcado como deshabilitado cuyo submenú nunca se abre al pasarle el mouse, a diferencia de su gemelo habilitado, que además anida un tercer nivel con links reales a archivos para descargar, y un diálogo nativo `<dialog>` con una versión modal que deja inerte al resto de la página y otra no modal que no, y una página de A/B testing que depende de un experimento de Optimizely discontinuado hace años pero cuyo script sigue corriendo y dividiendo visitantes de verdad, y un `<select multiple>` cuyo atributo HTML `selected` no se actualiza solo: lo sincroniza a mano el propio listener de "change" de la página, un paso por detrás de la propiedad real del DOM, un gráfico SVG con barras y un círculo clickeables donde seleccionar una barra desmarca a las otras y el círculo alterna de color de forma independiente, y dos custom elements con shadow root abierto donde el `<p>` que envuelve el `<slot>` no contiene, en el árbol liviano, el texto que el navegador termina pintando ahí, y una página de autenticación HTTP Digest que muestra el mismo mensaje y usa las mismas credenciales que la de Basic Auth pero falla de dos formas distintas según falte la credencial o esté mal, y un campo de autocompletado que espera 300ms después de que el usuario deja de tipear antes de pedirle sugerencias a un servidor que además se toma su propio tiempo en responder, y cuya función de resaltado por teclado da la vuelta distinto según la dirección en la que se la recorra, y un formulario de alta de cuenta donde el navegador aplica sus propias reglas de validación antes de mandar nada y el servidor repite solo una parte de ellas, con un único usuario ya tomado que el backend rechaza sin importar mayúsculas aunque el propio formulario nunca deje probarlo con una variante real, y tres botones que apilan mensajes flotantes en la esquina superior derecha con un contador global compartido entre los tres tipos, que solo se cierran solos si la duración configurada es mayor a cero
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -261,6 +261,28 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   bloquea antes de llegar a intentarlo. Mientras la respuesta está en
   vuelo, el botón de envío queda deshabilitado y el resultado muestra
   "Checking...".
+- Toasts (`/toasts`): tres botones agregan un mensaje flotante distinto cada
+  uno ("Saved successfully", "Something went wrong", "Here is some
+  information") a un contenedor fijo en la esquina superior derecha,
+  verificando el texto exacto de cada tipo y que el de error usa
+  `role="alert"` mientras que éxito e información usan `role="status"` --
+  una distinción de accesibilidad real, no solo de color. El contador
+  "Toasts shown" es un único acumulador compartido entre los tres tipos, no
+  uno por botón: pedir un toast de éxito y después uno de error numera al
+  segundo como el #2, no como el primero de su propio tipo, y el test lo
+  confirma mezclando dos tipos distintos en la misma secuencia. El campo de
+  duración (en milisegundos) se puede precargar desde la URL
+  (`?duration=1000`), pero el script que lo lee exige que el valor sea
+  puramente numérico antes de pisar el default de 3000 -- un valor roto en
+  la URL deja el campo intacto, verificado aparte del caso válido. Con
+  duración 0 el toast queda para siempre, porque el script nunca programa su
+  propio `setTimeout` cuando la duración no es mayor a cero: solo el botón
+  de cierre lo sacan de encima. Con una duración corta (500ms) el mismo
+  toast se cierra solo, verificado con `expect().to_be_hidden(timeout=...)`
+  en vez de un `wait_for_timeout()` a ciegas que podría quedar corto. Y el
+  botón de cierre funciona igual sin importar la duración configurada --
+  probado con una duración de un minuto para descartar que el cierre
+  "manual" dependa en el fondo del mismo temporizador.
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -813,6 +835,19 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   demorar la respuesta a propósito un segundo, el mismo patrón que ya usa
   esta suite para separar el estado intermedio del final en vez de
   arriesgar una carrera contra el tiempo real del sitio.
+- `/toasts` es la primera página de esta suite donde "cuántos elementos hay"
+  es tan parte del comportamiento a probar como su contenido: cada click
+  agrega un `<div class="toast">` nuevo al contenedor, nunca reemplaza al
+  anterior, así que un test que solo mirara el último toast creado no
+  distinguiría "se apilaron dos" de "se reemplazó uno por otro" -- hubo que
+  contar `.toast` dentro del contenedor después de dos clicks para
+  confirmar que son dos nodos reales, no un conteo visual casual. El id de
+  cada toast (`#toast-N`) sigue el mismo acumulador `shown` que el contador
+  de texto de la página, así que ambos números tienen que coincidir
+  siempre -- el Page Object expone `toast_por_numero()` en vez de
+  `toast_ultimo()` justamente para poder pedir el primero, el segundo o
+  cualquier otro por su posición real en la secuencia, sin asumir que el
+  último es siempre el que importa.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
