@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **501 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **512 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 286 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 297 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 93 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 25 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no, y una página con dos grupos de radio buttons donde uno arranca con una opción ya marcada por el propio servidor, una opción del segundo grupo viene deshabilitada de antemano y un script sincroniza a mano el atributo HTML `checked` de todo el grupo cada vez que se tilda una opción distinta, y un login en dos pasos donde el segundo paso pide un código de un solo uso que el propio sitio expone en el HTML en vez de mandarlo por SMS, y un dropdown que no es un `<select>` sino `div`s con roles ARIA, con una opción marcada `aria-disabled` que Playwright respeta igual que a un control disabled nativo, y un menú de jQuery UI con un item marcado como deshabilitado cuyo submenú nunca se abre al pasarle el mouse, a diferencia de su gemelo habilitado, que además anida un tercer nivel con links reales a archivos para descargar, y un diálogo nativo `<dialog>` con una versión modal que deja inerte al resto de la página y otra no modal que no, y una página de A/B testing que depende de un experimento de Optimizely discontinuado hace años pero cuyo script sigue corriendo y dividiendo visitantes de verdad, y un `<select multiple>` cuyo atributo HTML `selected` no se actualiza solo: lo sincroniza a mano el propio listener de "change" de la página, un paso por detrás de la propiedad real del DOM, un gráfico SVG con barras y un círculo clickeables donde seleccionar una barra desmarca a las otras y el círculo alterna de color de forma independiente, y dos custom elements con shadow root abierto donde el `<p>` que envuelve el `<slot>` no contiene, en el árbol liviano, el texto que el navegador termina pintando ahí, y una página de autenticación HTTP Digest que muestra el mismo mensaje y usa las mismas credenciales que la de Basic Auth pero falla de dos formas distintas según falte la credencial o esté mal, y un campo de autocompletado que espera 300ms después de que el usuario deja de tipear antes de pedirle sugerencias a un servidor que además se toma su propio tiempo en responder, y cuya función de resaltado por teclado da la vuelta distinto según la dirección en la que se la recorra, y un formulario de alta de cuenta donde el navegador aplica sus propias reglas de validación antes de mandar nada y el servidor repite solo una parte de ellas, con un único usuario ya tomado que el backend rechaza sin importar mayúsculas aunque el propio formulario nunca deje probarlo con una variante real, y tres botones que apilan mensajes flotantes en la esquina superior derecha con un contador global compartido entre los tres tipos, que solo se cierran solos si la duración configurada es mayor a cero
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no, y una página con dos grupos de radio buttons donde uno arranca con una opción ya marcada por el propio servidor, una opción del segundo grupo viene deshabilitada de antemano y un script sincroniza a mano el atributo HTML `checked` de todo el grupo cada vez que se tilda una opción distinta, y un login en dos pasos donde el segundo paso pide un código de un solo uso que el propio sitio expone en el HTML en vez de mandarlo por SMS, y un dropdown que no es un `<select>` sino `div`s con roles ARIA, con una opción marcada `aria-disabled` que Playwright respeta igual que a un control disabled nativo, y un menú de jQuery UI con un item marcado como deshabilitado cuyo submenú nunca se abre al pasarle el mouse, a diferencia de su gemelo habilitado, que además anida un tercer nivel con links reales a archivos para descargar, y un diálogo nativo `<dialog>` con una versión modal que deja inerte al resto de la página y otra no modal que no, y una página de A/B testing que depende de un experimento de Optimizely discontinuado hace años pero cuyo script sigue corriendo y dividiendo visitantes de verdad, y un `<select multiple>` cuyo atributo HTML `selected` no se actualiza solo: lo sincroniza a mano el propio listener de "change" de la página, un paso por detrás de la propiedad real del DOM, un gráfico SVG con barras y un círculo clickeables donde seleccionar una barra desmarca a las otras y el círculo alterna de color de forma independiente, y dos custom elements con shadow root abierto donde el `<p>` que envuelve el `<slot>` no contiene, en el árbol liviano, el texto que el navegador termina pintando ahí, y una página de autenticación HTTP Digest que muestra el mismo mensaje y usa las mismas credenciales que la de Basic Auth pero falla de dos formas distintas según falte la credencial o esté mal, y un campo de autocompletado que espera 300ms después de que el usuario deja de tipear antes de pedirle sugerencias a un servidor que además se toma su propio tiempo en responder, y cuya función de resaltado por teclado da la vuelta distinto según la dirección en la que se la recorra, y un formulario de alta de cuenta donde el navegador aplica sus propias reglas de validación antes de mandar nada y el servidor repite solo una parte de ellas, con un único usuario ya tomado que el backend rechaza sin importar mayúsculas aunque el propio formulario nunca deje probarlo con una variante real, y tres botones que apilan mensajes flotantes en la esquina superior derecha con un contador global compartido entre los tres tipos, que solo se cierran solos si la duración configurada es mayor a cero, y una página con cinco inputs nativos de fecha y hora cuyo resumen en texto respeta siempre el orden del DOM y no el orden en que se los llenó, más un calendario propio hecho en JavaScript sobre un campo de solo lectura que arranca la semana en lunes y vuelve a marcar el día elegido cada vez que se dibuja de nuevo la grilla, incluso después de navegar a otro mes y volver
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -283,6 +283,23 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   botón de cierre funciona igual sin importar la duración configurada --
   probado con una duración de un minuto para descartar que el cierre
   "manual" dependa en el fondo del mismo temporizador.
+- Date & Time Pickers (`/date_pickers`): cinco inputs nativos (`date`, `time`,
+  `datetime-local`, `month`, `week`) que un único párrafo resume en un texto
+  del tipo `date: 2026-04-15, time: 14:30`, reconstruido desde cero en cada
+  evento `input` recorriendo el `<form>` con `querySelectorAll` -- el orden
+  del texto es siempre el orden de los inputs en el DOM, nunca el orden en
+  que se los llenó, verificado llenando `time` antes que `date` y
+  confirmando que el resultado igual dice `date` primero. El input de fecha
+  declara `min`/`max` en su HTML pero no tiene ningún botón de submit que
+  los haga cumplir, así que un valor fuera de ese rango se acepta igual. Un
+  segundo widget, un calendario armado a mano en JavaScript sobre un campo
+  de solo lectura, abre en el mes fijado por `?month=YYYY-MM` en la URL (o
+  en el mes real si el parámetro es inválido o falta), arranca la semana en
+  lunes en vez de domingo, cierra el calendario y escribe la fecha elegida
+  en el campo al clickear un día, y vuelve a marcar ese mismo día con la
+  clase `selected` cada vez que se dibuja de nuevo la grilla -- incluso
+  después de navegar a otro mes y volver, sin haber clickeado el día una
+  segunda vez.
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -848,6 +865,25 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   `toast_ultimo()` justamente para poder pedir el primero, el segundo o
   cualquier otro por su posición real en la secuencia, sin asumir que el
   último es siempre el que importa.
+- El calendario de `/date_pickers` vuelve a dibujar toda la grilla de días
+  cada vez que se abre o se cambia de mes, y en cada dibujado marca con
+  `selected` al botón cuyo `data-date` coincide con el valor actual del
+  campo -- no es un estado que se pise una sola vez al elegir el día, se
+  recalcula siempre. Eso significa que navegar a otro mes hace perder la
+  marca (ningún botón de ese mes coincide con la fecha elegida) pero
+  volver al mes original la recupera sola, sin volver a clickear nada: el
+  test lo prueba explícitamente navegando con `next-month` y `previous-month`
+  en vez de asumir que `selected` es un estado que solo cambia por click. La
+  grilla además arranca la semana en lunes, al revés del `Date.getDay()` de
+  JavaScript (que da domingo = 0) -- confirmado con un mes real cuyo primer
+  día cae domingo (enero de 2023) y contando que la primera fila tiene seis
+  celdas vacías antes del botón "1", no cero. Para no depender de la fecha
+  real del día en que corre la suite, la mayoría de los tests fijan el mes
+  con `?month=YYYY-MM` en la URL; el único que depende de "hoy" es el que
+  prueba justamente que un valor inválido de ese parámetro se ignora y cae
+  al mes real, calculado con `datetime.date.today()` en el propio test en
+  vez de hardcodear un mes que dejaría de coincidir con el real al día
+  siguiente.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
