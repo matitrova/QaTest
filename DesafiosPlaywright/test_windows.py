@@ -1,13 +1,17 @@
+import pytest
 from playwright.sync_api import Page, expect
 
 from config import BASE_URL
 from WindowsPage import WindowsPage
 
 
-def test_abrir_nueva_ventana(page: Page) -> None:
-    windows_page = WindowsPage(page)
+@pytest.fixture
+def windows_page(page: Page) -> WindowsPage:
     page.goto(f"{BASE_URL}/windows")
+    return WindowsPage(page)
 
+
+def test_abrir_nueva_ventana(windows_page: WindowsPage) -> None:
     nueva_pagina = windows_page.hacer_clic_en_abrir_ventana()
     nueva_pagina.wait_for_load_state()
 
@@ -17,10 +21,7 @@ def test_abrir_nueva_ventana(page: Page) -> None:
     nueva_pagina.close()
 
 
-def test_ventana_original_no_se_modifica(page: Page) -> None:
-    windows_page = WindowsPage(page)
-    page.goto(f"{BASE_URL}/windows")
-
+def test_ventana_original_no_se_modifica(windows_page: WindowsPage, page: Page) -> None:
     nueva_pagina = windows_page.hacer_clic_en_abrir_ventana()
     nueva_pagina.wait_for_load_state()
 
@@ -32,10 +33,7 @@ def test_ventana_original_no_se_modifica(page: Page) -> None:
     nueva_pagina.close()
 
 
-def test_cerrar_nueva_ventana_no_afecta_original(page: Page) -> None:
-    windows_page = WindowsPage(page)
-    page.goto(f"{BASE_URL}/windows")
-
+def test_cerrar_nueva_ventana_no_afecta_original(windows_page: WindowsPage, page: Page) -> None:
     nueva_pagina = windows_page.hacer_clic_en_abrir_ventana()
     nueva_pagina.wait_for_load_state()
     nueva_pagina.close()

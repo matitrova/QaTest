@@ -1837,6 +1837,20 @@ igual que el resto de la suite. Ningún locator ni ninguna aserción cambió. Se
 la suite completa (`DesafiosPlaywright`) corrida una vez más al final para confirmar que no
 quedó nada roto en los otros 232 tests de la carpeta.
 
+**Tres archivos más de `DesafiosPlaywright` con el mismo patrón viejo.**
+Seguía quedando `goto()` + Page Object repetido en cada test de `test_dropdown.py`,
+`test_hovers.py` y `test_windows.py` (3 tests cada uno, misma URL siempre). Se les
+sumó la misma fixture local que ya tienen la mayoría de los archivos de esta suite
+(`dropdown_page`, `hovers_page`, `windows_page`), que navega una sola vez y entrega
+el Page Object listo; los tests pasaron a recibirla como parámetro en vez de repetir
+las dos líneas. En `test_windows.py` dos de los tres tests también necesitaban la
+fixture `page` sin envolver (para comparar `page.context.pages` y la URL de la
+pestaña original contra la nueva ventana que abre `windows_page`), así que quedaron
+pidiendo ambas fixtures a la vez. Ningún locator ni ninguna aserción cambió. Se
+corrieron los 9 tests de los tres archivos dos veces seguidas antes de commitear:
+mismos resultados, con la suite completa de `DesafiosPlaywright` (297 tests) corrida
+una vez más al final para confirmar que no quedó nada roto en el resto de la carpeta.
+
 ## Instalación
 
 ```bash
