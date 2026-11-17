@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **512 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **524 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 297 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 309 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 93 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 25 | API |
@@ -64,7 +64,7 @@ python3 -m pytest IspbossTest -v
 
 ---
 
-## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no, y una página con dos grupos de radio buttons donde uno arranca con una opción ya marcada por el propio servidor, una opción del segundo grupo viene deshabilitada de antemano y un script sincroniza a mano el atributo HTML `checked` de todo el grupo cada vez que se tilda una opción distinta, y un login en dos pasos donde el segundo paso pide un código de un solo uso que el propio sitio expone en el HTML en vez de mandarlo por SMS, y un dropdown que no es un `<select>` sino `div`s con roles ARIA, con una opción marcada `aria-disabled` que Playwright respeta igual que a un control disabled nativo, y un menú de jQuery UI con un item marcado como deshabilitado cuyo submenú nunca se abre al pasarle el mouse, a diferencia de su gemelo habilitado, que además anida un tercer nivel con links reales a archivos para descargar, y un diálogo nativo `<dialog>` con una versión modal que deja inerte al resto de la página y otra no modal que no, y una página de A/B testing que depende de un experimento de Optimizely discontinuado hace años pero cuyo script sigue corriendo y dividiendo visitantes de verdad, y un `<select multiple>` cuyo atributo HTML `selected` no se actualiza solo: lo sincroniza a mano el propio listener de "change" de la página, un paso por detrás de la propiedad real del DOM, un gráfico SVG con barras y un círculo clickeables donde seleccionar una barra desmarca a las otras y el círculo alterna de color de forma independiente, y dos custom elements con shadow root abierto donde el `<p>` que envuelve el `<slot>` no contiene, en el árbol liviano, el texto que el navegador termina pintando ahí, y una página de autenticación HTTP Digest que muestra el mismo mensaje y usa las mismas credenciales que la de Basic Auth pero falla de dos formas distintas según falte la credencial o esté mal, y un campo de autocompletado que espera 300ms después de que el usuario deja de tipear antes de pedirle sugerencias a un servidor que además se toma su propio tiempo en responder, y cuya función de resaltado por teclado da la vuelta distinto según la dirección en la que se la recorra, y un formulario de alta de cuenta donde el navegador aplica sus propias reglas de validación antes de mandar nada y el servidor repite solo una parte de ellas, con un único usuario ya tomado que el backend rechaza sin importar mayúsculas aunque el propio formulario nunca deje probarlo con una variante real, y tres botones que apilan mensajes flotantes en la esquina superior derecha con un contador global compartido entre los tres tipos, que solo se cierran solos si la duración configurada es mayor a cero, y una página con cinco inputs nativos de fecha y hora cuyo resumen en texto respeta siempre el orden del DOM y no el orden en que se los llenó, más un calendario propio hecho en JavaScript sobre un campo de solo lectura que arranca la semana en lunes y vuelve a marcar el día elegido cada vez que se dibuja de nuevo la grilla, incluso después de navegar a otro mes y volver
+## Desafíos de Playwright — carga dinámica, upload, diálogos JS, checkboxes, dropdown, ventanas, hovers, slider, drag and drop, add/remove elements, basic auth, tablas, inputs numéricos, teclas, menú contextual, mensajes de notificación, códigos de status HTTP, elementos que aparecen y desaparecen, contenido que cambia de posición, recuperar contraseña, anuncio de entrada, imágenes rotas, intención de salida, menú flotante, scroll infinito, un link cuya URL relativa redirige a otra página, un DOM enorme anidado 50 niveles de profundidad, un formulario de login con sesión real de servidor y controles que se habilitan o eliminan de forma asíncrona, y una página con tres botones cuyo id y texto se regeneran al azar en cada carga, una tabla sin ningún atributo para ubicar filas o columnas y un canvas que, a diferencia de todo lo demás en esa página, sí tiene un id fijo, un párrafo donde el sitio introduce un típo al azar en cada carga, una página que promete contenido "estático" bajo un parámetro de URL pero sólo cumple esa promesa a medias, y una página que pide la ubicación del navegador y la muestra tal cual la entrega el contexto, y una página con dos campos que no se pueden editar por dos mecanismos HTML distintos más un tercero que alterna entre los dos estados, y una página que ofrece una lista pública de archivos para descargar que cualquier visitante puede alterar subiendo los suyos, y una página con dos framesets anidados en dos niveles donde encadenar mal el `frame_locator` no encuentra nada, y una página que tira a la basura y vuelve a armar su lista cada vez que se aprieta un botón, para demostrar cuándo una referencia a un elemento queda obsoleta y cuándo no, y una página con dos grupos de radio buttons donde uno arranca con una opción ya marcada por el propio servidor, una opción del segundo grupo viene deshabilitada de antemano y un script sincroniza a mano el atributo HTML `checked` de todo el grupo cada vez que se tilda una opción distinta, y un login en dos pasos donde el segundo paso pide un código de un solo uso que el propio sitio expone en el HTML en vez de mandarlo por SMS, y un dropdown que no es un `<select>` sino `div`s con roles ARIA, con una opción marcada `aria-disabled` que Playwright respeta igual que a un control disabled nativo, y un menú de jQuery UI con un item marcado como deshabilitado cuyo submenú nunca se abre al pasarle el mouse, a diferencia de su gemelo habilitado, que además anida un tercer nivel con links reales a archivos para descargar, y un diálogo nativo `<dialog>` con una versión modal que deja inerte al resto de la página y otra no modal que no, y una página de A/B testing que depende de un experimento de Optimizely discontinuado hace años pero cuyo script sigue corriendo y dividiendo visitantes de verdad, y un `<select multiple>` cuyo atributo HTML `selected` no se actualiza solo: lo sincroniza a mano el propio listener de "change" de la página, un paso por detrás de la propiedad real del DOM, un gráfico SVG con barras y un círculo clickeables donde seleccionar una barra desmarca a las otras y el círculo alterna de color de forma independiente, y dos custom elements con shadow root abierto donde el `<p>` que envuelve el `<slot>` no contiene, en el árbol liviano, el texto que el navegador termina pintando ahí, y una página de autenticación HTTP Digest que muestra el mismo mensaje y usa las mismas credenciales que la de Basic Auth pero falla de dos formas distintas según falte la credencial o esté mal, y un campo de autocompletado que espera 300ms después de que el usuario deja de tipear antes de pedirle sugerencias a un servidor que además se toma su propio tiempo en responder, y cuya función de resaltado por teclado da la vuelta distinto según la dirección en la que se la recorra, y un formulario de alta de cuenta donde el navegador aplica sus propias reglas de validación antes de mandar nada y el servidor repite solo una parte de ellas, con un único usuario ya tomado que el backend rechaza sin importar mayúsculas aunque el propio formulario nunca deje probarlo con una variante real, y tres botones que apilan mensajes flotantes en la esquina superior derecha con un contador global compartido entre los tres tipos, que solo se cierran solos si la duración configurada es mayor a cero, y una página con cinco inputs nativos de fecha y hora cuyo resumen en texto respeta siempre el orden del DOM y no el orden en que se los llenó, más un calendario propio hecho en JavaScript sobre un campo de solo lectura que arranca la semana en lunes y vuelve a marcar el día elegido cada vez que se dibuja de nuevo la grilla, incluso después de navegar a otro mes y volver, y una página con dos fuentes de idioma independientes entre sí: un saludo que el servidor elige mirando el header `Accept-Language` del navegador (o un parámetro de URL que lo pisa aparte) y una fecha, un número y un precio fijos que el propio navegador formatea con `Intl` según su locale y su zona horaria, sin ningún viaje al servidor
 
 Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automatización de UI.
 
@@ -884,6 +884,22 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   al mes real, calculado con `datetime.date.today()` en el propio test en
   vez de hardcodear un mes que dejaría de coincidir con el real al día
   siguiente.
+- `/locale` mezcla dos fuentes de idioma que no se enteran una de la otra:
+  el servidor elige el saludo mirando el header `Accept-Language` que manda
+  el navegador (`¡Hola!` para `es`, `Hallo!` para `de`, etc.), salvo que la
+  URL lo pise con `?lang=` -- y un código que no reconoce lo ignora en vez
+  de romper, y vuelve a decidir por el header. El navegador, aparte,
+  formatea con `Intl` una fecha, un número y un precio fijos usando su
+  propio locale y zona horaria, sin pedirle nada al servidor: un test prueba
+  justamente que forzar `?lang=ja` con el contexto en `de-DE` cambia el
+  saludo del servidor pero no toca ni el locale ni la zona horaria que
+  muestra el navegador. Simulado con `locale` y `timezone_id` en el contexto
+  de Playwright (igual que `geolocation` en Geolocation), para que el
+  resultado no dependa del idioma ni del huso horario de la máquina que
+  corre la suite -- incluyendo el detalle de que el espacio antes del
+  símbolo de moneda en `es-AR` y `de-DE` es un *non-breaking space*
+  (`\xa0`), no un espacio común, y en `fr-FR` tanto ahí como entre los
+  miles es un *narrow no-break space* (` `) todavía más angosto.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
@@ -1850,6 +1866,29 @@ pidiendo ambas fixtures a la vez. Ningún locator ni ninguna aserción cambió. 
 corrieron los 9 tests de los tres archivos dos veces seguidas antes de commitear:
 mismos resultados, con la suite completa de `DesafiosPlaywright` (297 tests) corrida
 una vez más al final para confirmar que no quedó nada roto en el resto de la carpeta.
+
+**Pisar `browser_context_args` a nivel de módulo arrastra tests que no lo piden.**
+Al escribir `test_locale.py` (`/locale`, con un saludo que depende del contexto de
+Playwright y una fecha/número/precio que dependen de otro), dos de los cuatro tests
+necesitaban variar `locale`/`timezone_id` por caso y los otros dos fijaban uno propio
+para probar el override de `?lang=`. La primera versión pisaba `browser_context_args`
+(el patrón que ya usa `test_geolocation.py`) parametrizado por los cinco locales: pero
+la fixture `autouse=True` de `conftest.py` pide `page` para TODOS los tests del
+archivo, así que los otros dos tests -- que no declaraban `caso_de_locale` en su firma
+-- quedaban arrastrados igual por la cadena `page` → `context` → `browser_context_args`
+→ `caso_de_locale`, y terminaban corriendo 5 veces cada uno con el mismo resultado. Se
+resolvió con una fixture propia (`pagina_con_locale`) que arma el contexto a mano sobre
+`browser` -- que no depende de `browser_context_args` -- y los otros dos tests pasaron
+a pedir directamente `browser` en vez de `page`, sin pisar ninguna fixture del módulo:
+de 20 tests recolectados bajaron a los 12 reales. Aparte, verificar los valores exactos
+que compara el test (separadores de miles, el orden del signo de moneda, si el espacio
+antes de `€` es un *non-breaking space* o uno común) contra el Chromium que trae de
+fábrica este sandbox hubiera sido verificar contra la versión equivocada: el navegador
+pre-instalado acá es una revisión más nueva que la que fija `requirements.txt`
+(`playwright==1.61.0`, que la integración continua instala con `playwright install`).
+Se descargó aparte, solo para esta verificación, la revisión exacta que pide el
+`requirements.txt` del repo (sin tocar el entorno ni el repo), y los doce tests se
+corrieron tres veces seguidas contra ese binario antes de commitear.
 
 ## Instalación
 
