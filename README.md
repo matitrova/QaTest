@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **524 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **545 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 309 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 330 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 93 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 25 | API |
@@ -300,6 +300,25 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   clase `selected` cada vez que se dibuja de nuevo la grilla -- incluso
   después de navegar a otro mes y volver, sin haber clickeado el día una
   segunda vez.
+- Large Form (`/large_form`): un formulario largo que mezcla campos con buen
+  `id` y `<label for>`, campos ubicables solo por `name` y un input de edad
+  sin ninguno de los dos (solo un `<span>` de texto al lado). El `<select>`
+  de país arranca en un placeholder vacío igual que el de `/dropdown`, pero
+  sin `disabled` en el HTML: nada le impide al usuario volver a elegirlo a
+  mano. El slider de experiencia sincroniza un `<span>` con su valor en cada
+  `oninput`, pero el botón `type="reset"` no dispara ese evento al revertir
+  el control a su valor original -- el slider vuelve a 5, el `<span>` queda
+  mostrando el último valor tipeado a mano, dos fuentes que deberían
+  coincidir y no coinciden después de resetear. Un envío válido (pasando la
+  validación nativa de `type="email"` y de `min`/`max` en el input de edad)
+  responde con una tabla de confirmación que repite cada valor mandado, y
+  ahí aparecen dos inconsistencias más: los dos campos de selección múltiple
+  (`languages[]`, `interests[]`) no agregan ninguna fila cuando no se elige
+  ninguna opción -- a diferencia de un campo escalar vacío como `last_name`
+  o `country`, que sí aparece en la tabla con el valor vacío --, y cuando sí
+  hay opciones elegidas, el servidor las junta siempre en el orden en que
+  aparecen en el propio `<select>`/grupo de checkboxes, nunca en el orden en
+  que el usuario las fue tildando.
 
 **Desafíos técnicos resueltos:**
 - El timeout default de `expect()` (5000ms) quedaba corto contra la demora simulada del sitio (~5s) y hacía flaky el test — ajustado explícitamente en vez de agrandarlo a ciegas, confirmado corriendo la suite varias veces seguidas.
@@ -1903,6 +1922,26 @@ pre-instalado acá es una revisión más nueva que la que fija `requirements.txt
 Se descargó aparte, solo para esta verificación, la revisión exacta que pide el
 `requirements.txt` del repo (sin tocar el entorno ni el repo), y los doce tests se
 corrieron tres veces seguidas contra ese binario antes de commitear.
+
+**El pool seguía sin agotarse: the-internet.herokuapp.com tiene más páginas
+todavía.** Después de dar por completo el pool original varias veces, releer
+el menú en vivo de la home (no la lista vieja) mostró que el sitio real sigue
+agregando casos nuevos: `/large_form`, `/subdirectories`, `/permissions`,
+`/canvas`, `/responsive`, `/spa`, `/download_secure`, `/live_updates`,
+`/websocket`, entre otros, sin ningún Page Object en esta carpeta. Se eligió
+`/large_form` por ser el más rico de los que no dependen de timing ni de
+condiciones de red (a diferencia de `/live_updates` o `/websocket`) ni de dos
+pestañas o dos browsers a la vez (a diferencia de `/chat`). Confirmado contra
+el sitio real con `curl` antes de escribir ningún test: el botón de reset no
+dispara el evento `input` del slider de experiencia (el `<span>` que lo
+refleja queda desincronizado), y la tabla de confirmación omite por completo
+la fila de un campo de selección múltiple vacío en vez de mostrarla con un
+valor vacío como hace con los campos escalares. Se corrieron los 11 tests
+nuevos tres veces seguidas, y la suite completa de `DesafiosPlaywright` (330
+tests) una vez más al final, antes de commitear -- sin ninguna regresión
+nueva: los 6 tests que ya fallaban antes de este cambio (`digest_auth`,
+`floating_menu`, `forgot_password`) siguen fallando exactamente igual, por
+cambios del lado del sitio real ajenos a esta suite, no por nada tocado hoy.
 
 ## Instalación
 
