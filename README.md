@@ -3,7 +3,7 @@
 [![Tests](https://github.com/matitrova/QaTest/actions/workflows/tests.yml/badge.svg)](https://github.com/matitrova/QaTest/actions/workflows/tests.yml)
 
 Automatización de pruebas con **Python, Pytest y Playwright**, sobre interfaces web y
-APIs REST. **545 casos de prueba** organizados con el patrón **Page Object Model**, que
+APIs REST. **558 casos de prueba** organizados con el patrón **Page Object Model**, que
 corren en integración continua con **GitHub Actions** en cada push.
 
 Incluye automatización sobre **ISPBoss**, un sistema real de gestión y facturación para
@@ -14,7 +14,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | Suite | Sobre qué | Tests | Tipo |
 |---|---|---|---|
 | [`IspbossTest`](IspbossTest) | ISPBoss, sistema real (entorno beta) | 3 | UI · E2E |
-| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 330 | UI |
+| [`DesafiosPlaywright`](DesafiosPlaywright) | the-internet.herokuapp.com | 343 | UI |
 | [`UiTestingPlaygroundTest`](UiTestingPlaygroundTest) | uitestingplayground.com | 93 | UI |
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 25 | API |
@@ -954,6 +954,19 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   pendiente, se resuelve en contra sin que nadie lo niegue explícitamente,
   y la propia tabla pasa de `"prompt"` a `"denied"` como efecto colateral
   del intento fallido.
+- `/responsive` cambia de layout con un media query de CSS, sin JavaScript
+  ni reload: alcanza con redimensionar el viewport (`page.set_viewport_size`)
+  para que el botón hamburguesa aparezca, el menú pase a estar oculto por
+  default y el grid de tarjetas baje de tres columnas a una. El nombre del
+  layout (`"desktop"`/`"mobile"`) tampoco es texto del DOM -- lo pone un
+  pseudo-elemento `::after` (`#layout-name::after { content: "desktop"; }`),
+  así que `text_content()` sobre `#layout-name` da siempre vacío; hay que
+  leerlo con `getComputedStyle(el, "::after").content`, que además devuelve
+  el valor con comillas literales (`'"desktop"'`) porque así serializa la
+  propiedad CSS `content`. El listener de click del menú hace dos cosas a
+  la vez con cualquier link -- escribe el resultado y cierra el menú -- así
+  que en mobile un click sobre un link deja el menú oculto otra vez sin que
+  nadie haya tocado el botón hamburguesa después de abrirlo.
 
 ```bash
 cd DesafiosPlaywright && python3 -m pytest -v
@@ -1963,6 +1976,29 @@ tests) una vez más al final, antes de commitear -- sin ninguna regresión
 nueva: los 6 tests que ya fallaban antes de este cambio (`digest_auth`,
 `floating_menu`, `forgot_password`) siguen fallando exactamente igual, por
 cambios del lado del sitio real ajenos a esta suite, no por nada tocado hoy.
+
+**`/responsive`: el nombre del layout no es un nodo de texto, es un
+pseudo-elemento CSS.** Del resto de páginas sin Page Object que quedaban
+del pool (`/subdirectories`, `/canvas`, `/spa`, `/download_secure`), se
+eligió `/responsive` por ser la única que depende de una acción de
+automatización real (redimensionar el viewport) en vez de solo layout
+estático o un login que esta suite no tiene por qué resolver. Confirmado
+contra el sitio real antes de escribir ningún test: `#layout-name` nunca
+tiene texto propio, el "desktop"/"mobile" que se lee en pantalla lo pone
+un `::after` controlado por `@media (max-width: 640px)`, así que hubo que
+leerlo con `getComputedStyle(el, "::after").content` en vez de
+`text_content()` -- ese valor además viene con comillas literales
+(`'"desktop"'`) porque así serializa la propiedad CSS `content`, y el test
+las descarta explícitamente en vez de compararlas por accidente. También
+se confirmó que el handler de click de cada link del menú hace dos cosas a
+la vez (escribe el resultado Y cierra el menú), así que en mobile un test
+que abre el menú y clickea un link tiene que esperar que quede cerrado de
+nuevo sin haber tocado el botón hamburguesa una segunda vez. Se corrieron
+los 7 tests nuevos tres veces seguidas, y la suite completa de
+`DesafiosPlaywright` (343 tests) una vez más al final, antes de
+commitear: 4 tests ya rotos de antes (`forgot_password`, que ahora
+responde 200 en vez del 500 que esta suite esperaba, y
+`floating_menu`), sin ninguna regresión nueva.
 
 ## Instalación
 
