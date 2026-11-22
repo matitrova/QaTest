@@ -19,7 +19,7 @@ proveedores de internet en el que trabajé cuatro años como responsable de cali
 | [`TestX`](TestX) | SauceDemo (e-commerce) | 29 | UI |
 | [`ReqResTest`](ReqResTest) | API de ReqRes | 25 | API |
 | [`RestfulBookerTest`](RestfulBookerTest) | API de Restful Booker, con autenticación | 29 | API |
-| [`ApiTest`](ApiTest) | API de JSONPlaceholder | 9 | API |
+| [`ApiTest`](ApiTest) | API de JSONPlaceholder | 15 | API |
 | [`postman/`](postman) | API de Restful Booker, en Postman + Newman | 22 | API |
 | [`practica/`](practica) | Ejercicios de Python y repaso de Playwright | 10 | Práctica |
 
@@ -1789,6 +1789,13 @@ fixture y se envía en la cookie de las operaciones que lo requieren.
   test, no copiados de memoria) y tres ids inexistentes (`9999`, `0`, `-1`),
   cada grupo corriendo como un solo `test_...[caso]` por `pytest.mark.parametrize`
   en vez de una función por caso
+- Contrato de schema de JSONPlaceholder (`jsonschema`): valida que `GET /users/<id>`
+  y `GET /posts/<id>` cumplan la forma exacta del JSON que prometen (incluyendo los
+  objetos anidados `address.geo` y `company`), que un usuario inexistente devuelva
+  un cuerpo vacío (`{}`) en vez de una estructura de error, y que el `POST /posts`
+  de creación devuelva siempre el mismo `id` fijo sin importar el contenido
+  enviado, más dos tests que confirman que el esquema rechaza un documento
+  inválido, mismo patrón que ya usan ReqRes y Restful Booker
 
 **Desafíos técnicos resueltos:**
 - El `id` de un usuario es un entero en el `GET` (`"id": 2`) pero un **string** en la
@@ -1894,6 +1901,20 @@ fixture y se envía en la cookie de las operaciones que lo requieren.
   `reservas_creadas.append(booking_id)` que faltaba, mismo patrón que ya
   usan `test_bookings.py` y `test_contrato_schema.py`. Verificado corriendo
   la suite completa (29 tests) dos veces seguidas antes de commitear.
+- `ApiTest` era la única de las tres suites de API sin contrato de schema,
+  a diferencia de `ReqResTest` y `RestfulBookerTest`, que ya validaban la
+  forma de sus respuestas con `jsonschema`. Se agregó
+  `ApiTest/test_contrato_schema.py` con esquemas para el usuario individual
+  (incluyendo los objetos anidados `address.geo` y `company`, que ningún
+  otro esquema del repo tenía) y para el post individual. De paso se
+  encontraron dos comportamientos reales que ningún test anterior cubría:
+  un usuario inexistente (`GET /users/9999`) devuelve 404 con el cuerpo
+  literal `{}`, distinto tanto del 200 con `data: []` de ReqRes como del
+  404 con cuerpo propio de Restful Booker; y el `POST /posts` de creación
+  no persiste nada, siempre devuelve `"id": 101` sin importar el contenido
+  enviado — confirmado con dos `POST` de payloads distintos que vuelven con
+  el mismo id. Verificado corriendo la suite completa (15 tests) tres veces
+  seguidas antes de commitear.
 
 ```bash
 cd ReqResTest && python3 -m pytest -v
