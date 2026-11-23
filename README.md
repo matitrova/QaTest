@@ -2207,6 +2207,32 @@ responde 200 en vez del 500 que esta suite esperaba, y
   barra opcional del regex es código muerto que cubre una URL que el propio
   sitio jamás sirve.
 
+**El `base_page.py` que el refactor anterior dejó en tres carpetas seguía
+siendo exactamente el mismo archivo, copiado y pegado tres veces.**
+`DesafiosPlaywright/base_page.py`, `UiTestingPlaygroundTest/base_page.py` y
+`TestX/base_page.py` quedaron, después de ese refactor, carácter por
+carácter idénticos entre sí (`class BasePage: def __init__(self, page:
+Page) -> None: self.page = page`). Tocar esa clase -- agregarle un método
+común, por ejemplo -- significaba editar tres archivos a mano y que no se
+desincronizaran. No se podía simplemente borrar dos copias e importar la
+tercera entre carpetas: la integración continua corre cada suite desde su
+propia carpeta a propósito, precisamente para que módulos con el mismo
+nombre (`config.py`, y ahora `base_page.py`) no choquen entre suites (ver
+"Cada suite corre desde su propia carpeta" más arriba) -- un
+`from UiTestingPlaygroundTest.base_page import BasePage` dentro de
+`DesafiosPlaywright` rompería ese aislamiento. Se sumó `shared/base_page.py`
+con la única implementación real, y los tres `base_page.py` de cada suite
+pasaron a ser un *shim* de diez líneas que la carga con
+`importlib.util.spec_from_file_location` por ruta absoluta
+(`Path(__file__).resolve().parent.parent / "shared" / "base_page.py"`) en
+vez de un `import` común -- así no depende de `sys.path` ni de si pytest
+corre desde la raíz o desde la carpeta de la suite, y no reintroduce el
+problema de nombres duplicados que la separación por carpetas evita. Los 49
+Page Objects que heredan de `BasePage` no cambiaron ni una línea. Se
+verificó con `--collect-only` en las tres suites (383, 93 y 29 tests
+recolectados sin error de import) y corriendo una muestra real de cada una
+dos veces seguidas antes de commitear: mismos resultados.
+
 ## Instalación
 
 ```bash
