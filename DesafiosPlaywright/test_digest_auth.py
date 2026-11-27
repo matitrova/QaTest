@@ -1,6 +1,6 @@
 import pytest
 import requests
-from playwright.sync_api import Error, Page, expect
+from playwright.sync_api import Page, expect
 from requests.auth import HTTPDigestAuth
 
 from config import BASE_URL
@@ -26,37 +26,41 @@ def test_credenciales_correctas_muestran_felicitacion(page: Page) -> None:
     expect(digest_auth_page.mensaje_exito).to_contain_text("Congratulations")
 
 
-def test_sin_credenciales_la_navegacion_falla_en_vez_de_colgarse(page: Page) -> None:
-    # A diferencia de Basic Auth -- donde ir sin credenciales deja pendiente
-    # un diálogo nativo que nunca se resuelve y hay que probarlo con requests
-    # en su lugar --, Digest Auth sin credenciales en el contexto hace que
-    # Chromium aborte la navegación de inmediato con un error de red, porque
-    # no tiene con qué responder al challenge del servidor.
+def test_sin_credenciales_la_navegacion_no_cuelga_y_devuelve_401(page: Page) -> None:
+    # Esta suite venía documentando que ir sin credenciales en el contexto
+    # hacía que Chromium abortara la navegación con un error de red
+    # (ERR_INVALID_AUTH_CREDENTIALS), porque no tenía con qué responder al
+    # challenge del servidor -- pero eso dejó de pasar: confirmado a mano con
+    # un contexto nuevo sin http_credentials, page.goto() ya no tira ningún
+    # error, devuelve el 401 del servidor como una respuesta HTTP normal. A
+    # diferencia de Basic Auth (que sí deja pendiente un diálogo nativo que
+    # nunca se resuelve), Digest Auth sin credenciales termina comportándose
+    # igual que pegarle directo con `requests` (ver test de abajo).
     context = page.context.browser.new_context()
     pagina_sin_auth = context.new_page()
 
-    with pytest.raises(Error, match="ERR_INVALID_AUTH_CREDENTIALS"):
-        pagina_sin_auth.goto(f"{BASE_URL}/digest_auth")
+    response = pagina_sin_auth.goto(f"{BASE_URL}/digest_auth")
 
+    assert response.status == 401
     context.close()
 
 
-def test_credenciales_incorrectas_fallan_con_un_error_de_red_distinto(
-    page: Page,
-) -> None:
-    # Con credenciales (aunque sean incorrectas) Chromium sí completa el
-    # intercambio Digest y manda la respuesta al challenge -- el servidor la
-    # rechaza con 401, y eso se ve en Playwright como un error de red
-    # diferente al del caso sin credenciales: no es que falte con qué
-    # responder, es que la respuesta que se mandó no vale.
+def test_credenciales_incorrectas_tambien_devuelven_401(page: Page) -> None:
+    # Mismo cambio de comportamiento que en el test anterior: esta suite
+    # venía documentando que credenciales incorrectas completaban el
+    # intercambio Digest y fallaban con un error de red distinto
+    # (ERR_HTTP_RESPONSE_CODE_FAILURE) al rechazo del servidor -- confirmado
+    # a mano, eso tampoco pasa más. Chromium ya no distingue "sin
+    # credenciales" de "credenciales incorrectas": en los dos casos deja
+    # pasar el 401 del servidor tal cual, sin tirar ningún error de red.
     context = page.context.browser.new_context(
         http_credentials={"username": "admin", "password": "incorrecta"}
     )
     pagina_con_auth_mala = context.new_page()
 
-    with pytest.raises(Error, match="ERR_HTTP_RESPONSE_CODE_FAILURE"):
-        pagina_con_auth_mala.goto(f"{BASE_URL}/digest_auth")
+    response = pagina_con_auth_mala.goto(f"{BASE_URL}/digest_auth")
 
+    assert response.status == 401
     context.close()
 
 

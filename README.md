@@ -879,14 +879,14 @@ Suite sobre the-internet.herokuapp.com enfocada en problemas clásicos de automa
   en vez de `Basic`), y eso cambia cómo falla cada camino negativo. Ir sin
   credenciales a `/basic_auth` deja a Chromium con un diálogo nativo
   pendiente que nunca se resuelve -- hay que probar ese caso con `requests`
-  para no colgar el test. Contra `/digest_auth`, en cambio, Chromium sabe de
-  entrada que no tiene con qué responder al desafío Digest y aborta la
-  navegación al toque con `net::ERR_INVALID_AUTH_CREDENTIALS`, sin
-  colgarse; pasarle credenciales incorrectas sí alcanza a completar el
-  intercambio y lo rechaza con un error de red distinto,
-  `net::ERR_HTTP_RESPONSE_CODE_FAILURE` -- dos fallas que suenan parecidas
-  pero no son la misma, y el test las distingue por mensaje en vez de
-  conformarse con "tiró una excepción". Del lado de `requests` aparece un
+  para no colgar el test. Contra `/digest_auth`, en cambio, Chromium ni
+  cuelga ni aborta la navegación con un error de red: tanto sin credenciales
+  como con una incorrecta, deja pasar el 401 del servidor como una respuesta
+  HTTP normal (ver "Mejoras sobre lo existente" más abajo -- esta suite
+  documentó antes que esos dos casos tiraban `net::ERR_INVALID_AUTH_CREDENTIALS`
+  y `net::ERR_HTTP_RESPONSE_CODE_FAILURE` respectivamente, comportamiento que
+  dejó de reproducirse en una versión más nueva de Chromium). Del lado de
+  `requests` aparece un
   tercer matiz: pasar `auth=("admin", "admin")` (un tuple simple) arma un
   header `Authorization: Basic` -- el esquema que el servidor no pidió --, y
   la respuesta es un 400, no un 401; hay que usar
@@ -2449,6 +2449,42 @@ no un arreglo de toda la suite), pero quedan anotados acá para no perderles el 
 candidatos a revisar son cambios reales del sitio (como ya pasó con `forgot_password`,
 que ahora responde 200 en vez de 500) y permisos de navegador/diálogos nativos que se
 comportan distinto según el sandbox donde corre Chromium.
+
+## Mejoras sobre lo existente
+
+Con las cuatro fuentes agotadas, en vez de un caso nuevo cada entrada puede ser una
+mejora sobre lo que ya está: un refactor, un fixture propio, un test parametrizado, o
+-- como esta vez -- la investigación de uno de los fallos que quedaron anotados en la
+lista de arriba para no perderles el rastro.
+
+**`digest_auth`: dos de los dos fallos de esta suite eran tests desactualizados, no un
+problema del sandbox.** La entrada de `/slow_api` dejó anotados 9 fallos sin investigar,
+dos de ellos en `test_digest_auth.py`: `test_sin_credenciales_la_navegacion_falla_en_vez_de_colgarse`
+y `test_credenciales_incorrectas_fallan_con_un_error_de_red_distinto` esperaban que
+Chromium abortara la navegación con `net::ERR_INVALID_AUTH_CREDENTIALS` (sin
+credenciales) o `net::ERR_HTTP_RESPONSE_CODE_FAILURE` (credenciales incorrectas).
+Reproducido a mano con Playwright puro (sin pytest, contexto nuevo, sin ningún login
+previo en el mismo proceso del navegador, para descartar que fuera un auth cacheado
+de otro test): en los dos casos `page.goto()` ya no tira ningún error, devuelve
+directo el 401 del servidor como una respuesta HTTP normal -- el mismo resultado que
+ya daba `requests.get()` sin autenticar. No es un comportamiento específico de este
+sandbox: no depende de qué test corrió antes, es el comportamiento actual de la
+versión de Chromium que instala Playwright 1.61, y al no haber ningún plugin de orden
+aleatorio en la suite, correría igual en la integración continua. Se renombraron los
+dos tests (`test_sin_credenciales_la_navegacion_no_cuelga_y_devuelve_401`,
+`test_credenciales_incorrectas_tambien_devuelven_401`) para afirmar lo que
+efectivamente pasa -- un `response.status == 401`, igual que del lado de
+`requests` -- en vez de esperar una excepción que ya no ocurre, y se sacó del
+import el símbolo `Error` que quedó sin uso. La suite completa de `test_digest_auth.py`
+(8 tests) se corrió tres veces seguidas sin un solo fallo. También se corrió la suite
+completa de `DesafiosPlaywright` (445 tests) antes y después del cambio: antes, 9
+fallos (los de la lista de `/slow_api`); después, los mismos 7 que no tocó este commit
+más uno nuevo y aislado (`entry_ad`, que al correrlo solo tres veces seguidas pasó las
+tres, así que es flakiness real del sitio bajo carga, no una regresión de este cambio) --
+es decir, los dos de `digest_auth` quedaron resueltos y nada más se rompió. Quedan sin
+investigar los otros 7 (`browser_permissions` x2, `chat`, `floating_menu`,
+`forgot_password` x3): los mismos candidatos ya anotados, para la próxima entrada de
+este tipo.
 
 ## Instalación
 
